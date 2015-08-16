@@ -1,0 +1,40 @@
+# To disable database DAO, set driver: none. All output will then be to file, exclusively.
+# Under monitor section, any section without a buffer size and count will use the defaults.
+# Don't mess with these lightly. 
+
+configuration_file_version: 1
+
+# Turns on console output for certain backend tasks (such as asynch commits) and statistics
+debug: true
+
+default_buffer_size: 100
+default_buffer_count: 3
+
+dao:
+  database:
+    driver: mysql
+    host:
+    port: 2306
+    username:
+    password:
+    database: devotion
+    schema:
+  file:
+    base: Devotion/
+    max_file_size: 262144000
+    max_io_rate: 1048576
+    io_chunk_size: 4096
+
+monitor:
+  movement:
+    active: true
+    scan_time: 2
+    wait_time: 2
+    buffer_size: 10000
+    buffer_count: 4
+  inventory:
+    active: true
+
+
+# Add player Account IDs (UUID) here to exempt them from monitoring
+immune_accounts: []

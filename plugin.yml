@@ -1,0 +1,32 @@
+name: ${project.name}
+main: com.programmerdan.minecraft.devotion.Devotion
+author: ProgrammerDan
+authors: []
+version: ${project.version}
+commands:
+   devotion:
+      description: Devotion: Deep insight into player activity without lagging your server
+      usage: To view help, use /devotion help
+   devotion stats:
+      description: Outputs throughput and capture statistics. Exclusively reads from internally maintained fields.
+      usage: /devotion stats [monitor]
+      aliases: dev-s
+      permission: Devotion.passive
+   devotion control:
+      description: Turn on or off various monitors, or display active status of a specific monitor
+      usage: /devotion control <monitor> [on|off]
+      aliases: dev-c
+      permissions: Devotion.active
+permissions:
+    Devotion.*:
+      description: Gives access to all Devotion commands
+      default: op
+      children:
+        Devotion.passive: true
+        Devotion.active: true
+    Devotion.passive:
+      description: Allows you to use any command that reads data without altering configs or performing actions 
+      default: op
+    Devotion.active:
+      description: Allows you to use any command that sets data, alters configs, or performs actions
+      default: op
