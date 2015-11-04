@@ -1,6 +1,7 @@
 package com.programmerdan.minecraft.devotion;
 
 import com.programmerdan.minecraft.devotion.commands.CommandHandler;
+import com.programmerdan.minecraft.devotion.events.*;
 
 import java.util.logging.Logger;
 
@@ -49,11 +50,10 @@ public class Devotion extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		// setting a couple of static fields so that they are available
-		// elsewhere
+		// setting a couple of static fields so that they are available elsewhere
 		logger = getLogger();
 		plugin = this;
 		commandHandler = new CommandHandler(this);
-		getServer().getPluginManager().registerEvents(new ChunkEvents(), this);
+		getServer().getPluginManager().registerEvents(new MovementEvents(), this);
 	}
 }
