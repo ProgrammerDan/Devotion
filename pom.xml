@@ -35,15 +35,22 @@
         </includes>
         <filtering>true</filtering>
       </resource>
+      <resource>
+        <directory>${basedir}/src/resources</directory>
+        <includes>
+          <include>*.yml</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
     </resources>
   </build>
 
-<repositories>
-<repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-</repository>
-</repositories>
+  <repositories>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
 
 
 

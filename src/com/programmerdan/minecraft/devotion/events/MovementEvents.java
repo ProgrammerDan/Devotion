@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 class MovementEvents implements Listener {
 	
-	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=false)
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void monitorPlayerLogin(PlayerLoginEvent event) {
 	}
 
@@ -28,7 +28,7 @@ class MovementEvents implements Listener {
 	public void monitorPlayerJoin(PlayerJoinEvent event) {
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=false)
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void monitorPlayerQuit(PlayerQuitEvent event) {
 	}
 
@@ -40,7 +40,7 @@ class MovementEvents implements Listener {
 	public void monitorPlayerTeleport(PlayerTeleportEvent event) {
 	}
 
-	@EventHandler(priority=EventPriority.HIGHEST, ignoreCancelled=false)
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void monitorPlayerChangeWorld(PlayerChangedWorldEvent event) {
 	}
 

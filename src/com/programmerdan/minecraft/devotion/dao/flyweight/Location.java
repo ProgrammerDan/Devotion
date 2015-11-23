@@ -12,7 +12,7 @@ import java.util.logging.Level;
  * @author ProgrammerDan <programmerdan@gmail.com>
  * @since 1.0
  */
-public final class Location implements Flyweight {
+public final class Location extends Flyweight {
 	private static final byte ID = 0x01;
 	private static final byte VERSION = 0x00;
 
@@ -20,8 +20,8 @@ public final class Location implements Flyweight {
 	public double x = 0.0;
 	public double y = 0.0;
 	public double z = 0.0;
-	double float yaw = 0.0f;
-	double float pitch = 0.0f;
+	public float yaw = 0.0f;
+	public float pitch = 0.0f;
 
 	public Location(String worldUUID, double x, double y, double z, float yaw, float pitch) {
 		this.worldUUID = worldUUID;
@@ -32,29 +32,34 @@ public final class Location implements Flyweight {
 		this.pitch = pitch;
 	}
 
-
-	public void serialize(OutputStream os) {
+	@Override
+	public void marshall(DataOutputStream os) {
 		try {
 			// TODO: replace buffer with configured size.
-			DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(os, 1024));
-			os.write(ID);
-			os.write(VERSION);
+
+			os.writeUTF(this.worldUUID);
+			os.writeDouble(this.x);
+			os.writeDouble(this.y);
+			os.writeDouble(this.z);
+			os.writeFloat(this.yaw);
+			os.writeFloat(this.pitch);
 		} catch (IOException ioe) {
 			Devotion.logger().log(Level.SEVERE, "Failed to Serialize a Location", ioe);
 		}
 	}
 
-	public static Flyweight deserialize(InputStream os) {
+	protected static Location unmarshall(DataInputStream is, byte id, byte version) {
 		try {
-			os.mark(2);
-			byte id = os.read();
-			byte version = os.read();
-
 			if (id == ID && version == VERSION) {
-				
-				return this;
+				String worldUUID = is.readUTF();
+				double x = is.readDouble();
+				double y = is.readDouble();
+				double z = is.readDouble();
+				float yaw = is.readDouble();
+				float pitch = is.readDouble();
+
+				return new Location(worldUUID, x, y, z, yaw, pitch);
 			} else {
-				os.reset();
 				return null;
 			}
 		} catch (IOException ioe) {

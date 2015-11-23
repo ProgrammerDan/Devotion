@@ -30,3 +30,8 @@ permissions:
     Devotion.active:
       description: Allows you to use any command that sets data, alters configs, or performs actions
       default: op
+      children:
+        Devotion.invisible: true
+    Devotion.invisible:
+      description: Permission based immunity from tracking, less permanent then adding to immunity list
+      default: op
