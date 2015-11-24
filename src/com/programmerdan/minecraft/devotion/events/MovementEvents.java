@@ -1,6 +1,7 @@
-package com.programmerdan.minecraft.devotion;
+package com.programmerdan.minecraft.devotion.events;
 
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -18,7 +19,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
-class MovementEvents implements Listener {
+public class MovementEvents implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void monitorPlayerLogin(PlayerLoginEvent event) {

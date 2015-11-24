@@ -14,10 +14,10 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @since 1.0.0
  */
 public class Devotion extends JavaPlugin {
-	private static final CommandHandler commandHandler;
-	private static final Logger logger;
-	private static final JavaPlugin plugin;
-	private static boolean enabled = true;
+	private static CommandHandler commandHandler;
+	private static Logger logger;
+	private static JavaPlugin plugin;
+	private static boolean active = true;
 	private static boolean debug = false;
 
 	public static CommandHandler commandHandler() {
@@ -32,16 +32,16 @@ public class Devotion extends JavaPlugin {
 		return Devotion.plugin;
 	}
 
-	public static boolean isEnabled() {
-		return Devotion.enabled;
+	public static boolean isActive() {
+		return Devotion.active;
 	}
 
 	public static boolean isDebug() {
 		return Devotion.debug;
 	}
 
-	public static void setEnabled(boolean status) {
-		Devotion.enabled = status;
+	public static void setActive(boolean status) {
+		Devotion.active = status;
 	}
 
 	public static void setDebug(boolean debug) {
