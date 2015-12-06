@@ -22,7 +22,7 @@ public final class fLocation extends Flyweight {
 	private static final byte ID = 0x01;
 	private static final byte VERSION = 0x00;
 
-	public String worldUUID = null;
+	public String worldUUID = "";
 	public double x = 0.0;
 	public double y = 0.0;
 	public double z = 0.0;
