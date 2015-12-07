@@ -16,6 +16,7 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 
 	private Class<K> clazz = null;
 	private File storageFile = null;
+	private boolean fileInit = false;
 	private DataOutputStream dos = null;
 	private DataInputStream dis = null;
 	
@@ -41,9 +42,11 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 				} else {
 					Devotion.logger().log(Level.FINE, "FILEDAO] File {0} already exists for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 				}
+				fileInit = true;
 			} catch (IOException ioe) {
 				Devotion.logger().log(Level.SEVERE, "FILEDAO] Failed to manage file {0} exist check/create for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 				Devotion.logger().log(Level.SEVERE, "FILEDAO] Failure Details: ", ioe);
+				fileInit = false;
 				return false;
 			}
 		} else {
@@ -52,29 +55,44 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 		}
 		
 		try {
-			this.dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(storageFile)));
-			Devotion.logger().log(Level.FINE, "FILEDAO] Data Output Stream initialized for {0}", clazz.getName());
+			if (this.dos == null) {
+				this.dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(storageFile)));
+				Devotion.logger().log(Level.FINE, "FILEDAO] Data Output Stream initialized for {0}", clazz.getName());
+			}
 		} catch (IOException ioe) {
 			Devotion.logger().log(Level.SEVERE, "FILEDAO] Failed to open output stream for file {0} for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 			Devotion.logger().log(Level.SEVERE, "FILEDAO] Failure Details: ", ioe);
+			this.dos = null;
 			return false;
 		}
 
 		try {
-			this.dis = new DataInputStream(new BufferedInputStream(new FileInputStream(storageFile)));
-			Devotion.logger().log(Level.FINE, "FILEDAO] Data Input Stream initialized for {0}", clazz.getName());
+			if (this.dis == null) {
+				this.dis = new DataInputStream(new BufferedInputStream(new FileInputStream(storageFile)));
+				Devotion.logger().log(Level.FINE, "FILEDAO] Data Input Stream initialized for {0}", clazz.getName());
+			}
 		} catch (IOException ioe) {
 			Devotion.logger().log(Level.SEVERE, "FILEDAO] Failed to open input stream for file {0} for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 			Devotion.logger().log(Level.SEVERE, "FILEDAO] Failure Details: ", ioe);
+			this.dis = null;
 			return false;
 		}
 		
 		return true;
 	}
 	
+	/**
+	 * Find and return the last entry by this DAO.
+	 * 
+	 * @return
+	 */
 	@Override
 	public K findLast() {
-		// TODO Auto-generated method stub
+		if (!fileInit) {
+			if (!init()) {
+				throw new DAOException("Unable to find last, underlying file unavailable");
+			}
+		}
 		return null;
 	}
 
