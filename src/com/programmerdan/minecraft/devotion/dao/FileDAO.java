@@ -12,6 +12,11 @@ import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 
+/**
+ * A blocking DAO that writes flyweights to disk directly with no caching or asynchronous behavior.
+ *
+ * @author ProgrammerDan <programmerdan@gmail.com>
+ */
 public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 
 	private Class<K> clazz = null;
@@ -24,6 +29,11 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 	public FileDAO(Class<K> clazz, File storageFile) {
 		this.clazz = clazz;
 		this.storageFile = storageFile;
+		if (init()) {
+			Devotion.logger().log(Level.DEBUG, "FILEDAO] Init Completed successfully");
+		} else {
+			Devotion.logger().log(Level.DEBUG, "FILEDAO] Init Failed");
+		}
 	}
 	
 	public boolean isDAOFor(Class<?> clazz) {
@@ -81,23 +91,8 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 		return true;
 	}
 	
-	/**
-	 * Find and return the last entry by this DAO.
-	 * 
-	 * @return
-	 */
 	@Override
-	public K findLast() {
-		if (!fileInit) {
-			if (!init()) {
-				throw new DAOException("Unable to find last, underlying file unavailable");
-			}
-		}
-		return null;
-	}
-
-	@Override
-	public K findAndRemoveLast() {
+	public List<K> findAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -107,11 +102,4 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void removeLast() {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
