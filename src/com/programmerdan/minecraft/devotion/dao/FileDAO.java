@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -21,7 +23,6 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 
 	private Class<K> clazz = null;
 	private File storageFile = null;
-	private boolean fileInit = false;
 	private DataOutputStream dos = null;
 	private DataInputStream dis = null;
 	
@@ -29,11 +30,6 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 	public FileDAO(Class<K> clazz, File storageFile) {
 		this.clazz = clazz;
 		this.storageFile = storageFile;
-		if (init()) {
-			Devotion.logger().log(Level.DEBUG, "FILEDAO] Init Completed successfully");
-		} else {
-			Devotion.logger().log(Level.DEBUG, "FILEDAO] Init Failed");
-		}
 	}
 	
 	public boolean isDAOFor(Class<?> clazz) {
@@ -52,11 +48,9 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 				} else {
 					Devotion.logger().log(Level.FINE, "FILEDAO] File {0} already exists for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 				}
-				fileInit = true;
 			} catch (IOException ioe) {
 				Devotion.logger().log(Level.SEVERE, "FILEDAO] Failed to manage file {0} exist check/create for {1}", new Object[] {storageFile.getPath(), clazz.getName()});
 				Devotion.logger().log(Level.SEVERE, "FILEDAO] Failure Details: ", ioe);
-				fileInit = false;
 				return false;
 			}
 		} else {
@@ -93,13 +87,28 @@ public class FileDAO<K extends Flyweight> implements GenericDAO<K> {
 	
 	@Override
 	public List<K> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		if (init()) {
+			Vector<K> all = new Vector<K>();
+			try {
+				while (this.dis.available() > 0) {
+					K next = Flyweight.deserialize(dis, clazz); // cool, eh?
+					all.add(next);
+				} 
+			} catch (IOException e) {
+				throw new DAOException("File " + storageFile + " unavailable for read.", e);
+			}
+			return all;
+		} else {
+			throw new DAOException("File " + storageFile + " unavailable for read.");
+		}
 	}
 
 	@Override
 	public void insert(K val) {
-		// TODO Auto-generated method stub
-		
+		if (init()) {
+			val.serialize(dos);
+		} else {
+			Devotion.logger().log(Level.INFO, "FILEDAO] Init Failed");
+		}
 	}
 }
