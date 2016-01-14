@@ -6,7 +6,7 @@
   <groupId>com.programmerdan.minecraft</groupId>
   <artifactId>devotion</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0-${build.version}</version>
+  <version>1.0.0</version>
   <name>Devotion</name>
   <url>https://github.com/Devoted/Devotion</url>
   

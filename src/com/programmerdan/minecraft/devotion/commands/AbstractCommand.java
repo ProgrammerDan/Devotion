@@ -2,7 +2,7 @@ package com.programmerdan.minecraft.devotion.commands;
 
 import java.util.List;
 
-import com.programmerdan.minecraft.devotion.Devotion
+import com.programmerdan.minecraft.devotion.Devotion;
 
 import org.bukkit.command.CommandSender;
 
