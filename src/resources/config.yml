@@ -34,7 +34,3 @@ monitor:
     buffer_count: 4
   inventory:
     active: true
-
-
-# Add player Account IDs (UUID) here to exempt them from monitoring
-immune_accounts: []

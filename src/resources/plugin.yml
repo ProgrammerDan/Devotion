@@ -17,6 +17,11 @@ commands:
       usage: /devotion control <monitor> [on|off]
       aliases: dev-c
       permissions: Devotion.active
+   devotion invisible:
+      description: Toggle invisible permission
+      usage: /devotion invisible <player name or UUID>
+      aliases: dev-i
+      permissions: [Devotion.active, Devotion.invisible]
 permissions:
     Devotion.*:
       description: Gives access to all Devotion commands
@@ -33,5 +38,5 @@ permissions:
       children:
         Devotion.invisible: true
     Devotion.invisible:
-      description: Permission based immunity from tracking, less permanent then adding to immunity list
+      description: Permission based immunity from tracking
       default: op
