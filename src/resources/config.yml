@@ -27,10 +27,8 @@ dao:
 
 monitor:
   movement:
-    active: true
-    scan_time: 2
-    wait_time: 2
-    buffer_size: 10000
-    buffer_count: 4
+    sampling: onevent
+    sampling_period: 1000
+#   sampling_size: 5  (for continuous/roundrobin)
   inventory:
     active: true

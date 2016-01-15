@@ -52,7 +52,7 @@ public class Devotion extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		// setting a couple of static fields so that they are available elsewhere
-		plugin = this;
+		instance = this;
 		commandHandler = new CommandHandler(this);
 		activeMonitors = new ArrayList<Monitor>();
 
@@ -61,7 +61,7 @@ public class Devotion extends JavaPlugin {
 				m.onEnable();
 			}
 		} else {
-			getLogger().error("Unable to configure Devotion, no monitors active. Fix configuration and reload.");
+			getLogger().severe("Unable to configure Devotion, no monitors active. Fix configuration and reload.");
 		}
 		
 		//getServer().getPluginManager().registerEvents(new MovementEvents(), this);
@@ -73,6 +73,7 @@ public class Devotion extends JavaPlugin {
 		for (Monitor m : activeMonitors) {
 			m.onDisable();
 		}
+		activeMonitors.clear();
 		// close database
 		// close files
 		plugin = null;

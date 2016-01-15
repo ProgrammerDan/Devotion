@@ -83,10 +83,10 @@ public abstract class Monitor {
 	 * Implementations must implement this with appropriate steps including configuration,
 	 *   listener registration, task execution, DAO registration, and anything else necessary.
 	 */
-	public abstract onEnable();
+	public abstract void onEnable();
 	/**
 	 * Implementations must implement this with appropriate steps including unregistering
 	 *   any listeners, halting any tasks, DAO unregistration, etc.
 	 */
-	public abstract onDisable();
+	public abstract void onDisable();
 }
