@@ -12,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
+import com.programmerdan.minecraft.devotion.monitors.PlayerMovementMonitor;
 import com.programmerdan.minecraft.devotion.monitors.SamplingMethod;
 
 public class ConfigurationReader {
@@ -30,21 +31,36 @@ public class ConfigurationReader {
 			localDebug = true;
 		}
 		
+		// Discover and configure Monitors
 		ConfigurationSection monitors = conf.getConfigurationSection("monitors");
-		for (String monitor : monitors.getKeys(false)) {
-			if (monitor.equalsIgnoreCase("movement")) {
-				PlayerMovementMonitorConfig pmmc = new PlayerMovementMonitorConfig();
-				pmmc.technique = SamplingMethod.valueOf(monitors.getString("sampling", "onevent"));
-				pmmc.timeoutBetweenSampling = monitors.getLong("sampling_period", 1000l);
-			}
-			
+
+		ConfigurationSection monitor = monitors.getConfigurationSection("movement");
+		if (monitor != null) {
+			PlayerMovementMonitorConfig pmmc = new PlayerMovementMonitorConfig();
+			pmmc.technique = SamplingMethod.valueOf(monitors.getString("sampling", "onevent"));
+			pmmc.timeoutBetweenSampling = monitors.getLong("sampling_period", 1000l);
+			pmmc.sampleSize = monitors.getInt("sampling_size", 50);
+			PlayerMovementMonitor pmm = new PlayerMovementMonitor(pmmc);
+			Devotion.instance().registerMonitor(pmm);
 		}
+		
+	
+		ConfigurationSection dao = conf.getConfigurationSection("dao");
+
 		// Get Database information, wire up DAO
+		ConfigurationSection database = dao.getConfigurationSection("database");
+		
+		if (database != null) {
+			Devotion.instance().registerDataHandler(DatabaseDataHandler.generate(database));
+		}
 
 		// Get file information, wire up file
-
-		// Discover and configure Monitors
+		ConfigurationSection file = dao.getConfigurationSection("file");
 		
+		if (file != null) {
+			Devotion.instance().registerDataHandler(FileDataHandler.generate(file));
+		}
+	
 		return true;
 	}
 
