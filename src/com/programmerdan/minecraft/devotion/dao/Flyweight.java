@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.devotion.dao;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -17,7 +18,21 @@ import com.programmerdan.minecraft.devotion.Devotion;
 public abstract class Flyweight {
 	protected abstract byte getID();
 	protected abstract byte getVersion();
+	
+	private int lastWriteSize = 0;
+	
+	public final int getLastWriteSize() {
+		return lastWriteSize;
+	}
 
+	private final void computeWrite(int start, int end) {
+		if (end < start) {// overflow
+			lastWriteSize = Integer.MAX_VALUE - start + end;
+		} else {
+			lastWriteSize = end - start;
+		}
+	}
+	
 	public final void serialize(DataOutputStream os) {
 		try {
 			int rSize = os.size();
@@ -28,15 +43,15 @@ public abstract class Flyweight {
 
 			marshall(os); // subclasses inject serialization here
 
-			rSize = os.size() - rSize;
+			computeWrite(rSize, os.size());
 			rTime = System.currentTimeMillis() - rTime;
-			Devotion.logger().log(Level.FINE, "Flyweight size {0} and time-to-write {1}", new Object[]{rSize, rTime});
+			Devotion.logger().log(Level.FINE, "Flyweight size {0} and time-to-write {1}", 
+					new Object[]{getLastWriteSize(), rTime});
 		} catch (IOException ioe) {
 			Devotion.logger().log(Level.SEVERE, "Failed to Serialize a Flyweight", ioe);
 		}
 	}
 	protected abstract void marshall(DataOutputStream os);
-
 
 	public static <T extends Flyweight> T deserialize(DataInputStream is, Class<T> clazz) {
 		try {

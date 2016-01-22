@@ -1,19 +1,24 @@
 package com.programmerdan.minecraft.devotion.dao.flyweight;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+
+import org.bukkit.entity.Player;
 
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 
 /**
  * Lightweight wrapper for bukkit's entity Player object
  * 
- * Includes only core fields. Can be expanded.
+ * Includes only core fields.
  * 
  * @author ProgrammerDan <programmedan@gmail.com>
  * @since 1.0
- *
  */
 public class fPlayer extends Flyweight {
+	private static final byte ID = 0x02;
+	private static final byte VERSION = 0x00;
+	
 	private String ip;
 	private fLocation bedSpawn;
 	private fLocation compassTarget;
@@ -60,18 +65,20 @@ public class fPlayer extends Flyweight {
 	private double maxHealth;
 	@Override
 	protected byte getID() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fPlayer.ID;
 	}
 	@Override
 	protected byte getVersion() {
-		// TODO Auto-generated method stub
-		return 0;
+		return fPlayer.VERSION;
 	}
 	@Override
 	protected void marshall(DataOutputStream os) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	protected static Flyweight unmarshall(DataInputStream is, byte id, byte version) {
+		return null;
 	}
 	
 	
