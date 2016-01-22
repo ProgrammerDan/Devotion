@@ -6,6 +6,7 @@ import com.programmerdan.minecraft.devotion.events.*;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -20,7 +21,9 @@ public class Devotion extends JavaPlugin {
 	private boolean debug = false;
 
 	private ArrayList<Monitor> activeMonitors;
-
+	
+	private ArrayList<DataHandler> dataHandlers;
+	
 	public CommandHandler commandHandler() {
 		return this.commandHandler;
 	}
@@ -48,6 +51,14 @@ public class Devotion extends JavaPlugin {
 	public ArrayList<Monitor> getMonitors() {
 		return activeMonitors;
 	}
+	
+	public void registerDataHandler(DataHandler handler) {
+		dataHandlers.add(handler);
+	}
+	
+	public ArrayList<DataHandler> getHandlers() {
+		return dataHandlers;
+	}
 
 	@Override
 	public void onEnable() {
@@ -55,14 +66,23 @@ public class Devotion extends JavaPlugin {
 		instance = this;
 		commandHandler = new CommandHandler(this);
 		activeMonitors = new ArrayList<Monitor>();
+		dataHandlers = new ArrayList<DataHandler>();
 
 		if (ConfigurationReader.readConfig()) {
 			for (Monitor m : activeMonitors) {
 				m.onEnable();
 			}
+			
+			for (DataHandler dh : dataHandlers) {
+				Bukkit.getScheduler().runTaskTimerAsynchronously(this, dh, dh.getDelay(), dh.getDelay());
+			}
 		} else {
 			getLogger().severe("Unable to configure Devotion, no monitors active. Fix configuration and reload.");
+			this.setEnabled(false);
+			return;
 		}
+		
+		
 		
 		//getServer().getPluginManager().registerEvents(new MovementEvents(), this);
 	}
@@ -73,9 +93,12 @@ public class Devotion extends JavaPlugin {
 		for (Monitor m : activeMonitors) {
 			m.onDisable();
 		}
+		for (DataHandler dh : dataHandlers) {
+			dh.teardown();
+		}
 		activeMonitors.clear();
 		// close database
 		// close files
-		plugin = null;
+		instance = null;
 	}
 }

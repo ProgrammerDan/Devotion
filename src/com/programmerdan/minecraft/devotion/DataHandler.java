@@ -7,8 +7,9 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * 
  * @author ProgrammerDan
  */
-public interface DataHandler {
+public interface DataHandler extends Runnable {
 	public long getDelay();
 	public boolean useAdaptiveSchedule();
 	public void insert(Flyweight data);
+	public void teardown();
 }

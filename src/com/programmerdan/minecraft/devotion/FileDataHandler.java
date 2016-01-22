@@ -20,8 +20,10 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
-public class FileDataHandler implements DataHandler, Runnable {
+public class FileDataHandler implements DataHandler {
 
+	private boolean active;
+	
 	private File baseFolder;
 	private long maxFileSize;
 	private int maxIORate;
@@ -79,7 +81,13 @@ public class FileDataHandler implements DataHandler, Runnable {
 	}
 	
 	private void releaseStream() {
-		// no-op for now.
+		try {
+			if (activeStream != null) {
+				activeStream.close();
+			}
+		} catch (IOException ioe) {
+			Devotion.logger().warning("Failed to close prior file on shutdown: " + lastFileName);
+		}
 	}
 	
 	/**
@@ -139,6 +147,8 @@ public class FileDataHandler implements DataHandler, Runnable {
 					"Failed to set up FileDataHandler", se);
 			return null;
 		}
+		
+		fdh.active = true;
 
 		return fdh;
 	}
@@ -159,6 +169,7 @@ public class FileDataHandler implements DataHandler, Runnable {
 	 */
 	@Override
 	public void run() {
+		if (!active) return;
 		Devotion.logger().log(Level.INFO, "Starting commit...");
 		long in = System.currentTimeMillis();
 		long records = 0l;
@@ -180,8 +191,6 @@ public class FileDataHandler implements DataHandler, Runnable {
 				records++;
 			}
 
-			this.releaseStream();
-
 			Devotion.logger().log(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
 					new Object[]{records, writeSoFar, (in - System.currentTimeMillis())});
 		} else {
@@ -200,5 +209,10 @@ public class FileDataHandler implements DataHandler, Runnable {
 	@Override
 	public boolean useAdaptiveSchedule() {
 		return false;
+	}
+	
+	public void teardown() {
+		this.releaseStream();
+		active = false;
 	}
 }
