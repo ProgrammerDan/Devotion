@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
+import java.util.Calendar;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -20,6 +21,16 @@ public abstract class Flyweight {
 	protected abstract byte getVersion();
 	
 	private int lastWriteSize = 0;
+	
+	private long recordDate = 0;
+
+	public final long getRecordDate() {
+		return recordDate;
+	}
+	
+	protected final void setRecordDate(long recordDate) {
+		this.recordDate = recordDate;
+	}
 	
 	public final int getLastWriteSize() {
 		return lastWriteSize;
@@ -40,6 +51,7 @@ public abstract class Flyweight {
 
 			os.writeByte(getID());
 			os.writeByte(getVersion());
+			os.writeLong(System.currentTimeMillis());
 
 			marshall(os); // subclasses inject serialization here
 
@@ -55,14 +67,16 @@ public abstract class Flyweight {
 
 	public static <T extends Flyweight> T deserialize(DataInputStream is, Class<T> clazz) {
 		try {
-			is.mark(2);
+			is.mark(10);
 			byte id = is.readByte();
 			byte version = is.readByte();
+			long recordDate = is.readLong();
 
 			@SuppressWarnings("unchecked")
 			T instance = (T) T.unmarshall(is, id, version);
-
+			
 			if (instance != null) {
+				instance.setRecordDate(recordDate);
 				return instance;
 			} else {
 				is.reset();

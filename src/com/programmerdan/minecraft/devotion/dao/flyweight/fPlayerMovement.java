@@ -127,19 +127,37 @@ public class fPlayerMovement extends Flyweight {
 	protected static Flyweight unmarshall(DataInputStream is, byte id, byte version) {
 		try {
 			if (id == ID && version == VERSION) {
-				String worldUUID = is.readUTF();
-				double x = is.readDouble();
-				double y = is.readDouble();
-				double z = is.readDouble();
-				float yaw = is.readFloat();
-				float pitch = is.readFloat();
+				String uuid = is.readUTF();
+				String name = is.readUTF();
+				fLocation eyeLocation = fLocation.deserialize(is, fLocation.class);
+				fLocation location = fLocation.deserialize(is, fLocation.class);
+				String gameMode = is.readUTF();
+				float exhaustion = is.readFloat();
+				int foodLevel = is.readInt();
+				float saturation = is.readFloat();
+				int totalExperience = is.readInt();
+				boolean inVehicle = is.readBoolean();
+				double velocityX = is.readDouble();
+				double velocityY = is.readDouble();
+				double velocityZ = is.readDouble();
+				int remainingAir = is.readInt();
+				byte compact = is.readByte();
+				boolean sneaking = (compact & (byte) 0x8 ) > 0;
+				boolean sprinting = (compact & (byte) 0x4 ) > 0;
+				boolean blocking = (compact & (byte) 0x2 ) > 0;
+				boolean sleeping = (compact & (byte) 0x1 ) > 0;
+				double health = is.readDouble();
+				double maxHealth = is.readDouble();
 
-				return new fLocation(worldUUID, x, y, z, yaw, pitch);
+				return new fPlayerMovement(uuid, name, eyeLocation, location, gameMode, exhaustion,
+						foodLevel, saturation, totalExperience, inVehicle, velocityX, velocityY,
+						velocityZ, remainingAir, sneaking, sprinting, blocking, sleeping,
+						health, maxHealth);
 			} else {
 				return null;
 			}
 		} catch (IOException ioe) {
-			Devotion.logger().log(Level.SEVERE, "Failed to Deserialize a Location", ioe);
+			Devotion.logger().log(Level.SEVERE, "Failed to Deserialize a PlayerMovement", ioe);
 			return null;
 		}
 	}
