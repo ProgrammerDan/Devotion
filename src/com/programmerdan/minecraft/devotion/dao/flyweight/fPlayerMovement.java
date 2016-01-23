@@ -10,6 +10,12 @@ import org.bukkit.entity.Player;
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 
+/**
+ * Class to capture critical components of movement in MC.
+ * Eye position, food position, food / saturation, velociy, experience, in vehicle, air, health, and movement modes.
+ * 
+ * @author ProgrammerDan <programmerdan@gmail.com>
+ */
 public class fPlayerMovement extends Flyweight {
 	private static final byte ID = 0x03;
 	private static final byte VERSION = 0x00;
@@ -100,7 +106,6 @@ public class fPlayerMovement extends Flyweight {
 	@Override
 	protected void marshall(DataOutputStream os) {
 		try {
-			// TODO: replace buffer with configured size.
 			os.writeUTF(this.uuid);
 			os.writeUTF(this.name);
 			this.eyeLocation.marshall(os);

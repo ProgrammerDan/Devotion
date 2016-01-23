@@ -74,7 +74,10 @@ public class Devotion extends JavaPlugin {
 			}
 			
 			for (DataHandler dh : dataHandlers) {
-				Bukkit.getScheduler().runTaskTimerAsynchronously(this, dh, dh.getDelay(), dh.getDelay());
+				dh.begin();
+				/*if (dh.useAdaptiveSchedule() {
+					Bukkit.getSchedule().
+				Bukkit.getScheduler().runTaskTimerAsynchronously(this, dh, dh.getDelay(), dh.getDelay());*/
 			}
 		} else {
 			getLogger().severe("Unable to configure Devotion, no monitors active. Fix configuration and reload.");

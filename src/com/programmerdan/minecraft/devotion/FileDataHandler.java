@@ -20,7 +20,7 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
-public class FileDataHandler implements DataHandler {
+public class FileDataHandler extends DataHandler {
 
 	private boolean active;
 	
@@ -169,7 +169,6 @@ public class FileDataHandler implements DataHandler {
 	 */
 	@Override
 	public void run() {
-		if (!active) return;
 		Devotion.logger().log(Level.INFO, "Starting commit...");
 		long in = System.currentTimeMillis();
 		long records = 0l;
@@ -203,14 +202,6 @@ public class FileDataHandler implements DataHandler {
 		return delay;
 	}
 
-	/**
-	 * Adaptive scheduling adds a new requirement to run(), namely, schedule next-execution.
-	 */
-	@Override
-	public boolean useAdaptiveSchedule() {
-		return false;
-	}
-	
 	public void teardown() {
 		this.releaseStream();
 		active = false;
