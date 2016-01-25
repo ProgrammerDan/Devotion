@@ -22,14 +22,11 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  */
 public class FileDataHandler extends DataHandler {
 
-	private boolean active;
-	
 	private File baseFolder;
 	private long maxFileSize;
 	private int maxIORate;
 	private int ioChunkSize;
 
-	private long delay;
 	private long maxRun;
 
 	private String lastFileName;
@@ -125,8 +122,7 @@ public class FileDataHandler extends DataHandler {
 		fdh.lastFileSize = 0l;
 		fdh.lastFileName = fdh.generateFileName();
 
-		fdh.delay = config.getLong("delay", 20l);
-		fdh.maxRun = config.getLong("max_run", 500l);
+		fdh.maxRun = config.getLong("max_run", 50l);
 
 		if (fdh.maxFileSize <= 0 || fdh.maxIORate <= 0 || fdh.ioChunkSize <= 0) {
 			Devotion.logger().log(Level.SEVERE,
@@ -147,10 +143,26 @@ public class FileDataHandler extends DataHandler {
 					"Failed to set up FileDataHandler", se);
 			return null;
 		}
-		
-		fdh.active = true;
 
-		return fdh;
+		fdh.setup(config.getLong("delay", 100l), false, config.getBoolean("debug"));
+		
+		if (fdh.isActive()) {
+			return fdh;
+		} else {
+			Devotion.logger().log(Level.SEVERE,
+					"Failed to satisfy DataHandler interface");
+			return null;
+		}
+	}
+
+	@Override
+	public void teardown() {
+		this.releaseStream();
+	}
+
+	@Override
+	void buildUp() {
+		this.getStream();		
 	}
 
 	/**
@@ -168,8 +180,8 @@ public class FileDataHandler extends DataHandler {
 	 *    output rate >> input rate. Else warn/fail.
 	 */
 	@Override
-	public void run() {
-		Devotion.logger().log(Level.INFO, "Starting commit...");
+	void process() {
+		debug(Level.INFO, "Starting commit...");
 		long in = System.currentTimeMillis();
 		long records = 0l;
 		
@@ -190,20 +202,10 @@ public class FileDataHandler extends DataHandler {
 				records++;
 			}
 
-			Devotion.logger().log(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
+			debug(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
 					new Object[]{records, writeSoFar, (in - System.currentTimeMillis())});
 		} else {
-			Devotion.logger().log(Level.SEVERE, "Data stream is null, cannot commit. Skipping for now.");
+			debug(Level.SEVERE, "Data stream is null, cannot commit. Skipping for now.");
 		}
-	}
-
-	@Override
-	public long getDelay() {
-		return delay;
-	}
-
-	public void teardown() {
-		this.releaseStream();
-		active = false;
 	}
 }

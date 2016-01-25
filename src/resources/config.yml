@@ -20,6 +20,7 @@ dao:
     database: devotion
     schema:
     # Database delay is milliseconds, it's adaptive.
+    debug: true
     delay: 250
     max_run: 100
   file:
@@ -29,6 +30,7 @@ dao:
     io_chunk_size: 4096
     # File delay is not adaptive, it's server ticks.
     delay: 200
+    debug: true
     max_run: 100
 
 monitor:
