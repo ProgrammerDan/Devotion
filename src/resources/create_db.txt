@@ -1,0 +1,44 @@
+CREATE TABLE IF NOT EXISTS devotion_event (
+    devotion_event_id INT NOT NULL AUTO_INCREMENT
+   ,event_utctime DATETIME NOT NULL
+   ,event_type VARCHAR(50) NOT NULL
+   ,player_name VARCHAR(100) NOT NULL
+   ,player_uuid VARCHAR(32)  NOT NULL
+   ,location_worlduuid VARCHAR(32) NOT NULL
+   ,location_x DOUBLE NOT NULL
+   ,location_y DOUBLE NOT NULL
+   ,location_z DOUBLE NOT NULL
+   ,location_yaw FLOAT NOT NULL
+   ,location_pitch FLOAT NOT NULL
+   ,location_eye_worlduuid VARCHAR(32) NOT NULL
+   ,location_eye_x DOUBLE NOT NULL
+   ,location_eye_y DOUBLE NOT NULL
+   ,location_eye_z DOUBLE NOT NULL
+   ,location_eye_yaw FLOAT NOT NULL
+   ,location_eye_pitch FLOAT NOT NULL
+   ,game_mode VARCHAR(20)
+   ,exhaustion FLOAT NOT NULL
+   ,food_level INT NOT NULL
+   ,saturation FLOAT NOT NULL
+   ,total_experience INT NOT NULL
+   ,velocity_x DOUBLE NOT NULL
+   ,velocity_y DOUBLE NOT NULL
+   ,velocity_z DOUBLE NOT NULL
+   ,remaining_air INT NOT NULL
+   ,health DOUBLE NOT NULL
+   ,max_health DOUBLE NOT NULL
+   ,status_flags CHAR(5) NOT NULL /* inVehicle, sneaking, sprinting, blocking, sleeping */
+   
+   ,CONSTRAINT pk_devotion_event PRIMARY KEY (devotion_event_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_login (
+    devotion_event_login_id INT NOT NULL AUTO_INCREMENT
+   ,devotion_event_id INT NOT NULL
+   ,address VARCHAR(20)
+   ,hostname VARCHAR(100)
+   ,real_address VARCHAR(20)
+   
+   ,CONSTRAINT pk_devotion_event_login PRIMARY KEY (devotion_event_login_id)
+   ,CONSTRAINT fk_devotion_event_devotion_event_id FOREIGN KEY (devotion_event_id) REFERENCES devotion_event (devotion_event_id)
+)

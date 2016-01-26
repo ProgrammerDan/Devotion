@@ -6,14 +6,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.DataOutputStream;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
+import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 
 /**
  * Database handler for all Flyweight types that properly extend {@link Flyweight}.
@@ -21,52 +24,9 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
 public class DatabaseDataHandler extends DataHandler {
-
-	private DriverType driver;
-	private String host;
-	private int port;
-	private String username;
-	private String password;
-	private String database;
-	private String schema;
-
-	private long delay;
-
-	private long maxRun;
-
-	private ConcurrentHashMap<Class<?>, ConcurrentLinkedQueue<Flyweight>> insertQueues;
+	private SqlDatabase db;
 
 	private DatabaseDataHandler() {
-	}
-
-	/**
-	 * Not sure I like this approach but for a given class get its statement.
-	 * 
-	 * @return a valid PreparedStatement suitable for insertion or null.
-	 */
-	private PreparedStatement getStatement(Class clazz) {
-		return null; // TODO
-	}
-	
-	/**
-	 * All done inserting to the batch? commit.
-	 */
-	private void commitStatement(PrepareStatement) {
-		// TODO
-	}
-	
-	/**
-	 * Synchronous method called by listeners, puts data on the queue and returns quickly.
-	 */
-	@Override
-	public void insert(Flyweight data) {
-		ConcurrentLinkedQueue<Flyweight> insertQueue = insertQueues.get(data.class);
-		if (insertQueue == null) {
-			insertQueue = new ConcurrentLinkedQueue<Flyweight>();
-			insertQueues.put(data.class, insertQueue);
-		}
-		
-		insertQueue.add(data);
 	}
 
 	/**
@@ -82,49 +42,32 @@ public class DatabaseDataHandler extends DataHandler {
 			return null;
 		}
 
-		DatabaseDataHandler fdh = new DatabaseDataHandler();
-
-		fdh.maxRun = config.getLong("max_run", 50l);
-
-		if (fdh.maxFileSize <= 0 || fdh.maxIORate <= 0 || fdh.ioChunkSize <= 0) {
-			Devotion.logger().log(Level.SEVERE,
-					"Improper settings for FileDataHandler");
-			return null;
-		}
-
-		try {
-			if (!fdh.baseFolder.isDirectory() && !fdh.baseFolder.mkdirs()) {
-				Devotion.logger().log(
-						Level.SEVERE,
-						"FileDataHandler base folder can't be created: "
-								+ fdh.baseFolder.getPath());
-				return null;
-			}
-		} catch (SecurityException se) {
-			Devotion.logger().log(Level.SEVERE,
-					"Failed to set up FileDataHandler", se);
-			return null;
-		}
-
-		fdh.setup(config.getLong("delay", 100l), false, config.getBoolean("debug"));
+		DatabaseDataHandler ddh = new DatabaseDataHandler();
 		
-		if (fdh.isActive()) {
-			return fdh;
-		} else {
-			Devotion.logger().log(Level.SEVERE,
-					"Failed to satisfy DataHandler interface");
-			return null;
-		}
+	    String host = config.getString("host");
+	    int port = config.getInt("port", 2306);
+	    String username = config.getString("username");
+	    String password = config.getString("password");
+	    String database = config.getString("database");
+	    //String schema = config.getString("schema");
+	    
+	    ddh.db = new SqlDatabase(host, port, database, username, password, Devotion.logger());
+	    
+	    if(!ddh.db.connect())
+	    	return null;
+
+	    ddh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
+		
+	    return ddh;
 	}
 
 	@Override
 	public void teardown() {
-		this.releaseStream();
+		this.db.close();
 	}
 
 	@Override
 	void buildUp() {
-		this.getStream();		
 	}
 
 	/**
@@ -145,29 +88,32 @@ public class DatabaseDataHandler extends DataHandler {
 	void process() {
 		debug(Level.INFO, "Starting commit...");
 		long in = System.currentTimeMillis();
-		long records = 0l;
 		
-		int writeSoFar = 0;
-
-		DataOutputStream bos = getStream();
+		if(isQueueEmpty()) {
+			debug(Level.SEVERE, "Queue is empty, cannot commit. Skipping for now.");
+		}
 		
-		if (bos != null) {
-
-			while (System.currentTimeMillis() < in + this.maxRun
-					&& !this.insertQueue.isEmpty() && writeSoFar <= this.maxIORate) {
-				Flyweight toWrite = this.insertQueue.poll();
-	
-				toWrite.serialize(bos);
+		int records = 0;
+		
+		try {
+			this.db.begin();
+		
+			while(records < getMaxRun() && !isQueueEmpty()) {
+				Flyweight obj = pollFromQueue();
 				
-				writeSoFar += toWrite.getLastWriteSize();
+				obj.serialize(this.db);
 				
 				records++;
 			}
+			
+			this.db.commit();
 
-			debug(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
-					new Object[]{records, writeSoFar, (in - System.currentTimeMillis())});
-		} else {
-			debug(Level.SEVERE, "Data stream is null, cannot commit. Skipping for now.");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
+		debug(Level.INFO, "Done commit {0} records in {1} milliseconds",
+					new Object[]{records, (in - System.currentTimeMillis())});
 	}
 }

@@ -14,7 +14,7 @@ dao:
   database:
     driver: mysql
     host:
-    port: 2306
+    port: 3306
     username:
     password:
     database: devotion
@@ -33,7 +33,7 @@ dao:
     debug: true
     max_run: 100
 
-monitor:
+monitors:
   movement:
     sampling: onevent
     sampling_period: 1000

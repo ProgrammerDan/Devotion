@@ -1,11 +1,11 @@
-name: ${project.name}
+name: Devotion
 main: com.programmerdan.minecraft.devotion.Devotion
 author: ProgrammerDan
 authors: []
-version: ${project.version}
+version: 1.0.0.0
 commands:
    devotion:
-      description: Devotion: Deep insight into player activity without lagging your server
+      description: Deep insight into player activity without lagging your server
       usage: To view help, use /devotion help
    devotion stats:
       description: Outputs throughput and capture statistics. Exclusively reads from internally maintained fields.

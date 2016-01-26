@@ -1,14 +1,13 @@
 package com.programmerdan.minecraft.devotion;
 
 import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.DataOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -27,13 +26,9 @@ public class FileDataHandler extends DataHandler {
 	private int maxIORate;
 	private int ioChunkSize;
 
-	private long maxRun;
-
 	private String lastFileName;
 	private long lastFileSize;
 	private DataOutputStream activeStream;
-	
-	private ConcurrentLinkedQueue<Flyweight> insertQueue;
 
 	private FileDataHandler() {
 	}
@@ -86,14 +81,6 @@ public class FileDataHandler extends DataHandler {
 			Devotion.logger().warning("Failed to close prior file on shutdown: " + lastFileName);
 		}
 	}
-	
-	/**
-	 * Synchronous method called by listeners, puts data on the queue and returns quickly.
-	 */
-	@Override
-	public void insert(Flyweight data) {
-		insertQueue.add(data);
-	}
 
 	/**
 	 * Generates a new FileDataHandler from a config section.
@@ -115,14 +102,12 @@ public class FileDataHandler extends DataHandler {
 		} else {
 			fdh.baseFolder = new File(baseFolder);
 		}
-
+		
 		fdh.maxFileSize = config.getLong("max_file_size", 8388608l);
 		fdh.maxIORate = config.getInt("max_io_rate", Integer.MAX_VALUE);
 		fdh.ioChunkSize = config.getInt("io_chunk_size", 2048);
 		fdh.lastFileSize = 0l;
 		fdh.lastFileName = fdh.generateFileName();
-
-		fdh.maxRun = config.getLong("max_run", 50l);
 
 		if (fdh.maxFileSize <= 0 || fdh.maxIORate <= 0 || fdh.ioChunkSize <= 0) {
 			Devotion.logger().log(Level.SEVERE,
@@ -144,7 +129,7 @@ public class FileDataHandler extends DataHandler {
 			return null;
 		}
 
-		fdh.setup(config.getLong("delay", 100l), false, config.getBoolean("debug"));
+		fdh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
 		
 		if (fdh.isActive()) {
 			return fdh;
@@ -191,9 +176,10 @@ public class FileDataHandler extends DataHandler {
 		
 		if (bos != null) {
 
-			while (System.currentTimeMillis() < in + this.maxRun
-					&& !this.insertQueue.isEmpty() && writeSoFar <= this.maxIORate) {
-				Flyweight toWrite = this.insertQueue.poll();
+			while (System.currentTimeMillis() < in + this.getMaxRun()
+					&& !isQueueEmpty() && writeSoFar <= this.maxIORate) {
+				
+				Flyweight toWrite = pollFromQueue();
 	
 				toWrite.serialize(bos);
 				

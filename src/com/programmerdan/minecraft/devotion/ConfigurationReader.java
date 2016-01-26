@@ -43,7 +43,6 @@ public class ConfigurationReader {
 			PlayerMovementMonitor pmm = new PlayerMovementMonitor(pmmc);
 			Devotion.instance().registerMonitor(pmm);
 		}
-		
 	
 		ConfigurationSection dao = conf.getConfigurationSection("dao");
 

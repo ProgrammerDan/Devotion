@@ -1,12 +1,13 @@
 package com.programmerdan.minecraft.devotion;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
+
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
-
-import net.minecraft.server.MinecraftServer;
 
 
 /**
@@ -16,16 +17,24 @@ import net.minecraft.server.MinecraftServer;
  */
 public abstract class DataHandler extends BukkitRunnable {
 	private long delay = -1;
-	private boolean adaptive;
+	private boolean adaptive = false;
+	private long maxRun;
+	private ConcurrentLinkedQueue<Flyweight> insertQueue = new ConcurrentLinkedQueue<Flyweight>(); 
+	
 	protected boolean debug = false;
 	protected boolean active = false;
 	
 	public final boolean isActive() {
-		return active;
+		return this.active;
+	}
+	
+	protected long getMaxRun() {
+		return this.maxRun;
 	}
 
-	protected void setup(long delay, boolean adaptive, boolean debug) {
+	protected void setup(long delay, long maxRun, boolean adaptive, boolean debug) {
 		this.delay = delay;
+		this.maxRun = maxRun;
 		this.adaptive = adaptive;
 		this.debug = debug;
 	}
@@ -94,12 +103,19 @@ public abstract class DataHandler extends BukkitRunnable {
 	}
 	
 	/**
-	 * Subclasses must implement this method; It is used to actually accrue data from the
-	 * various event tracking methods.
-	 * 
-	 * @param data
+	 * Synchronous method called by listeners, puts data on the queue and returns quickly.
 	 */
-	public abstract void insert(Flyweight data);
+	public void insert(Flyweight data) {
+		this.insertQueue.add(data);
+	}
+	
+	protected boolean isQueueEmpty() {
+		return this.insertQueue.isEmpty();
+	}
+	
+	protected Flyweight pollFromQueue() {
+		return this.insertQueue.poll();
+	}
 	
 	/**
 	 * Called by end() of the handler class; used by the Devotion plugin to end processing

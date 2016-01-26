@@ -1,13 +1,12 @@
 package com.programmerdan.minecraft.devotion.dao;
 
-import java.io.DataOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.util.Calendar;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
+import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 
 /**
  * Placeholder abstract class to manage Flyweight DAO insertion stubs. Since this project is (mostly) one direction
@@ -53,7 +52,7 @@ public abstract class Flyweight {
 			os.writeByte(getVersion());
 			os.writeLong(System.currentTimeMillis());
 
-			marshall(os); // subclasses inject serialization here
+			marshallToStream(os); // subclasses inject serialization here
 
 			computeWrite(rSize, os.size());
 			rTime = System.currentTimeMillis() - rTime;
@@ -63,7 +62,12 @@ public abstract class Flyweight {
 			Devotion.logger().log(Level.SEVERE, "Failed to Serialize a Flyweight", ioe);
 		}
 	}
-	protected abstract void marshall(DataOutputStream os);
+	protected abstract void marshallToStream(DataOutputStream os);
+	
+	public final void serialize(SqlDatabase db) {
+		marshallToDatabase(db);
+	}
+	protected abstract void marshallToDatabase(SqlDatabase db);
 
 	public static <T extends Flyweight> T deserialize(DataInputStream is, Class<T> clazz) {
 		try {
