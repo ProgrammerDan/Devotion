@@ -43,12 +43,19 @@ public class SqlDatabase {
         }
         try {
             this.connection = DriverManager.getConnection(jdbc);
+            
+            initDataSources();
+            
             this.logger.log(Level.INFO, "Connected to database!");
             return true;
         } catch (SQLException ex) { //Error handling below:
-            this.logger.log(Level.SEVERE, "Could not connnect to the database!", ex);
+            this.logger.log(Level.SEVERE, "Could not connnect to the database! Connection string: " + jdbc, ex);
             return false;
         }
+    }
+    
+    private void initDataSources() {
+    	this.devotionEventSource = new DevotionEventSource(this);
     }
     
     public void close() {
@@ -78,19 +85,24 @@ public class SqlDatabase {
     }
     
     public void commit() throws SQLException {
+    	boolean hasUpdates = false;
     	
     	if(this.devotionEventSource.hasUpdates()) {
     		this.devotionEventSource.executeBatch();
+    		hasUpdates = true;
     	}
     	
-    	this.connection.commit();
+    	if(hasUpdates) {
+    		this.connection.commit();
+    	}
+    	
     	this.connection.setAutoCommit(true);
     }
     
     public void initDb() {
-    	this.logger.log(Level.SEVERE, "Database initialization started...");
+    	this.logger.log(Level.INFO, "Database initialization started...");
     	
-    	String script = ResourceHelper.readTextFile("create_db.txt");
+    	String script = ResourceHelper.readTextFile("resources/create_db.txt");
     	
 		try {
 			prepareStatement(script).execute();
@@ -98,6 +110,6 @@ public class SqlDatabase {
 			e.printStackTrace();
 		}
 		
-		this.logger.log(Level.SEVERE, "Database initialized.");
+		this.logger.log(Level.INFO, "Database initialized.");
     }
 }

@@ -8,8 +8,7 @@ import com.programmerdan.minecraft.devotion.Devotion;
 
 public class ResourceHelper {
 	public static String readTextFile(String resourcePath) {
-    	ClassLoader classLoader = Devotion.instance().getClass().getClassLoader();
-    	File file = new File(classLoader.getResource(resourcePath).getFile());
+    	File file = new File(Devotion.class.getClassLoader().getResource(resourcePath).getFile());
     	StringBuilder result = new StringBuilder("");
     	
     	try (Scanner scanner = new Scanner(file)) {

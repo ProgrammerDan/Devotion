@@ -1,17 +1,7 @@
 package com.programmerdan.minecraft.devotion;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.DataOutputStream;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -68,6 +58,7 @@ public class DatabaseDataHandler extends DataHandler {
 
 	@Override
 	void buildUp() {
+		this.db.initDb();
 	}
 
 	/**
@@ -90,7 +81,8 @@ public class DatabaseDataHandler extends DataHandler {
 		long in = System.currentTimeMillis();
 		
 		if(isQueueEmpty()) {
-			debug(Level.SEVERE, "Queue is empty, cannot commit. Skipping for now.");
+			debug(Level.INFO, "Event queue is empty, nothing to commit.");
+			return;
 		}
 		
 		int records = 0;

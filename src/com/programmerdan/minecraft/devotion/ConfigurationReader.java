@@ -1,13 +1,5 @@
 package com.programmerdan.minecraft.devotion;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -25,10 +17,8 @@ public class ConfigurationReader {
 
 		Devotion.instance().setDebug(conf.getBoolean("debug", false));
 
-		boolean localDebug = false;
 		if (Devotion.instance().isDebug()) {
 			log("Debug mode active");
-			localDebug = true;
 		}
 		
 		// Discover and configure Monitors
@@ -50,14 +40,24 @@ public class ConfigurationReader {
 		ConfigurationSection database = dao.getConfigurationSection("database");
 		
 		if (database != null) {
-			Devotion.instance().registerDataHandler(DatabaseDataHandler.generate(database));
+			DataHandler dataHandler = DatabaseDataHandler.generate(database);
+			
+			if(dataHandler != null) {
+				Devotion.instance().registerDataHandler(dataHandler);
+				log("DatabaseDataHandler is registered.");
+			}
 		}
 
 		// Get file information, wire up file
 		ConfigurationSection file = dao.getConfigurationSection("file");
 		
 		if (file != null) {
-			Devotion.instance().registerDataHandler(FileDataHandler.generate(file));
+			DataHandler dataHandler = FileDataHandler.generate(file);
+			
+			if(dataHandler != null) {
+				Devotion.instance().registerDataHandler(dataHandler);
+				log("FileDataHandler is registered.");
+			}
 		}
 	
 		return true;
