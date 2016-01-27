@@ -1,10 +1,10 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class DevotionEventInfo {
 	public int devotionEventId;
-	public Date eventUtcTime;
+	public Timestamp eventTime;
 	public String eventType;
 	
 	public String playerName;
@@ -34,11 +34,11 @@ public class DevotionEventInfo {
 	
 	public String getStatusFlags() {
 		StringBuilder flags = new StringBuilder(5);
-		flags.setCharAt(0, inVehicle ? 'Y': 'N');
-		flags.setCharAt(1, sneaking ? 'Y': 'N');
-		flags.setCharAt(2, sprinting ? 'Y': 'N');
-		flags.setCharAt(3, blocking ? 'Y': 'N');
-		flags.setCharAt(4, sleeping ? 'Y': 'N');
+		flags.append(inVehicle ? 'Y': 'N');
+		flags.append(sneaking ? 'Y': 'N');
+		flags.append(sprinting ? 'Y': 'N');
+		flags.append(blocking ? 'Y': 'N');
+		flags.append(sleeping ? 'Y': 'N');
 		
 		return flags.toString();
 	}

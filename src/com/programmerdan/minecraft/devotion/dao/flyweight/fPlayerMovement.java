@@ -2,8 +2,9 @@ package com.programmerdan.minecraft.devotion.dao.flyweight;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
@@ -21,24 +22,25 @@ import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
-public class fPlayerMovement extends Flyweight {
+public abstract class fPlayerMovement extends Flyweight {
 	private static final byte ID = 0x03;
 	private static final byte VERSION = 0x00;
 	
-	public DevotionEventInfo eventInfo;
+	protected DevotionEventInfo eventInfo;
 
-	public fPlayerMovement(PlayerEvent playerEvent) {
+	protected fPlayerMovement(PlayerEvent playerEvent, String eventType) {
 		super();
 		
 		Player player = playerEvent.getPlayer();
 		
 		this.eventInfo = new DevotionEventInfo();
-		this.eventInfo.eventUtcTime = new Date(new java.util.Date().getTime());
+		this.eventInfo.eventType = eventType;
+		this.eventInfo.eventTime = new Timestamp(new Date().getTime());
 		this.eventInfo.playerName = player.getName();
 		this.eventInfo.playerUUID = player.getUniqueId().toString();
 		this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
 		this.eventInfo.location = new LocationInfo(player.getLocation());
-		this.eventInfo.gameMode = player.getGameMode().name();
+		this.eventInfo.gameMode = player.getGameMode() != null ? player.getGameMode().name(): "unknown";
 		this.eventInfo.exhaustion = player.getExhaustion();
 		this.eventInfo.foodLevel = player.getFoodLevel();
 		this.eventInfo.saturation = player.getSaturation();

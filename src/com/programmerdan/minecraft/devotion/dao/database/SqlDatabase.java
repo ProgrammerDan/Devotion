@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,11 +20,18 @@ public class SqlDatabase {
     private Logger logger;
     private Connection connection;
     
+    private ArrayList<Source> sourceList;
+    
     private DevotionEventSource devotionEventSource;
     public DevotionEventSource getDevotionEventSource() {
     	return this.devotionEventSource;
     }
 	
+    private DevotionEventLoginSource devotionEventLoginSource;
+    public DevotionEventLoginSource getDevotionEventLoginSource() {
+    	return this.devotionEventLoginSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -55,7 +63,10 @@ public class SqlDatabase {
     }
     
     private void initDataSources() {
-    	this.devotionEventSource = new DevotionEventSource(this);
+    	this.sourceList = new ArrayList<Source>();
+    	
+    	this.sourceList.add(this.devotionEventSource = new DevotionEventSource(this));
+    	this.sourceList.add(this.devotionEventLoginSource = new DevotionEventLoginSource(this));
     }
     
     public void close() {
@@ -81,15 +92,20 @@ public class SqlDatabase {
     
     public void begin() throws SQLException {
     	this.connection.setAutoCommit(false);
-    	this.devotionEventSource.startBatch();
+    	
+    	for(Source source : this.sourceList) {
+    		source.startBatch();
+    	}
     }
     
     public void commit() throws SQLException {
     	boolean hasUpdates = false;
     	
-    	if(this.devotionEventSource.hasUpdates()) {
-    		this.devotionEventSource.executeBatch();
-    		hasUpdates = true;
+    	for(Source source : this.sourceList) {
+    		if(source.hasUpdates()) {
+    			source.executeBatch();
+    			hasUpdates = true;
+    		}
     	}
     	
     	if(hasUpdates) {
@@ -99,17 +115,23 @@ public class SqlDatabase {
     	this.connection.setAutoCommit(true);
     }
     
-    public void initDb() {
+    public boolean initDb() {
     	this.logger.log(Level.INFO, "Database initialization started...");
     	
-    	String script = ResourceHelper.readTextFile("resources/create_db.txt");
+    	ArrayList<String> list = ResourceHelper.readScript("/resources/create_db.txt");
     	
-		try {
-			prepareStatement(script).execute();
-    	} catch (SQLException e) {
-			e.printStackTrace();
+		for(String script : list) {
+			try {
+				prepareStatement(script).execute();
+	    	} catch (SQLException e) {
+	    		this.logger.log(Level.SEVERE, "Database is NOT initialized.");
+	    		this.logger.log(Level.SEVERE, "Failed script: \n" + script);
+				e.printStackTrace();
+				return false;
+			}
 		}
 		
 		this.logger.log(Level.INFO, "Database initialized.");
+		return true;
     }
 }

@@ -28,6 +28,10 @@ public abstract class DataHandler extends BukkitRunnable {
 		return this.active;
 	}
 	
+	protected final void setActive(boolean value) {
+		this.active = value;
+	}
+	
 	protected long getMaxRun() {
 		return this.maxRun;
 	}

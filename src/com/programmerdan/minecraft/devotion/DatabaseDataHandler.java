@@ -1,5 +1,6 @@
 package com.programmerdan.minecraft.devotion;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -58,7 +59,10 @@ public class DatabaseDataHandler extends DataHandler {
 
 	@Override
 	void buildUp() {
-		this.db.initDb();
+		if(!this.db.initDb()) {
+			this.db.close();
+			setActive(false);
+		}
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class DatabaseDataHandler extends DataHandler {
 			e.printStackTrace();
 		}
 
-		debug(Level.INFO, "Done commit {0} records in {1} milliseconds",
+		debug(Level.INFO, "Done commit {0} events in {1} milliseconds",
 					new Object[]{records, (in - System.currentTimeMillis())});
 	}
 }
