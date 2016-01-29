@@ -1,8 +1,8 @@
-name: Devotion
+name: ${project.name}
 main: com.programmerdan.minecraft.devotion.Devotion
 author: ProgrammerDan
-authors: []
-version: 1.0.0.0
+authors: [Aleksey-Terzi]
+version: ${project.version}
 commands:
    devotion:
       description: Deep insight into player activity without lagging your server

@@ -29,16 +29,10 @@
     
     <resources>
       <resource>
-        <directory>${basedir}</directory>
-        <includes>
-          <include>*.yml</include>
-        </includes>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
         <directory>${basedir}/src/resources</directory>
         <includes>
           <include>*.yml</include>
+          <include>*.txt</include>
         </includes>
         <filtering>true</filtering>
       </resource>
@@ -56,8 +50,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
       <version>1.8.8-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
