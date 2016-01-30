@@ -1,16 +1,14 @@
 package com.programmerdan.minecraft.devotion;
 
 import com.programmerdan.minecraft.devotion.commands.CommandHandler;
-import com.programmerdan.minecraft.devotion.events.*;
 
-import java.util.ArrayList;
+import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * <p>Devotion quietly and unobtrusively tracks everything everyone does. Check the README for details.</p>
+ * <p>Devotion quietly and un-obtrusively tracks everything everyone does. Check the README for details.</p>
  *
  * @author ProgrammerDan <programmerdan@gmail.com>
  * @since 1.0.0
@@ -20,9 +18,9 @@ public class Devotion extends JavaPlugin {
 	private static Devotion instance;
 	private boolean debug = false;
 
-	private ArrayList<Monitor> activeMonitors;
+	private Vector<Monitor> activeMonitors;
 	
-	private ArrayList<DataHandler> dataHandlers;
+	private Vector<DataHandler> dataHandlers;
 	
 	public CommandHandler commandHandler() {
 		return this.commandHandler;
@@ -48,7 +46,7 @@ public class Devotion extends JavaPlugin {
 		activeMonitors.add(monitor);
 	}
 
-	public ArrayList<Monitor> getMonitors() {
+	public Vector<Monitor> getMonitors() {
 		return activeMonitors;
 	}
 	
@@ -56,7 +54,7 @@ public class Devotion extends JavaPlugin {
 		dataHandlers.add(handler);
 	}
 	
-	public ArrayList<DataHandler> getHandlers() {
+	public Vector<DataHandler> getHandlers() {
 		return dataHandlers;
 	}
 
@@ -65,8 +63,8 @@ public class Devotion extends JavaPlugin {
 		// setting a couple of static fields so that they are available elsewhere
 		instance = this;
 		commandHandler = new CommandHandler(this);
-		activeMonitors = new ArrayList<Monitor>();
-		dataHandlers = new ArrayList<DataHandler>();
+		activeMonitors = new Vector<Monitor>();
+		dataHandlers = new Vector<DataHandler>();
 
 		if (ConfigurationReader.readConfig()) {
 			for (Monitor m : activeMonitors) {
@@ -75,9 +73,6 @@ public class Devotion extends JavaPlugin {
 			
 			for (DataHandler dh : dataHandlers) {
 				dh.begin();
-				/*if (dh.useAdaptiveSchedule() {
-					Bukkit.getSchedule().
-				Bukkit.getScheduler().runTaskTimerAsynchronously(this, dh, dh.getDelay(), dh.getDelay());*/
 			}
 		} else {
 			getLogger().severe("Unable to configure Devotion, no monitors active. Fix configuration and reload.");

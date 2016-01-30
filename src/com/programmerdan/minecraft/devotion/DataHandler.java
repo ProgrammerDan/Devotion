@@ -20,6 +20,7 @@ public abstract class DataHandler extends BukkitRunnable {
 	private boolean adaptive = false;
 	private long maxRun;
 	private ConcurrentLinkedQueue<Flyweight> insertQueue = new ConcurrentLinkedQueue<Flyweight>(); 
+	long insertCount = 0l;
 	
 	protected boolean debug = false;
 	protected boolean active = false;
@@ -43,6 +44,9 @@ public abstract class DataHandler extends BukkitRunnable {
 		this.debug = debug;
 	}
 
+	protected long getDelay() {
+		return delay;
+	}
 
 	protected void debug(Level logLevel, String message) {
 		if (debug) {
@@ -111,6 +115,7 @@ public abstract class DataHandler extends BukkitRunnable {
 	 */
 	public void insert(Flyweight data) {
 		this.insertQueue.add(data);
+		insertCount++;
 	}
 	
 	protected boolean isQueueEmpty() {
@@ -119,6 +124,17 @@ public abstract class DataHandler extends BukkitRunnable {
 	
 	protected Flyweight pollFromQueue() {
 		return this.insertQueue.poll();
+	}
+	
+	/**
+	 * TODO: evaluate risk of not having this synchronized.
+	 * 
+	 * @return the latest insertCount.
+	 */
+	protected long getAndClearInsertCount() {
+		long saveCount = insertCount;
+		insertCount = 0;
+		return saveCount;
 	}
 	
 	/**

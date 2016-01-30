@@ -63,9 +63,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	}
 	
 	private void insert(Flyweight flyweight) {
-		ArrayList<DataHandler> handlers = Devotion.instance().getHandlers();
-		
-		for(DataHandler handler : handlers) {
+		for(DataHandler handler : Devotion.instance().getHandlers()) {
 			handler.insert(flyweight);
 		}
 	}

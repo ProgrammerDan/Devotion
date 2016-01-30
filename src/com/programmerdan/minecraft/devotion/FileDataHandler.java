@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
+import com.programmerdan.minecraft.devotion.util.FlowHelper;
 
 /**
  * Generic handler for all Flyweight types that properly extend {@link Flyweight}.
@@ -21,11 +22,13 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  */
 public class FileDataHandler extends DataHandler {
 
+	private FlowHelper statistics;
 	private File baseFolder;
 	private long maxFileSize;
 	private int maxIORate;
 	private int ioChunkSize;
 
+	private long lastSampleTime;
 	private String lastFileName;
 	private long lastFileSize;
 	private DataOutputStream activeStream;
@@ -41,6 +44,8 @@ public class FileDataHandler extends DataHandler {
 	/**
 	 * Handles stream setup. There is a bit of cost involved to tear down/bring up a new file, so
 	 * be careful in balancing your IO ops.
+	 *
+	 * TODO: Evaluate using explicit NIO channels instead of DOS. could be huge performance gains...
 	 * 
 	 * @return a valid DataOutputStream of null.
 	 */
@@ -117,9 +122,7 @@ public class FileDataHandler extends DataHandler {
 
 		try {
 			if (!fdh.baseFolder.isDirectory() && !fdh.baseFolder.mkdirs()) {
-				Devotion.logger().log(
-						Level.SEVERE,
-						"FileDataHandler base folder can't be created: "
+				Devotion.logger().log( Level.SEVERE, "FileDataHandler base folder can't be created: "
 								+ fdh.baseFolder.getPath());
 				return null;
 			}
@@ -132,6 +135,8 @@ public class FileDataHandler extends DataHandler {
 		fdh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
 		
 		if (fdh.isActive()) {
+			int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 54000 / (int) fdh.getDelay()) );
+			fdh.statistics = new FlowHelper(samples);
 			return fdh;
 		} else {
 			Devotion.logger().log(Level.SEVERE,
@@ -145,9 +150,14 @@ public class FileDataHandler extends DataHandler {
 		this.releaseStream();
 	}
 
+	/**
+	 * This override just forces the initialization of the file resource, ensuring it is ready for
+	 * writes as they accumulate.
+	 */
 	@Override
 	void buildUp() {
-		this.getStream();		
+		this.lastSampleTime = System.currentTimeMillis();
+		this.getStream();
 	}
 
 	/**
@@ -161,8 +171,7 @@ public class FileDataHandler extends DataHandler {
 	 *    - Time exceeded for write operations
 	 *    - Bytes exceed limit per cycle
 	 *  
-	 *  TODO: Use a semaphore to track incoming vs. written and ensure that
-	 *    output rate >> input rate. Else warn/fail.
+	 *  Using atomic statistics handler. TODO: self-configure based on results.
 	 */
 	@Override
 	void process() {
@@ -188,10 +197,16 @@ public class FileDataHandler extends DataHandler {
 				records++;
 			}
 
-			debug(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
-					new Object[]{records, writeSoFar, (in - System.currentTimeMillis())});
 		} else {
 			debug(Level.SEVERE, "Data stream is null, cannot commit. Skipping for now.");
 		}
+		
+		long sTime = System.currentTimeMillis();
+		statistics.sample(sTime - this.lastSampleTime, super.getAndClearInsertCount(), records);
+			
+		in = sTime - in;
+		this.lastSampleTime = sTime;
+		debug(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
+				new Object[]{records, writeSoFar, in});
 	}
 }
