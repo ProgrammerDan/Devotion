@@ -1,6 +1,5 @@
 package com.programmerdan.minecraft.devotion;
 
-import java.sql.Date;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -18,7 +17,7 @@ import com.programmerdan.minecraft.devotion.util.FlowHelper;
  * @author Aleksey-Terzi
  */
 public class DatabaseDataHandler extends DataHandler {
-	private FlowHelper statistics;
+	private FlowHelper statistics = new FlowHelper(); 
 	private long lastSampleTime;
 
 	private SqlDatabase db;
@@ -120,7 +119,7 @@ public class DatabaseDataHandler extends DataHandler {
 			
 		in = sTime - in;
 		this.lastSampleTime = sTime;
-		debug(Level.INFO, "Done commit {0} records in {2} milliseconds",
+		debug(Level.INFO, "Done commit {0} records in {1} milliseconds",
 				new Object[]{records, in});
 	}
 }

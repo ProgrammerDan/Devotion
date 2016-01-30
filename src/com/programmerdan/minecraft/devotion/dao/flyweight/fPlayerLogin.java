@@ -9,13 +9,15 @@ import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventLoginInfo;
 
-public class fPlayerLogin extends fPlayerMovement {
+public class fPlayerLogin extends fPlayer {
 	private DevotionEventLoginInfo loginInfo;
 	
 	public fPlayerLogin(PlayerLoginEvent event) {
 		super(event, "Login");
 		
 		this.loginInfo = new DevotionEventLoginInfo();
+		this.loginInfo.eventTime = this.eventInfo.eventTime;
+		this.loginInfo.playerUUID = this.eventInfo.playerUUID;
 		this.loginInfo.address = event.getAddress().toString();
 		this.loginInfo.hostname = event.getHostname();
 		this.loginInfo.realAddress = event.getRealAddress().toString();
@@ -25,9 +27,6 @@ public class fPlayerLogin extends fPlayerMovement {
 	protected void marshallToDatabase(SqlDatabase db) {
 		try {
 			db.getDevotionEventSource().insert(this.eventInfo);
-			
-			this.loginInfo.devotionEventId = this.eventInfo.devotionEventId;
-			
 			db.getDevotionEventLoginSource().insert(this.loginInfo);
 		} catch (SQLException e) {
 			Devotion.logger().log(Level.SEVERE, "Failed to Serialize an event", e);

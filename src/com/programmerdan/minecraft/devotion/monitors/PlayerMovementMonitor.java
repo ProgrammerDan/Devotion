@@ -1,11 +1,11 @@
 package com.programmerdan.minecraft.devotion.monitors;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,7 +23,6 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerJoin;
 import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerLogin;
 import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerMove;
-import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerMovement;
 import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerQuit;
 
 public class PlayerMovementMonitor extends Monitor implements Listener {
@@ -106,7 +105,10 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 				insert(new fPlayerMove(event));
 			} else {
 				Long lastSample = lastMovementSample.get(p);
-				if (lastSample != null && System.currentTimeMillis() - lastSample < config.timeoutBetweenSampling) return;
+				long timePassed = lastSample != null ? System.currentTimeMillis() - lastSample: config.timeoutBetweenSampling;
+				
+				if (timePassed < config.timeoutBetweenSampling) return;
+				
 				insert(new fPlayerMove(event));
 				lastMovementSample.put(p, System.currentTimeMillis());
 			}

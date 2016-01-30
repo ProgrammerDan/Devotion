@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceException;
-import com.programmerdan.minecraft.devotion.helpers.ResourceHelper;
+import com.programmerdan.minecraft.devotion.util.ResourceHelper;
 
 public class SqlDatabase {
 	private String host;
@@ -118,7 +118,7 @@ public class SqlDatabase {
     public boolean initDb() {
     	this.logger.log(Level.INFO, "Database initialization started...");
     	
-    	ArrayList<String> list = ResourceHelper.readScript("/resources/create_db.txt");
+    	ArrayList<String> list = ResourceHelper.readScript("/create_db.txt");
     	
 		for(String script : list) {
 			try {

@@ -27,9 +27,9 @@ public class ConfigurationReader {
 		ConfigurationSection monitor = monitors.getConfigurationSection("movement");
 		if (monitor != null) {
 			PlayerMovementMonitorConfig pmmc = new PlayerMovementMonitorConfig();
-			pmmc.technique = SamplingMethod.valueOf(monitors.getString("sampling", "onevent"));
-			pmmc.timeoutBetweenSampling = monitors.getLong("sampling_period", 1000l);
-			pmmc.sampleSize = monitors.getInt("sampling_size", 50);
+			pmmc.technique = SamplingMethod.valueOf(monitor.getString("sampling", "onevent"));
+			pmmc.timeoutBetweenSampling = monitor.getLong("sampling_period", 1000l);
+			pmmc.sampleSize = monitor.getInt("sampling_size", 50);
 			PlayerMovementMonitor pmm = new PlayerMovementMonitor(pmmc);
 			Devotion.instance().registerMonitor(pmm);
 		}

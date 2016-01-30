@@ -22,13 +22,13 @@ import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
-public abstract class fPlayerMovement extends Flyweight {
+public abstract class fPlayer extends Flyweight {
 	private static final byte ID = 0x03;
 	private static final byte VERSION = 0x00;
 	
 	protected DevotionEventInfo eventInfo;
 
-	protected fPlayerMovement(PlayerEvent playerEvent, String eventType) {
+	protected fPlayer(PlayerEvent playerEvent, String eventType) {
 		super();
 		
 		Player player = playerEvent.getPlayer();
@@ -144,11 +144,11 @@ public abstract class fPlayerMovement extends Flyweight {
 
 	@Override
 	protected byte getID() {
-		return fPlayerMovement.ID;
+		return fPlayer.ID;
 	}
 
 	@Override
 	protected byte getVersion() {
-		return fPlayerMovement.VERSION;
+		return fPlayer.VERSION;
 	}
 }
