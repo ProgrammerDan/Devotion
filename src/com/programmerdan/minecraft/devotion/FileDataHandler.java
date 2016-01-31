@@ -56,17 +56,17 @@ public class FileDataHandler extends DataHandler {
 					activeStream.close();
 				activeStream = null;
 			} catch (IOException ioe) {
-				Devotion.logger().warning("Failed to close prior file: " + lastFileName);
+				Devotion.logger().warning("Failed to close prior file: " + this.lastFileName);
 			}
 		}
 		if (lastFileSize > maxFileSize || activeStream == null) {
-			lastFileName = generateFileName();
-			File target = new File(baseFolder, lastFileName);
+			this.lastFileName = generateFileName();
+						
+			File target = new File(this.baseFolder, this.lastFileName);
+			
 			try {
-				if (target.createNewFile()) {
-					Devotion.logger().severe("Unable to create file: " + target.toString());
-					return null;
-				}
+				target.createNewFile();
+
 				activeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(target), ioChunkSize));
 			} catch(FileNotFoundException fnfe) {
 				Devotion.logger().log(Level.SEVERE, "File not found to open: " + target.toString(), fnfe);
@@ -134,15 +134,10 @@ public class FileDataHandler extends DataHandler {
 
 		fdh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
 		
-		if (fdh.isActive()) {
-			int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 54000 / (int) fdh.getDelay()) );
-			fdh.statistics = new FlowHelper(samples);
-			return fdh;
-		} else {
-			Devotion.logger().log(Level.SEVERE,
-					"Failed to satisfy DataHandler interface");
-			return null;
-		}
+		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 54000 / (int) fdh.getDelay()) );
+		fdh.statistics = new FlowHelper(samples);
+
+		return fdh;
 	}
 
 	@Override
@@ -175,30 +170,34 @@ public class FileDataHandler extends DataHandler {
 	 */
 	@Override
 	void process() {
-		debug(Level.INFO, "Starting commit...");
+		debug(Level.INFO, "FileDataHandler: Starting commit...");
 		long in = System.currentTimeMillis();
 		long records = 0l;
 		
 		int writeSoFar = 0;
 
-		DataOutputStream bos = getStream();
-		
-		if (bos != null) {
-
-			while (System.currentTimeMillis() < in + this.getMaxRun()
-					&& !isQueueEmpty() && writeSoFar <= this.maxIORate) {
-				
-				Flyweight toWrite = pollFromQueue();
+		if (!isQueueEmpty()) {
+			DataOutputStream bos = getStream();
+			
+			if (bos != null) {
 	
-				toWrite.serialize(bos);
-				
-				writeSoFar += toWrite.getLastWriteSize();
-				
-				records++;
+				while (System.currentTimeMillis() < in + this.getMaxRun()
+						&& !isQueueEmpty() && writeSoFar <= this.maxIORate) {
+					
+					Flyweight toWrite = pollFromQueue();
+		
+					toWrite.serialize(bos);
+					
+					writeSoFar += toWrite.getLastWriteSize();
+					
+					records++;
+				}
+	
+			} else {
+				debug(Level.SEVERE, "FileDataHandler: Data stream is null, cannot commit. Skipping for now.");
 			}
-
 		} else {
-			debug(Level.SEVERE, "Data stream is null, cannot commit. Skipping for now.");
+			debug(Level.INFO, "FileDataHandler: Event queue is empty, nothing to commit.");
 		}
 		
 		long sTime = System.currentTimeMillis();
@@ -206,7 +205,7 @@ public class FileDataHandler extends DataHandler {
 			
 		in = sTime - in;
 		this.lastSampleTime = sTime;
-		debug(Level.INFO, "Done commit {0} records ({1} bytes) in {2} milliseconds",
+		debug(Level.INFO, "FileDataHandler: Done commit {0} records ({1} bytes) in {2} milliseconds",
 				new Object[]{records, writeSoFar, in});
 	}
 }

@@ -10,6 +10,9 @@ public class LocationInfo {
 	public float yaw = 0.0f;
 	public float pitch = 0.0f;
 	
+	public LocationInfo() {
+	}
+	
 	public LocationInfo(Location location) {
 		this.worldUUID = location.getWorld().getUID().toString();
 		this.x = location.getX();

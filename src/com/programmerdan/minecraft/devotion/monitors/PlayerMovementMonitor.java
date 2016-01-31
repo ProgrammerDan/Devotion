@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -20,10 +21,7 @@ import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.Monitor;
 import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
-import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerJoin;
-import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerLogin;
-import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerMove;
-import com.programmerdan.minecraft.devotion.dao.flyweight.fPlayerQuit;
+import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
 
 public class PlayerMovementMonitor extends Monitor implements Listener {
 
@@ -79,19 +77,19 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerLogin(PlayerLoginEvent event) {
-		insert(new fPlayerLogin(event));
+		insert(event);
 		checkAdd(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void monitorPlayerJoin(PlayerJoinEvent event) {
-		insert(new fPlayerJoin(event));
+		insert(event);
 		checkAdd(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerQuit(PlayerQuitEvent event) {
-		insert(new fPlayerQuit(event));
+		insert(event);
 		setRemove(event.getPlayer().getUniqueId());
 	}
 	
@@ -102,14 +100,14 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		if (onlyEvent) {
 			UUID p = event.getPlayer().getUniqueId();
 			if (config.timeoutBetweenSampling <= 0) { // bypass throttling by setting timeout to 0.
-				insert(new fPlayerMove(event));
+				insert(event);
 			} else {
 				Long lastSample = lastMovementSample.get(p);
 				long timePassed = lastSample != null ? System.currentTimeMillis() - lastSample: config.timeoutBetweenSampling;
 				
 				if (timePassed < config.timeoutBetweenSampling) return;
 				
-				insert(new fPlayerMove(event));
+				insert(event);
 				lastMovementSample.put(p, System.currentTimeMillis());
 			}
 		}
@@ -127,7 +125,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		while (now != null && samples <= config.sampleSize) {
 			Player p = Bukkit.getPlayer(now);
 			if (p != null) {
-				insert(new fPlayerMove(p));
+				insert(new PlayerMoveEvent(p, new Location(null, 0, 0, 0), new Location(null, 0, 0, 0)));
 			}
 			samples++;
 			checkRemove(now); // put current samplee back on the list.
@@ -137,7 +135,9 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		checkRemove(start); // put first person back on the list.
 	}
 	
-	private void insert(Flyweight flyweight) {
+	private void insert(PlayerEvent event) {
+		Flyweight flyweight = PlayerFactory.create(event);
+		
 		for(DataHandler handler : Devotion.instance().getHandlers()) {
 			handler.insert(flyweight);
 		}

@@ -86,7 +86,7 @@ public class DatabaseDataHandler extends DataHandler {
 	 */
 	@Override
 	void process() {
-		debug(Level.INFO, "Starting commit...");
+		debug(Level.INFO, "DatabaseDataHandler: Starting commit...");
 		long in = System.currentTimeMillis();
 
 		int records = 0;
@@ -111,7 +111,7 @@ public class DatabaseDataHandler extends DataHandler {
 				e.printStackTrace();
 			}
 		} else {
-			debug(Level.INFO, "Event queue is empty, nothing to commit.");
+			debug(Level.INFO, "DatabaseDataHandler: Event queue is empty, nothing to commit.");
 		}
 
 		long sTime = System.currentTimeMillis();
@@ -119,7 +119,7 @@ public class DatabaseDataHandler extends DataHandler {
 			
 		in = sTime - in;
 		this.lastSampleTime = sTime;
-		debug(Level.INFO, "Done commit {0} records in {1} milliseconds",
+		debug(Level.INFO, "DatabaseDataHandler: Done commit {0} records in {1} milliseconds",
 				new Object[]{records, in});
 	}
 }

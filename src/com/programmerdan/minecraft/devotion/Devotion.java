@@ -1,11 +1,12 @@
 package com.programmerdan.minecraft.devotion;
 
-import com.programmerdan.minecraft.devotion.commands.CommandHandler;
-
 import java.util.Vector;
 import java.util.logging.Logger;
 
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.programmerdan.minecraft.devotion.commands.CommandHandler;
+import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
 
 /**
  * <p>Devotion quietly and un-obtrusively tracks everything everyone does. Check the README for details.</p>
@@ -65,6 +66,8 @@ public class Devotion extends JavaPlugin {
 		commandHandler = new CommandHandler(this);
 		activeMonitors = new Vector<Monitor>();
 		dataHandlers = new Vector<DataHandler>();
+		
+		PlayerFactory.init();
 
 		if (ConfigurationReader.readConfig()) {
 			for (Monitor m : activeMonitors) {

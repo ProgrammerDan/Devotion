@@ -1,7 +1,6 @@
 package com.programmerdan.minecraft.devotion.dao.database;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class Source {

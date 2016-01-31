@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.devotion.dao;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -16,11 +17,9 @@ import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
  * @since 1.0
  */
 public abstract class Flyweight {
-	protected abstract byte getID();
-	protected abstract byte getVersion();
-	
+	private FlyweightType flyweightType;
+	private byte version;
 	private int lastWriteSize = 0;
-	
 	private long recordDate = 0;
 
 	public final long getRecordDate() {
@@ -33,6 +32,15 @@ public abstract class Flyweight {
 	
 	public final int getLastWriteSize() {
 		return lastWriteSize;
+	}
+	
+	protected final FlyweightType getFlyweightType() {
+		return this.flyweightType;
+	}
+	
+	protected Flyweight(FlyweightType flyweightType, byte version) {
+		this.flyweightType = flyweightType;
+		this.version = version;
 	}
 
 	private final void computeWrite(int start, int end) {
@@ -48,8 +56,8 @@ public abstract class Flyweight {
 			int rSize = os.size();
 			long rTime = System.currentTimeMillis();
 
-			os.writeByte(getID());
-			os.writeByte(getVersion());
+			os.writeByte(this.flyweightType.getId());
+			os.writeByte(this.version);
 			os.writeLong(System.currentTimeMillis());
 
 			marshallToStream(os); // subclasses inject serialization here
@@ -62,12 +70,16 @@ public abstract class Flyweight {
 			Devotion.logger().log(Level.SEVERE, "Failed to Serialize a Flyweight", ioe);
 		}
 	}
-	protected abstract void marshallToStream(DataOutputStream os);
+	protected abstract void marshallToStream(DataOutputStream os) throws IOException;
 	
 	public final void serialize(SqlDatabase db) {
-		marshallToDatabase(db);
+		try {
+			marshallToDatabase(db);
+		} catch (SQLException e) {
+			Devotion.logger().log(Level.SEVERE, "Failed to Serialize an event", e);
+		}
 	}
-	protected abstract void marshallToDatabase(SqlDatabase db);
+	protected abstract void marshallToDatabase(SqlDatabase db) throws SQLException;
 
 	public static <T extends Flyweight> T deserialize(DataInputStream is, Class<T> clazz) {
 		try {
@@ -90,7 +102,6 @@ public abstract class Flyweight {
 			Devotion.logger().log(Level.SEVERE, "Failed to Deserialize a Flyweight", ioe);
 			return null;
 		}
-		
 	}
 	
 	protected static Flyweight unmarshall(DataInputStream is, byte id, byte version) {

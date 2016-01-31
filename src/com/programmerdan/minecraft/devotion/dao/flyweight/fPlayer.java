@@ -1,17 +1,17 @@
 package com.programmerdan.minecraft.devotion.dao.flyweight;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
 
-import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
+import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
@@ -23,65 +23,63 @@ import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
 public abstract class fPlayer extends Flyweight {
-	private static final byte ID = 0x03;
 	private static final byte VERSION = 0x00;
 	
 	protected DevotionEventInfo eventInfo;
 
-	protected fPlayer(PlayerEvent playerEvent, String eventType) {
-		super();
+	protected fPlayer(PlayerEvent playerEvent, FlyweightType flyweightType) {
+		super(flyweightType, VERSION);
 		
-		Player player = playerEvent.getPlayer();
-		
-		this.eventInfo = new DevotionEventInfo();
-		this.eventInfo.eventType = eventType;
-		this.eventInfo.eventTime = new Timestamp(new Date().getTime());
-		this.eventInfo.playerName = player.getName();
-		this.eventInfo.playerUUID = player.getUniqueId().toString();
-		this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
-		this.eventInfo.location = new LocationInfo(player.getLocation());
-		this.eventInfo.gameMode = player.getGameMode() != null ? player.getGameMode().name(): "unknown";
-		this.eventInfo.exhaustion = player.getExhaustion();
-		this.eventInfo.foodLevel = player.getFoodLevel();
-		this.eventInfo.saturation = player.getSaturation();
-		this.eventInfo.totalExperience = player.getTotalExperience();
-		this.eventInfo.inVehicle = player.isInsideVehicle();
-		this.eventInfo.velocityX = player.getVelocity().getX();
-		this.eventInfo.velocityY = player.getVelocity().getY();
-		this.eventInfo.velocityZ = player.getVelocity().getZ();
-		this.eventInfo.remainingAir = player.getRemainingAir();
-		this.eventInfo.sneaking = player.isSneaking();
-		this.eventInfo.sprinting = player.isSprinting();
-		this.eventInfo.blocking = player.isBlocking();
-		this.eventInfo.sleeping = player.isSleeping();
-		this.eventInfo.health = player.getHealth();
-		this.eventInfo.maxHealth = player.getMaxHealth();
+		if(playerEvent != null) {
+			Player player = playerEvent.getPlayer();
+			
+			this.eventInfo = new DevotionEventInfo();
+			this.eventInfo.eventType = flyweightType.getName();
+			this.eventInfo.eventTime = new Timestamp(new Date().getTime());
+			this.eventInfo.playerName = player.getName();
+			this.eventInfo.playerUUID = player.getUniqueId().toString();
+			this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
+			this.eventInfo.location = new LocationInfo(player.getLocation());
+			this.eventInfo.gameMode = player.getGameMode() != null ? player.getGameMode().name(): "unknown";
+			this.eventInfo.exhaustion = player.getExhaustion();
+			this.eventInfo.foodLevel = player.getFoodLevel();
+			this.eventInfo.saturation = player.getSaturation();
+			this.eventInfo.totalExperience = player.getTotalExperience();
+			this.eventInfo.inVehicle = player.isInsideVehicle();
+			this.eventInfo.velocityX = player.getVelocity().getX();
+			this.eventInfo.velocityY = player.getVelocity().getY();
+			this.eventInfo.velocityZ = player.getVelocity().getZ();
+			this.eventInfo.remainingAir = player.getRemainingAir();
+			this.eventInfo.sneaking = player.isSneaking();
+			this.eventInfo.sprinting = player.isSprinting();
+			this.eventInfo.blocking = player.isBlocking();
+			this.eventInfo.sleeping = player.isSleeping();
+			this.eventInfo.health = player.getHealth();
+			this.eventInfo.maxHealth = player.getMaxHealth();
+		}
 	}
 
 	@Override
-	protected void marshallToStream(DataOutputStream os) {
-		try {
-			os.writeUTF(this.eventInfo.playerUUID);
-			os.writeUTF(this.eventInfo.playerName);
-			marshallLocationToStream(this.eventInfo.eyeLocation, os);
-			marshallLocationToStream(this.eventInfo.location, os);
-			os.writeUTF(this.eventInfo.gameMode);
-			os.writeFloat(this.eventInfo.exhaustion);
-			os.writeInt(this.eventInfo.foodLevel);
-			os.writeFloat(this.eventInfo.saturation);
-			os.writeInt(this.eventInfo.totalExperience);
-			os.writeBoolean(this.eventInfo.inVehicle);
-			os.writeDouble(this.eventInfo.velocityX);
-			os.writeDouble(this.eventInfo.velocityY);
-			os.writeDouble(this.eventInfo.velocityZ);
-			os.writeInt(this.eventInfo.remainingAir);
-			os.writeByte( (this.eventInfo.sneaking ? 8 : 0) + (this.eventInfo.sprinting ? 4 : 0) +
-					(this.eventInfo.blocking ? 2 : 0) + (this.eventInfo.sleeping ? 1 : 0));
-			os.writeDouble( this.eventInfo.health);
-			os.writeDouble( this.eventInfo.maxHealth);
-		} catch (IOException ioe) {
-			Devotion.logger().log(Level.SEVERE, "Failed to Serialize an event", ioe);
-		}
+	protected void marshallToStream(DataOutputStream os) throws IOException {
+		os.writeLong(this.eventInfo.eventTime.getTime());
+		os.writeUTF(this.eventInfo.playerName);
+		os.writeUTF(this.eventInfo.playerUUID);
+		marshallLocationToStream(this.eventInfo.eyeLocation, os);
+		marshallLocationToStream(this.eventInfo.location, os);
+		os.writeUTF(this.eventInfo.gameMode);
+		os.writeFloat(this.eventInfo.exhaustion);
+		os.writeInt(this.eventInfo.foodLevel);
+		os.writeFloat(this.eventInfo.saturation);
+		os.writeInt(this.eventInfo.totalExperience);
+		os.writeBoolean(this.eventInfo.inVehicle);
+		os.writeDouble(this.eventInfo.velocityX);
+		os.writeDouble(this.eventInfo.velocityY);
+		os.writeDouble(this.eventInfo.velocityZ);
+		os.writeInt(this.eventInfo.remainingAir);
+		os.writeByte( (this.eventInfo.sneaking ? 8 : 0) + (this.eventInfo.sprinting ? 4 : 0) +
+				(this.eventInfo.blocking ? 2 : 0) + (this.eventInfo.sleeping ? 1 : 0));
+		os.writeDouble( this.eventInfo.health);
+		os.writeDouble( this.eventInfo.maxHealth);
 	}
 	
 	private static void marshallLocationToStream(LocationInfo loc, DataOutputStream os) throws IOException {
@@ -94,61 +92,58 @@ public abstract class fPlayer extends Flyweight {
 	}
 	
 	@Override
-	protected void marshallToDatabase(SqlDatabase db) {
-		try {
-			db.getDevotionEventSource().insert(this.eventInfo);
-		} catch (SQLException e) {
-			Devotion.logger().log(Level.SEVERE, "Failed to Serialize an event", e);
-		}
+	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
+		db.getDevotionEventSource().insert(this.eventInfo);
 	}
 
-	/*
-	protected static Flyweight unmarshall(DataInputStream is, byte id, byte version) {
-		try {
-			if (id == ID && version == VERSION) {
-				String uuid = is.readUTF();
-				String name = is.readUTF();
-				fLocation eyeLocation = fLocation.deserialize(is, fLocation.class);
-				fLocation location = fLocation.deserialize(is, fLocation.class);
-				String gameMode = is.readUTF();
-				float exhaustion = is.readFloat();
-				int foodLevel = is.readInt();
-				float saturation = is.readFloat();
-				int totalExperience = is.readInt();
-				boolean inVehicle = is.readBoolean();
-				double velocityX = is.readDouble();
-				double velocityY = is.readDouble();
-				double velocityZ = is.readDouble();
-				int remainingAir = is.readInt();
-				byte compact = is.readByte();
-				boolean sneaking = (compact & (byte) 0x8 ) > 0;
-				boolean sprinting = (compact & (byte) 0x4 ) > 0;
-				boolean blocking = (compact & (byte) 0x2 ) > 0;
-				boolean sleeping = (compact & (byte) 0x1 ) > 0;
-				double health = is.readDouble();
-				double maxHealth = is.readDouble();
-
-				return new fPlayerMovement(uuid, name, eyeLocation, location, gameMode, exhaustion,
-						foodLevel, saturation, totalExperience, inVehicle, velocityX, velocityY,
-						velocityZ, remainingAir, sneaking, sprinting, blocking, sleeping,
-						health, maxHealth);
-			} else {
-				return null;
-			}
-		} catch (IOException ioe) {
-			Devotion.logger().log(Level.SEVERE, "Failed to Deserialize a PlayerMovement", ioe);
-			return null;
-		}
+	protected static Flyweight unmarshallFromStream(DataInputStream is, byte id, byte version) throws IOException {
+		if(version != VERSION) return null;
+		
+		fPlayer flyweight = PlayerFactory.create(id);
+		flyweight.unmarshallFromStream(is);
+		
+		return flyweight;
 	}
-	*/
-
-	@Override
-	protected byte getID() {
-		return fPlayer.ID;
+	
+	protected void unmarshallFromStream(DataInputStream is) throws IOException {
+		this.eventInfo = new DevotionEventInfo();
+		this.eventInfo.eventTime = new Timestamp(is.readLong());
+		this.eventInfo.eventType = getFlyweightType().getName();
+		this.eventInfo.playerName = is.readUTF();
+		this.eventInfo.playerUUID = is.readUTF();
+		this.eventInfo.eyeLocation = unmarshallLocationFromStream(is);
+		this.eventInfo.location = unmarshallLocationFromStream(is);
+		this.eventInfo.gameMode = is.readUTF();
+		this.eventInfo.exhaustion = is.readFloat();
+		this.eventInfo.foodLevel = is.readInt();
+		this.eventInfo.saturation = is.readFloat();
+		this.eventInfo.totalExperience = is.readInt();
+		this.eventInfo.inVehicle = is.readBoolean();
+		this.eventInfo.velocityX = is.readDouble();
+		this.eventInfo.velocityY = is.readDouble();
+		this.eventInfo.velocityZ = is.readDouble();
+		this.eventInfo.remainingAir = is.readInt();
+		
+		byte compact = is.readByte();
+		this.eventInfo.sneaking = (compact & (byte) 0x8 ) > 0;
+		this.eventInfo.sprinting = (compact & (byte) 0x4 ) > 0;
+		this.eventInfo.blocking = (compact & (byte) 0x2 ) > 0;
+		this.eventInfo.sleeping = (compact & (byte) 0x1 ) > 0;
+		
+		this.eventInfo.health = is.readDouble();
+		this.eventInfo.maxHealth = is.readDouble();
 	}
-
-	@Override
-	protected byte getVersion() {
-		return fPlayer.VERSION;
+	
+	private static LocationInfo unmarshallLocationFromStream(DataInputStream is) throws IOException {
+		LocationInfo loc = new LocationInfo();
+		
+		loc.worldUUID = is.readUTF();
+		loc.x = is.readDouble();
+		loc.y = is.readDouble();
+		loc.z = is.readDouble();
+		loc.yaw = is.readFloat();
+		loc.pitch = is.readFloat();
+		
+		return loc;
 	}
 }
