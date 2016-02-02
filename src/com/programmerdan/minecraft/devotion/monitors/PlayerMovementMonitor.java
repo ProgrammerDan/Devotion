@@ -1,20 +1,28 @@
 package com.programmerdan.minecraft.devotion.monitors;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 
 import com.programmerdan.minecraft.devotion.DataHandler;
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -82,7 +90,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void monitorPlayerJoin(PlayerJoinEvent event) {
+	public void onPlayerJoin(PlayerJoinEvent event) {
 		insert(event);
 		checkAdd(event.getPlayer().getUniqueId());
 	}
@@ -94,7 +102,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerMovement(PlayerMoveEvent event) {
+	public void onPlayerMove(PlayerMoveEvent event) {
 		if (onlyAsynch) return;
 		
 		if (onlyEvent) {
@@ -111,6 +119,11 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 				lastMovementSample.put(p, System.currentTimeMillis());
 			}
 		}
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		insert(event);
 	}
 	
 	/**

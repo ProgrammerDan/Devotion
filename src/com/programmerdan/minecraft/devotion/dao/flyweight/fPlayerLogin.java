@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 import org.bukkit.event.player.PlayerLoginEvent;
 
@@ -32,8 +31,6 @@ public class fPlayerLogin extends fPlayer {
 	protected void marshallToStream(DataOutputStream os) throws IOException {
 		super.marshallToStream(os);
 		
-		os.writeLong(this.loginInfo.eventTime.getTime());
-		os.writeUTF(this.loginInfo.playerUUID);
 		os.writeUTF(this.loginInfo.address);
 		os.writeUTF(this.loginInfo.hostname);
 		os.writeUTF(this.loginInfo.realAddress);
@@ -44,8 +41,8 @@ public class fPlayerLogin extends fPlayer {
 		super.unmarshallFromStream(is);
 		
 		this.loginInfo = new DevotionEventLoginInfo();
-		this.loginInfo.eventTime = new Timestamp(is.readLong());
-		this.loginInfo.playerUUID = is.readUTF();
+		this.loginInfo.eventTime = this.eventInfo.eventTime;
+		this.loginInfo.playerUUID = this.eventInfo.playerUUID;
 		this.loginInfo.address = is.readUTF();
 		this.loginInfo.hostname = is.readUTF();
 		this.loginInfo.realAddress = is.readUTF();

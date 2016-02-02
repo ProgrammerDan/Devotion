@@ -3,6 +3,7 @@ package com.programmerdan.minecraft.devotion.dao.flyweight;
 import java.util.ArrayList;
 
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -19,6 +20,7 @@ public class PlayerFactory {
 		Definitions.add(new EventDefinition(FlyweightType.Join.getId(), PlayerJoinEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Quit.getId(), PlayerQuitEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Move.getId(), PlayerMoveEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Interact.getId(), PlayerInteractEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -35,6 +37,7 @@ public class PlayerFactory {
 		if(id == FlyweightType.Join.getId()) return new fPlayerJoin((PlayerJoinEvent)event);
 		if(id == FlyweightType.Quit.getId()) return new fPlayerQuit((PlayerQuitEvent)event);
 		if(id == FlyweightType.Move.getId()) return new fPlayerMove((PlayerMoveEvent)event);
+		if(id == FlyweightType.Interact.getId()) return new fPlayerInteract((PlayerInteractEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}
