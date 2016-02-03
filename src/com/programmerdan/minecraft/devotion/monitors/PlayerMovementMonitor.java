@@ -44,6 +44,10 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	
 	private PlayerMovementMonitorConfig config;
 	
+	protected PlayerMovementMonitorConfig getConfig() {
+		return config;
+	}
+	
 	public PlayerMovementMonitor(PlayerMovementMonitorConfig config) {
 		this.config = config;
 	}

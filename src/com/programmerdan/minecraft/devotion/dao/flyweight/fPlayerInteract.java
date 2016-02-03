@@ -39,6 +39,7 @@ public class fPlayerInteract extends fPlayer {
 			this.interactInfo.actionName = event.getAction().name();
 			this.interactInfo.clickedBlockType = event.getClickedBlock().getType().name();
 			this.interactInfo.blockFace = event.getBlockFace().name();
+			this.interactInfo.eventCancelled = event.isCancelled();
 		}
 	}
 	
@@ -90,6 +91,7 @@ public class fPlayerInteract extends fPlayer {
 		os.writeUTF(this.interactInfo.actionName);
 		os.writeUTF(this.interactInfo.clickedBlockType);
 		os.writeUTF(this.interactInfo.blockFace);
+		os.writeBoolean(this.interactInfo.eventCancelled);
 	}
 	
 	@Override
@@ -118,6 +120,8 @@ public class fPlayerInteract extends fPlayer {
 		this.interactInfo.actionName = is.readUTF();
 		this.interactInfo.clickedBlockType = is.readUTF();
 		this.interactInfo.blockFace = is.readUTF();
+		
+		this.interactInfo.eventCancelled = is.readBoolean();
 	}
 	
 	@Override

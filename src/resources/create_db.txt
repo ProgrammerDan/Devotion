@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS devotion_event_interact (
    ,action_name VARCHAR(20) NOT NULL
    ,clicked_block_type VARCHAR(50) NOT NULL
    ,block_face VARCHAR(20) NOT NULL
+   ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_devotion_event_interact PRIMARY KEY (devotion_event_interact_id)
 )

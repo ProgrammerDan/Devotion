@@ -14,4 +14,5 @@ public class DevotionEventInteractInfo {
 	public String actionName;
 	public String clickedBlockType;
 	public String blockFace;
+	public Boolean eventCancelled;
 }

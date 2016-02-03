@@ -22,7 +22,7 @@ public class PlayerMovementMonitorThread extends BukkitRunnable {
 	
 	public PlayerMovementMonitorThread(PlayerMovementMonitor monitor) {
 		this.monitor = monitor;
-		targetDelay = 20;
+		targetDelay = monitor.getConfig().timeoutBetweenSampling;
 		adaptive = false;
 	}
 	
