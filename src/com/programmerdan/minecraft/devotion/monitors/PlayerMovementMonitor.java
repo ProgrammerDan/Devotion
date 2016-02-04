@@ -1,28 +1,23 @@
 package com.programmerdan.minecraft.devotion.monitors;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.programmerdan.minecraft.devotion.DataHandler;
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -130,6 +125,16 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		insert(event);
 	}
 	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerKick(PlayerKickEvent event) {
+		insert(event);
+	}
+
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerTelport(PlayerTeleportEvent event) {
+		insert(event);
+	}
+
 	/**
 	 * Called by MonitorThread, triggers a periodic sampling process
 	 * 

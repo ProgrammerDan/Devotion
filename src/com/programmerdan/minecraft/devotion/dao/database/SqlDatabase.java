@@ -37,6 +37,16 @@ public class SqlDatabase {
     	return this.devotionEventInteractSource;
     }
 
+    private DevotionEventKickSource devotionEventKickSource;
+    public DevotionEventKickSource getDevotionEventKickSource() {
+    	return this.devotionEventKickSource;
+    }
+
+    private DevotionEventTeleportSource devotionEventTeleportSource;
+    public DevotionEventTeleportSource getDevotionEventTeleportSource() {
+    	return this.devotionEventTeleportSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -73,6 +83,8 @@ public class SqlDatabase {
     	this.sourceList.add(this.devotionEventSource = new DevotionEventSource(this));
     	this.sourceList.add(this.devotionEventLoginSource = new DevotionEventLoginSource(this));
     	this.sourceList.add(this.devotionEventInteractSource = new DevotionEventInteractSource(this));
+    	this.sourceList.add(this.devotionEventKickSource = new DevotionEventKickSource(this));
+    	this.sourceList.add(this.devotionEventTeleportSource = new DevotionEventTeleportSource(this));
     }
     
     public void close() {

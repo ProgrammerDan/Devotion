@@ -58,4 +58,23 @@ CREATE TABLE IF NOT EXISTS devotion_event_interact (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_devotion_event_interact PRIMARY KEY (devotion_event_interact_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_kick (
+    devotion_event_kick_id BIGINT NOT NULL AUTO_INCREMENT
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL   
+   ,leave_message VARCHAR(500)
+   ,kick_reason VARCHAR(500)
+   
+   ,CONSTRAINT pk_devotion_event_kick PRIMARY KEY (devotion_event_kick_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_teleport (
+    devotion_event_teleport_id BIGINT NOT NULL AUTO_INCREMENT
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL   
+   ,cause VARCHAR(20)
+   
+   ,CONSTRAINT pk_devotion_event_teleport PRIMARY KEY (devotion_event_teleport_id)
 )

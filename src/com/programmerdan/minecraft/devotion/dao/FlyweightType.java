@@ -21,4 +21,6 @@ public class FlyweightType {
 	public static final FlyweightType Quit = new FlyweightType((byte) 0x03, "Quit");
 	public static final FlyweightType Move = new FlyweightType((byte) 0x04, "Move");
 	public static final FlyweightType Interact = new FlyweightType((byte) 0x05, "Interact");
+	public static final FlyweightType Kick = new FlyweightType((byte) 0x06, "Kick");
+	public static final FlyweightType Teleport = new FlyweightType((byte) 0x07, "Teleport");
 }
