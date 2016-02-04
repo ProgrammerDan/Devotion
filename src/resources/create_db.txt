@@ -77,4 +77,23 @@ CREATE TABLE IF NOT EXISTS devotion_event_teleport (
    ,cause VARCHAR(20)
    
    ,CONSTRAINT pk_devotion_event_teleport PRIMARY KEY (devotion_event_teleport_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_respawn (
+    devotion_event_respawn_id BIGINT NOT NULL AUTO_INCREMENT
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL   
+   ,is_bed_spawn BIT NOT NULL
+   
+   ,CONSTRAINT pk_devotion_event_respawn PRIMARY KEY (devotion_event_respawn_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_toggle (
+    devotion_event_toggle_id BIGINT NOT NULL AUTO_INCREMENT
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL
+   ,toggle_value BIT NOT NULL
+   ,cancel BIT NOT NULL
+   
+   ,CONSTRAINT pk_devotion_event_toggle PRIMARY KEY (devotion_event_toggle_id)
 )

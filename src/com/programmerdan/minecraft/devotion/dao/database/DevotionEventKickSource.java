@@ -6,6 +6,11 @@ import java.sql.Types;
 
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventKickInfo;
 
+/**
+ * @author Aleksey Terzi
+ *
+ */
+
 public class DevotionEventKickSource extends Source {
 	private static final String insertScript = "INSERT devotion_event_interact (event_time, player_uuid, leave_message, kick_reason) VALUES (?, ?, ?, ?)";
 	

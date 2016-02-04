@@ -3,6 +3,11 @@ package com.programmerdan.minecraft.devotion.dao.database;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * @author Aleksey Terzi
+ *
+ */
+
 public abstract class Source {
 	private SqlDatabase db;
 	private PreparedStatement sql;

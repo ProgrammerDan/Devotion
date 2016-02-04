@@ -11,6 +11,11 @@ import java.util.logging.Logger;
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceException;
 import com.programmerdan.minecraft.devotion.util.ResourceHelper;
 
+/**
+ * @author Aleksey Terzi
+ *
+ */
+
 public class SqlDatabase {
 	private String host;
     private int port;
@@ -45,6 +50,16 @@ public class SqlDatabase {
     private DevotionEventTeleportSource devotionEventTeleportSource;
     public DevotionEventTeleportSource getDevotionEventTeleportSource() {
     	return this.devotionEventTeleportSource;
+    }
+
+    private DevotionEventRespawnSource devotionEventRespawnSource;
+    public DevotionEventRespawnSource getDevotionEventRespawnSource() {
+    	return this.devotionEventRespawnSource;
+    }
+
+    private DevotionEventToggleSource devotionEventToggleSource;
+    public DevotionEventToggleSource getDevotionEventToggleSource() {
+    	return this.devotionEventToggleSource;
     }
 
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
@@ -85,6 +100,8 @@ public class SqlDatabase {
     	this.sourceList.add(this.devotionEventInteractSource = new DevotionEventInteractSource(this));
     	this.sourceList.add(this.devotionEventKickSource = new DevotionEventKickSource(this));
     	this.sourceList.add(this.devotionEventTeleportSource = new DevotionEventTeleportSource(this));
+    	this.sourceList.add(this.devotionEventRespawnSource = new DevotionEventRespawnSource(this));
+    	this.sourceList.add(this.devotionEventToggleSource = new DevotionEventToggleSource(this));
     }
     
     public void close() {

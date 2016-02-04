@@ -6,6 +6,11 @@ import java.sql.Types;
 
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventTeleportInfo;
 
+/**
+ * @author Aleksey Terzi
+ *
+ */
+
 public class DevotionEventTeleportSource extends Source {
 	private static final String insertScript = "INSERT devotion_event_teleport (event_time, player_uuid, cause) VALUES (?, ?, ?)";
 	

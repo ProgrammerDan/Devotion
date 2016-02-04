@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -19,7 +20,11 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
@@ -37,15 +42,15 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
  *  <li>Player Move</li>
  *  <li>Player Teleport - subclass of move, but with extra data</li>
  *  <li>Player Kick</li>
- * </ul>
- * 
- * TODO:
- * <ul>
  *  <li>PlayerChangedWorldEvent</li>
  *  <li>PlayerRespawnEvent</li>
  *  <li>PlayerToggleFlightEvent</li>
  *  <li>PlayerToggleSneakEvent</li>
  *  <li>PlayerToggleSprintEvent</li>
+ * </ul>
+ * 
+ * TODO:
+ * <ul>
  *  <li>PlayerVelocityEvent</li>
  * </ul>
  * 
@@ -187,6 +192,31 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerTelport(PlayerTeleportEvent event) {
+		insert(event);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+		insert(event);
+	}
+
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		insert(event);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+		insert(event);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+		insert(event);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
 		insert(event);
 	}
 

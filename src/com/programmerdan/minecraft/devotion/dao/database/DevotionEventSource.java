@@ -5,6 +5,11 @@ import java.sql.SQLException;
 
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInfo;
 
+/**
+ * @author Aleksey Terzi
+ *
+ */
+
 public class DevotionEventSource extends Source {
 	private static final String insertScript = "INSERT devotion_event (event_time, event_type, player_name, player_uuid, location_worlduuid, location_x, location_y, location_z, location_yaw, location_pitch, location_eye_worlduuid, location_eye_x, location_eye_y, location_eye_z, location_eye_yaw, location_eye_pitch, game_mode, exhaustion, food_level, saturation, total_experience, velocity_x, velocity_y, velocity_z, remaining_air, health, max_health, status_flags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	

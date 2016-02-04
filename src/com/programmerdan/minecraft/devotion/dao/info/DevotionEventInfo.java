@@ -3,7 +3,6 @@ package com.programmerdan.minecraft.devotion.dao.info;
 import java.sql.Timestamp;
 
 public class DevotionEventInfo {
-	public int devotionEventId;
 	public Timestamp eventTime;
 	public String eventType;
 	

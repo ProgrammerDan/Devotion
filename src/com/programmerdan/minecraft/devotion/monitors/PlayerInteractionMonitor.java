@@ -2,7 +2,6 @@ package com.programmerdan.minecraft.devotion.monitors;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
@@ -153,9 +152,4 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 			insert(event);
 		} // else skip.
 	}
-	
-	
-	
-
-
 }
