@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.programmerdan.minecraft.devotion.dao.DAOException;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
@@ -25,6 +27,8 @@ public class PlayerFactory {
 		Definitions.add(new EventDefinition(FlyweightType.Quit.getId(), PlayerQuitEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Move.getId(), PlayerMoveEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Interact.getId(), PlayerInteractEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Kick.getId(), PlayerKickEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Teleport.getId(), PlayerTeleportEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -42,6 +46,8 @@ public class PlayerFactory {
 		if(id == FlyweightType.Quit.getId()) return new fPlayerQuit((PlayerQuitEvent)event);
 		if(id == FlyweightType.Move.getId()) return new fPlayerMove((PlayerMoveEvent)event);
 		if(id == FlyweightType.Interact.getId()) return new fPlayerInteract((PlayerInteractEvent)event);
+		if(id == FlyweightType.Kick.getId()) return new fPlayerKick((PlayerKickEvent)event);
+		if(id == FlyweightType.Teleport.getId()) return new fPlayerTeleport((PlayerTeleportEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}
