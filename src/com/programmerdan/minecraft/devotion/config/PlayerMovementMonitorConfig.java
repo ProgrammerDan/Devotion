@@ -4,7 +4,7 @@ import com.programmerdan.minecraft.devotion.monitors.SamplingMethod;
 
 /**
  * Wrapper holding configuration for player movement monitor
- * @author Daniel
+ * @author ProgrammerDan <programmerdan@gmail.com>
  *
  */
 public class PlayerMovementMonitorConfig {

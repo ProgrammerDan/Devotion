@@ -1,10 +1,11 @@
-package com.programmerdan.minecraft.devotion;
+package com.programmerdan.minecraft.devotion.datahandlers;
 
 import java.sql.SQLException;
 import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.util.FlowHelper;
@@ -65,7 +66,7 @@ public class DatabaseDataHandler extends DataHandler {
 	}
 
 	@Override
-	void buildUp() {
+	public void buildUp() {
 		if (!this.db.initDb()) {
 			this.db.close();
 			setActive(false);

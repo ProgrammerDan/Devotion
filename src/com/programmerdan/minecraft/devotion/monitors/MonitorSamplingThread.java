@@ -13,19 +13,27 @@ import com.programmerdan.minecraft.devotion.Devotion;
  * @author ProgrammerDan <programmerdan@gmail.com>
  *
  */
-public class PlayerMovementMonitorThread extends BukkitRunnable {
+public class MonitorSamplingThread extends BukkitRunnable {
 
-	private PlayerMovementMonitor monitor;
+	private Monitor monitor;
 	
 	private long targetDelay;
 	private boolean adaptive;
 	
-	public PlayerMovementMonitorThread(PlayerMovementMonitor monitor) {
+	/**
+	 * Create a new Sampling thread with the target monitor.
+	 * @param monitor
+	 */
+	public MonitorSamplingThread(Monitor monitor) {
 		this.monitor = monitor;
-		targetDelay = monitor.getConfig().timeoutBetweenSampling;
+		targetDelay = 100l;
 		adaptive = false;
 	}
 	
+	/**
+	 * Allows to set or reset the current running mode of this sampling trigger thread to periodic.
+	 * @param targetDelay server Ticks between invocations.
+	 */
 	public void startPeriodic(long targetDelay) {
 		this.targetDelay = targetDelay;
 		if (adaptive) {
@@ -37,6 +45,10 @@ public class PlayerMovementMonitorThread extends BukkitRunnable {
 		}
 	}
 	
+	/**
+	 * Allows to set or reset the current running mode of this sampling trigger thread to adaptive.
+	 * @param targetDelay Milliseconds between invocations.
+	 */
 	public void startAdaptive(long targetDelay) {
 		this.targetDelay = targetDelay;
 		
@@ -49,7 +61,10 @@ public class PlayerMovementMonitorThread extends BukkitRunnable {
 		}
 	}
 	
-	public void activate() {
+	/**
+	 * Used internally to actually kick ass the task.
+	 */
+	private void activate() {
 		if (adaptive) {
 			this.runTaskLaterAsynchronously(Devotion.instance(), convertToTicks(this.targetDelay) ); // convert milliseconds into ticks
 		} else{

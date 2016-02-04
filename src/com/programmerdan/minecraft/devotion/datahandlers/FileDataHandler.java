@@ -1,4 +1,4 @@
-package com.programmerdan.minecraft.devotion;
+package com.programmerdan.minecraft.devotion.datahandlers;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.util.FlowHelper;
 
@@ -150,7 +151,7 @@ public class FileDataHandler extends DataHandler {
 	 * writes as they accumulate.
 	 */
 	@Override
-	void buildUp() {
+	public void buildUp() {
 		this.lastSampleTime = System.currentTimeMillis();
 		this.getStream();
 	}

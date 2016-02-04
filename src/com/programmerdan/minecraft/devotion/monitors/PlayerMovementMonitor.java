@@ -1,41 +1,60 @@
 package com.programmerdan.minecraft.devotion.monitors;
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.enchantments.Enchantment;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 
-import com.programmerdan.minecraft.devotion.DataHandler;
 import com.programmerdan.minecraft.devotion.Devotion;
-import com.programmerdan.minecraft.devotion.Monitor;
 import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
 
+/**
+ * Player Movement Monitor -- tracks movement related calls.
+ * 
+ * Current:
+ * <ul>
+ *  <li>Player Login</li>
+ *  <li>Player Join</li>
+ *  <li>Player Quit</li>
+ *  <li>Player Move</li>
+ * </ul>
+ * 
+ * TODO:
+ * <ul>
+ *  <li>Player Teleport - subclass of move, but with extra data</li>
+ *  <li>Player Kick</li>
+ *  <li>PlayerChangedWorldEvent</li>
+ *  <li>PlayerRespawnEvent</li>
+ *  <li>PlayerToggleFlightEvent</li>
+ *  <li>PlayerToggleSneakEvent</li>
+ *  <li>PlayerToggleSprintEvent</li>
+ *  <li>PlayerVelocityEvent</li>
+ * </ul>
+ * 
+ * @author ProgrammerDan<programmerdan@gmail.com>
+ * @author Aleksey Terzi
+ *
+ */
 public class PlayerMovementMonitor extends Monitor implements Listener {
 
 	private ConcurrentLinkedQueue<UUID> playersToMonitor;
 	private ConcurrentHashMap<UUID,Boolean> playersToRemove;
-	private PlayerMovementMonitorThread asynch;
+	private MonitorSamplingThread asynch;
 	
 	private boolean onlyAsynch;
 	private boolean onlyEvent;
@@ -44,12 +63,26 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	
 	private PlayerMovementMonitorConfig config;
 	
+	private AtomicBoolean isSampling = new AtomicBoolean(false);
+	
 	protected PlayerMovementMonitorConfig getConfig() {
 		return config;
 	}
 	
-	public PlayerMovementMonitor(PlayerMovementMonitorConfig config) {
+	private PlayerMovementMonitor(PlayerMovementMonitorConfig config) {
 		this.config = config;
+	}
+	
+	public static PlayerMovementMonitor generate(ConfigurationSection config) {
+		if (config == null) return null;
+		PlayerMovementMonitorConfig pmmc = new PlayerMovementMonitorConfig();
+		pmmc.technique = SamplingMethod.valueOf(config.getString("sampling", "onevent"));
+		pmmc.timeoutBetweenSampling = config.getLong("sampling_period", 1000l);
+		pmmc.sampleSize = config.getInt("sampling_size", 50);
+		PlayerMovementMonitor pmm = new PlayerMovementMonitor(pmmc);
+		pmm.setDebug(config.getBoolean("debug", Devotion.instance().isDebug()));
+		
+		return pmm;
 	}
 
 	@Override
@@ -61,10 +94,17 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		playersToMonitor = new ConcurrentLinkedQueue<UUID>();
 		playersToRemove = new ConcurrentHashMap<UUID, Boolean>(5000, .75f, 5); // large pre-claimed space, default load factor, est. 5 concurrent threads
 		
-		onlyAsynch = !SamplingMethod.onevent.equals(config.technique); // Onevent is only non-asynch sampling technique.
+		onlyAsynch = !SamplingMethod.onevent.equals(this.config.technique); // Onevent is only non-asynch sampling technique.
 		if (!onlyAsynch) {
 			lastMovementSample = new ConcurrentHashMap<UUID, Long>(5000, .75f, 5);
 			onlyEvent = true;
+		} else{
+			asynch = new MonitorSamplingThread(this);
+			if (SamplingMethod.continuous.equals(this.config.technique)) {
+				asynch.startAdaptive(this.config.timeoutBetweenSampling);
+			} else {
+				asynch.startPeriodic(this.config.timeoutBetweenSampling);
+			}
 		}
 		
 		Devotion.instance().getServer().getPluginManager().registerEvents(this, Devotion.instance());
@@ -78,7 +118,11 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 			return;
 		}
 
-		// TODO: any teardown. No need to unregister listener.
+		// Note: if asynch is set, it auto-self-terminates when this monitor is disabled.
+		//  all the same, calling cancel explicitly here (for now: TODO)
+		if (asynch != null) {
+			asynch.cancel();
+		}
 
 		super.setEnabled(false);
 		
@@ -107,17 +151,20 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerMove(PlayerMoveEvent event) {
-		if (onlyAsynch) return;
+		if (onlyAsynch) {
+			checkAdd(event.getPlayer().getUniqueId());
+			return;
+		}
 		
 		if (onlyEvent) {
 			UUID p = event.getPlayer().getUniqueId();
-			if (config.timeoutBetweenSampling <= 0) { // bypass throttling by setting timeout to 0.
+			if (this.config.timeoutBetweenSampling <= 0) { // bypass throttling by setting timeout to 0.
 				insert(event);
 			} else {
 				Long lastSample = lastMovementSample.get(p);
 				long timePassed = lastSample != null ? System.currentTimeMillis() - lastSample: config.timeoutBetweenSampling;
 				
-				if (timePassed < config.timeoutBetweenSampling) return;
+				if (timePassed < this.config.timeoutBetweenSampling) return;
 				
 				insert(event);
 				lastMovementSample.put(p, System.currentTimeMillis());
@@ -125,21 +172,18 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 		}
 	}
 	
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		insert(event);
-	}
-	
 	/**
 	 * Called by MonitorThread, triggers a periodic sampling process
 	 * 
-	 * This might not be safe to call the Bukkit function. Trying it, we can recode if unsafe.
+	 * TODO: This might not be safe to call the Bukkit function. Trying it, we can recode if unsafe.
 	 */
 	protected void doSample() {
+		if (!isEnabled()) return; // not enabled, stopping.
+		if (isSampling.getAndSet(true)) return; // already sampling.
 		int samples = 0;
 		UUID start = playersToMonitor.poll();
 		UUID now = start;
-		while (now != null && samples <= config.sampleSize) {
+		while (now != null && samples <= this.config.sampleSize) {
 			Player p = Bukkit.getPlayer(now);
 			if (p != null) {
 				insert(new PlayerMoveEvent(p, new Location(null, 0, 0, 0), new Location(null, 0, 0, 0)));
@@ -150,14 +194,17 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 			if (start.equals(now)) break; // we've sampled everyone
 		}
 		checkRemove(start); // put first person back on the list.
+		isSampling.set(false);
 	}
 	
+	/**
+	 * Quickly create a flyweight and pass it along to the active handlers.
+	 * @param event
+	 */
 	private void insert(PlayerEvent event) {
 		Flyweight flyweight = PlayerFactory.create(event);
 		
-		for(DataHandler handler : Devotion.instance().getHandlers()) {
-			handler.insert(flyweight);
-		}
+		Devotion.instance().insert(flyweight);
 	}
 	
 	/**

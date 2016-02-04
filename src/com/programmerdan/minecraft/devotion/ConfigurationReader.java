@@ -3,10 +3,19 @@ package com.programmerdan.minecraft.devotion;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
+import com.programmerdan.minecraft.devotion.datahandlers.DataHandler;
+import com.programmerdan.minecraft.devotion.datahandlers.DatabaseDataHandler;
+import com.programmerdan.minecraft.devotion.datahandlers.FileDataHandler;
+import com.programmerdan.minecraft.devotion.monitors.Monitor;
+import com.programmerdan.minecraft.devotion.monitors.PlayerInteractionMonitor;
 import com.programmerdan.minecraft.devotion.monitors.PlayerMovementMonitor;
-import com.programmerdan.minecraft.devotion.monitors.SamplingMethod;
 
+/**
+ * Handles loading of configurations, including establishment of the various monitors,
+ * handlers, and whatever else comprises Devotion.
+ * 
+ * @author ProgrammerDan <programmerdan@gmail.com>
+ */
 public class ConfigurationReader {
 	public static boolean readConfig() {
 		log("Loading configuration");
@@ -24,16 +33,27 @@ public class ConfigurationReader {
 		// Discover and configure Monitors
 		ConfigurationSection monitors = conf.getConfigurationSection("monitors");
 
-		ConfigurationSection monitor = monitors.getConfigurationSection("movement");
-		if (monitor != null) {
-			PlayerMovementMonitorConfig pmmc = new PlayerMovementMonitorConfig();
-			pmmc.technique = SamplingMethod.valueOf(monitor.getString("sampling", "onevent"));
-			pmmc.timeoutBetweenSampling = monitor.getLong("sampling_period", 1000l);
-			pmmc.sampleSize = monitor.getInt("sampling_size", 50);
-			PlayerMovementMonitor pmm = new PlayerMovementMonitor(pmmc);
-			Devotion.instance().registerMonitor(pmm);
+		ConfigurationSection movement = monitors.getConfigurationSection("movement");
+		if (movement != null) {
+			Monitor pmm = PlayerMovementMonitor.generate(movement);
+			if (pmm != null){
+				Devotion.instance().registerMonitor(pmm);
+				log("Player Movement Monitor is registered");
+			}
+		}
+		
+		ConfigurationSection interaction = monitors.getConfigurationSection("interaction");
+		if (interaction != null) {
+			Monitor pim = PlayerInteractionMonitor.generate(interaction);
+			if (pim != null){
+				Devotion.instance().registerMonitor(pim);
+				log("Player Interaction Monitor is registered");
+			}
 		}
 	
+		// TODO: next monitor is inventory
+		
+		
 		ConfigurationSection dao = conf.getConfigurationSection("dao");
 
 		// Get Database information, wire up DAO

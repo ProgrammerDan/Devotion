@@ -38,5 +38,7 @@ monitors:
     sampling: onevent
     sampling_period: 1000
 #   sampling_size: 5  (for continuous/roundrobin)
+  interaction:
+    sampling_delay: 5
   inventory:
     active: true

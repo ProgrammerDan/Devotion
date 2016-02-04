@@ -12,6 +12,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import com.programmerdan.minecraft.devotion.dao.DAOException;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 
+/**
+ * 
+ * @author Aleksey Terzi
+ */
 public class PlayerFactory {
 	private static final ArrayList<EventDefinition> Definitions = new ArrayList<EventDefinition>();
 	
