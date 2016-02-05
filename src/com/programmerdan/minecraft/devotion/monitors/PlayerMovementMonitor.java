@@ -29,7 +29,7 @@ import org.bukkit.event.player.PlayerToggleSprintEvent;
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerMovementMonitorConfig;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
-import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
+import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
 
 /**
  * Player Movement Monitor -- tracks movement related calls.
@@ -181,17 +181,12 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		insert(event);
-	}
-	
-	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerKick(PlayerKickEvent event) {
 		insert(event);
 	}
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerTelport(PlayerTeleportEvent event) {
+	public void onPlayerTeleport(PlayerTeleportEvent event) {
 		insert(event);
 	}
 	
@@ -250,7 +245,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	 * @param event
 	 */
 	private void insert(PlayerEvent event) {
-		Flyweight flyweight = PlayerFactory.create(event);
+		Flyweight flyweight = FlyweightFactory.create(event);
 		
 		Devotion.instance().insert(flyweight);
 	}

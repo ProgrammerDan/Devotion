@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.programmerdan.minecraft.devotion.commands.CommandHandler;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
-import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
+import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
 import com.programmerdan.minecraft.devotion.datahandlers.DataHandler;
 import com.programmerdan.minecraft.devotion.monitors.Monitor;
 
@@ -116,7 +116,7 @@ public class Devotion extends JavaPlugin {
 		activeMonitors = new Vector<Monitor>();
 		dataHandlers = new Vector<DataHandler>();
 		
-		PlayerFactory.init();
+		FlyweightFactory.init();
 
 		if (ConfigurationReader.readConfig()) {
 			for (DataHandler dh : dataHandlers) {

@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventTeleportInfo;
+import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 
 /**
  * Soft wrapper for the abstract underlying class.
@@ -28,6 +29,9 @@ public class fPlayerTeleport extends fPlayer {
 			this.teleportInfo.eventTime = this.eventInfo.eventTime;
 			this.teleportInfo.playerUUID = this.eventInfo.playerUUID;
 			this.teleportInfo.cause = event.getCause().name();
+			this.teleportInfo.from = new LocationInfo(event.getFrom());
+			this.teleportInfo.to = new LocationInfo(event.getTo());
+			this.teleportInfo.cancelled = event.isCancelled();
 		}
 	}
 	
@@ -36,6 +40,9 @@ public class fPlayerTeleport extends fPlayer {
 		super.marshallToStream(os);
 		
 		os.writeUTF(this.teleportInfo.cause != null ? this.teleportInfo.cause: "");
+		marshallLocationToStream(this.teleportInfo.from, os);
+		marshallLocationToStream(this.teleportInfo.to, os);
+		os.writeBoolean(this.teleportInfo.cancelled);
 	}
 	
 	@Override
@@ -48,6 +55,9 @@ public class fPlayerTeleport extends fPlayer {
 
 		this.teleportInfo.cause = is.readUTF();
 		if(this.teleportInfo.cause == "") this.teleportInfo.cause = null;
+		this.teleportInfo.from = unmarshallLocationFromStream(is);
+		this.teleportInfo.to = unmarshallLocationFromStream(is);
+		this.teleportInfo.cancelled = is.readBoolean();
 	}
 	
 	@Override

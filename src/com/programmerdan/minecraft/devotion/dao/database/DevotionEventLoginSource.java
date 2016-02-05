@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventLoginInfo;
  */
 
 public class DevotionEventLoginSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_login (event_time, player_uuid, address, hostname, real_address) VALUES (?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_login (event_time, player_uuid, address, hostname, real_address, result, kick_message) VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
 	public DevotionEventLoginSource(SqlDatabase db) {
 		super(db);
@@ -25,7 +25,8 @@ public class DevotionEventLoginSource extends Source {
 		sql.setString(3, info.address);
 		sql.setString(4, info.hostname);
 		sql.setString(5, info.realAddress);
-		
+		sql.setString(6, info.result);
+		sql.setString(7,  info.kickMessage);
 		sql.addBatch();
 	}
 }

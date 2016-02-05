@@ -13,7 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerInteractionMonitorConfig;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
-import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
+import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
 
 /**
  * Player Interaction Monitor -- tracks interactions with the MC world.
@@ -44,6 +44,7 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.PlayerFactory;
  *     <li>PlayerResourcePackStatusEvent</li>
  *     <li>PlayerShearEntityEvent</li>
  *     <li>PlayerStatisticIncrementEvent</li>
+ * 	   <li>PlayerDeathEvent</li>
  * </ul>
  * 
  * TODO: extract inventory events into PlayerInventoryMonitor
@@ -134,7 +135,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	 * @param event
 	 */
 	private void insert(PlayerEvent event) {
-		Flyweight flyweight = PlayerFactory.create(event);
+		Flyweight flyweight = FlyweightFactory.create(event);
 		
 		Devotion.instance().insert(flyweight);
 	}

@@ -23,7 +23,7 @@ import com.programmerdan.minecraft.devotion.dao.FlyweightType;
  * 
  * @author Aleksey Terzi
  */
-public class PlayerFactory {
+public class FlyweightFactory {
 	private static final ArrayList<EventDefinition> Definitions = new ArrayList<EventDefinition>();
 	
 	public static void init() {

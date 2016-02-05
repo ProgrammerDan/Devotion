@@ -20,10 +20,11 @@ public enum PlayerInteractionType {
 	PlayerPickupItemEvent(16),
 	PlayerResourcePackStatusEvent(17),
 	PlayerShearEntityEvent(18),
-	PlayerStatisticIncrementEvent(19);
+	PlayerStatisticIncrementEvent(19),
+	PlayerDeathEvent(20);
 	
-	public static final int MAX_IDX = 19; // UPDATE THIS if you alter the above
-	public static final int SIZE = 20; // UPDATE THIS if you alter the above.
+	public static final int MAX_IDX = 20; // UPDATE THIS if you alter the above
+	public static final int SIZE = 21; // UPDATE THIS if you alter the above.
 	
 	private int idx;
 	

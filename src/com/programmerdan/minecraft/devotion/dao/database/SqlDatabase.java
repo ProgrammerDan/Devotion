@@ -36,6 +36,11 @@ public class SqlDatabase {
     public DevotionEventLoginSource getDevotionEventLoginSource() {
     	return this.devotionEventLoginSource;
     }
+    
+    private DevotionEventQuitSource devotionEventQuitSource;
+    public DevotionEventQuitSource getDevotionEventQuitSource() {
+    	return this.devotionEventQuitSource;
+    }
 
     private DevotionEventInteractSource devotionEventInteractSource;
     public DevotionEventInteractSource getDevotionEventInteractSource() {
@@ -99,6 +104,7 @@ public class SqlDatabase {
     	this.sourceList.add(this.devotionEventLoginSource = new DevotionEventLoginSource(this));
     	this.sourceList.add(this.devotionEventInteractSource = new DevotionEventInteractSource(this));
     	this.sourceList.add(this.devotionEventKickSource = new DevotionEventKickSource(this));
+    	this.sourceList.add(this.devotionEventQuitSource = new DevotionEventQuitSource(this));
     	this.sourceList.add(this.devotionEventTeleportSource = new DevotionEventTeleportSource(this));
     	this.sourceList.add(this.devotionEventRespawnSource = new DevotionEventRespawnSource(this));
     	this.sourceList.add(this.devotionEventToggleSource = new DevotionEventToggleSource(this));

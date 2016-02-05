@@ -24,6 +24,8 @@ public class fPlayerLogin extends fPlayer {
 			this.loginInfo.address = event.getAddress().toString();
 			this.loginInfo.hostname = event.getHostname();
 			this.loginInfo.realAddress = event.getRealAddress().toString();
+			this.loginInfo.result = event.getResult().name();
+			this.loginInfo.kickMessage = event.getKickMessage();
 		}
 	}
 	
@@ -34,6 +36,8 @@ public class fPlayerLogin extends fPlayer {
 		os.writeUTF(this.loginInfo.address);
 		os.writeUTF(this.loginInfo.hostname);
 		os.writeUTF(this.loginInfo.realAddress);
+		os.writeUTF(this.loginInfo.result);
+		os.writeUTF(this.loginInfo.kickMessage == null ? "" : this.loginInfo.kickMessage);
 	}
 	
 	@Override
@@ -46,6 +50,11 @@ public class fPlayerLogin extends fPlayer {
 		this.loginInfo.address = is.readUTF();
 		this.loginInfo.hostname = is.readUTF();
 		this.loginInfo.realAddress = is.readUTF();
+		this.loginInfo.result = is.readUTF();
+		this.loginInfo.kickMessage = is.readUTF();
+		if (this.loginInfo.kickMessage.equals("")){
+			this.loginInfo.kickMessage = null;
+		}
 	}
 	
 	@Override

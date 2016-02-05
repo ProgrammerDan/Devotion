@@ -18,7 +18,7 @@ import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 
 /**
  * Class to capture critical components of movement in MC.
- * Eye position, food position, food / saturation, velociy, experience, in vehicle, air, health, and movement modes.
+ * Eye position, food position, food / saturation, velocity, experience, in vehicle, air, health, and movement modes.
  * 
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
@@ -56,6 +56,7 @@ public abstract class fPlayer extends Flyweight {
 			this.eventInfo.sleeping = player.isSleeping();
 			this.eventInfo.health = player.getHealth();
 			this.eventInfo.maxHealth = player.getMaxHealth();
+			
 		}
 	}
 
@@ -82,7 +83,7 @@ public abstract class fPlayer extends Flyweight {
 		os.writeDouble( this.eventInfo.maxHealth);
 	}
 	
-	private static void marshallLocationToStream(LocationInfo loc, DataOutputStream os) throws IOException {
+	protected static void marshallLocationToStream(LocationInfo loc, DataOutputStream os) throws IOException {
 		os.writeUTF(loc.worldUUID);
 		os.writeDouble(loc.x);
 		os.writeDouble(loc.y);
@@ -99,7 +100,7 @@ public abstract class fPlayer extends Flyweight {
 	protected static Flyweight unmarshallFromStream(DataInputStream is, byte id, byte version) throws IOException {
 		if(version != VERSION) return null;
 		
-		fPlayer flyweight = PlayerFactory.create(id);
+		fPlayer flyweight = FlyweightFactory.create(id);
 		flyweight.unmarshallFromStream(is);
 		
 		return flyweight;
@@ -134,7 +135,7 @@ public abstract class fPlayer extends Flyweight {
 		this.eventInfo.maxHealth = is.readDouble();
 	}
 	
-	private static LocationInfo unmarshallLocationFromStream(DataInputStream is) throws IOException {
+	protected static LocationInfo unmarshallLocationFromStream(DataInputStream is) throws IOException {
 		LocationInfo loc = new LocationInfo();
 		
 		loc.worldUUID = is.readUTF();

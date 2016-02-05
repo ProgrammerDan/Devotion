@@ -12,7 +12,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventKickInfo;
  */
 
 public class DevotionEventKickSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_interact (event_time, player_uuid, leave_message, kick_reason) VALUES (?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_kick (event_time, player_uuid, leave_message, kick_reason) VALUES (?, ?, ?, ?)";
 	
 	public DevotionEventKickSource(SqlDatabase db) {
 		super(db);

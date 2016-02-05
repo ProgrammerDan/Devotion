@@ -8,4 +8,6 @@ public class DevotionEventLoginInfo {
 	public String address;
 	public String hostname;
 	public String realAddress;
+	public String result;
+	public String kickMessage;
 }

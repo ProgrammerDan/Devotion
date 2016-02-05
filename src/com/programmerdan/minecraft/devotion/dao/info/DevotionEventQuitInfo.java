@@ -2,11 +2,8 @@ package com.programmerdan.minecraft.devotion.dao.info;
 
 import java.sql.Timestamp;
 
-public class DevotionEventTeleportInfo {
+public class DevotionEventQuitInfo {
 	public Timestamp eventTime;
 	public String playerUUID;
-	public String cause;
-	public LocationInfo from;
-	public LocationInfo to;
-	public boolean cancelled;
+	public String quitMessage;
 }
