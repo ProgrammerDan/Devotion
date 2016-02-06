@@ -9,7 +9,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventKickInfo;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventQuitInfo;
 
 public class fPlayerQuit extends fPlayer {

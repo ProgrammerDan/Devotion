@@ -56,8 +56,18 @@ public class DevotionEventInteractSource extends Source {
 		}
 		
 		sql.setString(8, info.actionName);
-		sql.setString(9, info.clickedBlockType);
-		sql.setString(10, info.blockFace);
+		
+		if(info.clickedBlockType != null) {
+			sql.setString(9, info.clickedBlockType);
+		} else {
+			sql.setNull(9, Types.VARCHAR);
+		}
+		
+		if(info.blockFace != null) {
+			sql.setString(10, info.blockFace);
+		} else {
+			sql.setNull(10, Types.VARCHAR);
+		}
 		
 		sql.setBoolean(11, info.eventCancelled);
 		

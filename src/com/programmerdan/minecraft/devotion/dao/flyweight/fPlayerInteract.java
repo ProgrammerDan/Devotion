@@ -37,8 +37,8 @@ public class fPlayerInteract extends fPlayer {
 			}
 			
 			this.interactInfo.actionName = event.getAction().name();
-			this.interactInfo.clickedBlockType = event.getClickedBlock().getType().name();
-			this.interactInfo.blockFace = event.getBlockFace().name();
+			this.interactInfo.clickedBlockType = event.getClickedBlock() != null ? event.getClickedBlock().getType().name(): null;
+			this.interactInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
 			this.interactInfo.eventCancelled = event.isCancelled();
 		}
 	}
@@ -89,8 +89,8 @@ public class fPlayerInteract extends fPlayer {
 		os.writeUTF(this.interactInfo.itemEnchantments != null ? this.interactInfo.itemEnchantments: ""); 
 		os.writeUTF(this.interactInfo.itemLore != null ? this.interactInfo.itemLore: "");
 		os.writeUTF(this.interactInfo.actionName);
-		os.writeUTF(this.interactInfo.clickedBlockType);
-		os.writeUTF(this.interactInfo.blockFace);
+		os.writeUTF(this.interactInfo.clickedBlockType != null ? this.interactInfo.clickedBlockType: "");
+		os.writeUTF(this.interactInfo.blockFace != null ? this.interactInfo.blockFace: "");
 		os.writeBoolean(this.interactInfo.eventCancelled);
 	}
 	
@@ -118,8 +118,12 @@ public class fPlayerInteract extends fPlayer {
 		if(this.interactInfo.itemLore == "") this.interactInfo.itemLore = null;
 		
 		this.interactInfo.actionName = is.readUTF();
+		
 		this.interactInfo.clickedBlockType = is.readUTF();
+		if(this.interactInfo.clickedBlockType == "") this.interactInfo.clickedBlockType = null;
+		
 		this.interactInfo.blockFace = is.readUTF();
+		if(this.interactInfo.blockFace == "") this.interactInfo.blockFace = null;
 		
 		this.interactInfo.eventCancelled = is.readBoolean();
 	}

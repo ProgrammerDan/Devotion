@@ -29,7 +29,7 @@ public abstract class fPlayerToggle extends fPlayer {
 			this.toggleFlightInfo.eventTime = this.eventInfo.eventTime;
 			this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
 			this.toggleFlightInfo.toggleValue = toggleValue;
-			this.toggleFlightInfo.cancel = ((Cancellable)event).isCancelled();
+			this.toggleFlightInfo.eventCancelled = ((Cancellable)event).isCancelled();
 		}
 	}
 	
@@ -38,7 +38,7 @@ public abstract class fPlayerToggle extends fPlayer {
 		super.marshallToStream(os);
 		
 		os.writeBoolean(this.toggleFlightInfo.toggleValue);
-		os.writeBoolean(this.toggleFlightInfo.cancel);
+		os.writeBoolean(this.toggleFlightInfo.eventCancelled);
 	}
 	
 	@Override
@@ -50,7 +50,7 @@ public abstract class fPlayerToggle extends fPlayer {
 		this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
 
 		this.toggleFlightInfo.toggleValue = is.readBoolean();
-		this.toggleFlightInfo.cancel = is.readBoolean();
+		this.toggleFlightInfo.eventCancelled = is.readBoolean();
 	}
 	
 	@Override

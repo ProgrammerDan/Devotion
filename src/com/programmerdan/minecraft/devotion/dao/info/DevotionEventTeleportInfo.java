@@ -8,5 +8,5 @@ public class DevotionEventTeleportInfo {
 	public String cause;
 	public LocationInfo from;
 	public LocationInfo to;
-	public boolean cancelled;
+	public boolean eventCancelled;
 }

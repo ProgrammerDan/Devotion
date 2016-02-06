@@ -31,7 +31,7 @@ public class fPlayerTeleport extends fPlayer {
 			this.teleportInfo.cause = event.getCause().name();
 			this.teleportInfo.from = new LocationInfo(event.getFrom());
 			this.teleportInfo.to = new LocationInfo(event.getTo());
-			this.teleportInfo.cancelled = event.isCancelled();
+			this.teleportInfo.eventCancelled = event.isCancelled();
 		}
 	}
 	
@@ -42,7 +42,7 @@ public class fPlayerTeleport extends fPlayer {
 		os.writeUTF(this.teleportInfo.cause != null ? this.teleportInfo.cause: "");
 		marshallLocationToStream(this.teleportInfo.from, os);
 		marshallLocationToStream(this.teleportInfo.to, os);
-		os.writeBoolean(this.teleportInfo.cancelled);
+		os.writeBoolean(this.teleportInfo.eventCancelled);
 	}
 	
 	@Override
@@ -57,7 +57,7 @@ public class fPlayerTeleport extends fPlayer {
 		if(this.teleportInfo.cause == "") this.teleportInfo.cause = null;
 		this.teleportInfo.from = unmarshallLocationFromStream(is);
 		this.teleportInfo.to = unmarshallLocationFromStream(is);
-		this.teleportInfo.cancelled = is.readBoolean();
+		this.teleportInfo.eventCancelled = is.readBoolean();
 	}
 	
 	@Override

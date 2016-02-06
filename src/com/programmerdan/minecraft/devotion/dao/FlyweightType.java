@@ -28,4 +28,5 @@ public class FlyweightType {
 	public static final FlyweightType ToggleFlight = new FlyweightType((byte) 0x0A, "ToggleFlight");
 	public static final FlyweightType ToggleSneak = new FlyweightType((byte) 0x0B, "ToggleSneak");
 	public static final FlyweightType ToggleSprint = new FlyweightType((byte) 0x0C, "ToggleSprint");
+	public static final FlyweightType Velocity = new FlyweightType((byte) 0x0D, "Velocity");
 }

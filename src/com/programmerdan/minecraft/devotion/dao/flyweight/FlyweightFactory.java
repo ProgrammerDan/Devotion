@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 
 import com.programmerdan.minecraft.devotion.dao.DAOException;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
@@ -39,6 +40,7 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ToggleFlight.getId(), PlayerToggleFlightEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ToggleSneak.getId(), PlayerToggleSneakEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ToggleSprint.getId(), PlayerToggleSprintEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Velocity.getId(), PlayerVelocityEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -63,6 +65,7 @@ public class FlyweightFactory {
 		if(id == FlyweightType.ToggleFlight.getId()) return new fPlayerToggleFlight((PlayerToggleFlightEvent)event);
 		if(id == FlyweightType.ToggleSneak.getId()) return new fPlayerToggleSneak((PlayerToggleSneakEvent)event);
 		if(id == FlyweightType.ToggleSprint.getId()) return new fPlayerToggleSprint((PlayerToggleSprintEvent)event);
+		if(id == FlyweightType.Velocity.getId()) return new fPlayerVelocity((PlayerVelocityEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

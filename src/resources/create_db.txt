@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS devotion_event_login (
    ,address VARCHAR(20)
    ,hostname VARCHAR(100)
    ,real_address VARCHAR(20)
-   ,reason VARCHAR(15)
+   ,result VARCHAR(15)
    ,kick_message VARCHAR(100)
    
    ,CONSTRAINT pk_devotion_event_login PRIMARY KEY (devotion_event_login_id)
@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS devotion_event_interact (
    ,item_enchantments VARCHAR(500)
    ,item_lore VARCHAR(500)
    ,action_name VARCHAR(20) NOT NULL
-   ,clicked_block_type VARCHAR(50) NOT NULL
-   ,block_face VARCHAR(20) NOT NULL
+   ,clicked_block_type VARCHAR(50)
+   ,block_face VARCHAR(20)
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_devotion_event_interact PRIMARY KEY (devotion_event_interact_id)
@@ -117,7 +117,19 @@ CREATE TABLE IF NOT EXISTS devotion_event_toggle (
    ,event_time DATETIME NOT NULL
    ,player_uuid VARCHAR(36) NOT NULL
    ,toggle_value BIT NOT NULL
-   ,cancel BIT NOT NULL
+   ,event_cancelled BIT NOT NULL
    
    ,CONSTRAINT pk_devotion_event_toggle PRIMARY KEY (devotion_event_toggle_id)
+);
+
+CREATE TABLE IF NOT EXISTS devotion_event_velocity (
+    devotion_event_velocity_id BIGINT NOT NULL AUTO_INCREMENT
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL
+   ,velocity_x DOUBLE NOT NULL
+   ,velocity_y DOUBLE NOT NULL
+   ,velocity_z DOUBLE NOT NULL
+   ,event_cancelled BIT NOT NULL
+   
+   ,CONSTRAINT pk_devotion_event_velocity PRIMARY KEY (devotion_event_velocity_id)
 )

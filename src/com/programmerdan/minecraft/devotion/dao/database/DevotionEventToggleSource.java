@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventToggleInfo;
  */
 
 public class DevotionEventToggleSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_toggle (event_time, player_uuid, toggle_value, cancel) VALUES (?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_toggle (event_time, player_uuid, toggle_value, event_cancelled) VALUES (?, ?, ?, ?)";
 	
 	public DevotionEventToggleSource(SqlDatabase db) {
 		super(db);
@@ -23,7 +23,7 @@ public class DevotionEventToggleSource extends Source {
 		sql.setTimestamp(1, info.eventTime);
 		sql.setString(2, info.playerUUID);
 		sql.setBoolean(3, info.toggleValue);
-		sql.setBoolean(4, info.cancel);
+		sql.setBoolean(4, info.eventCancelled);
 		
 		sql.addBatch();
 	}
