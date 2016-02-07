@@ -202,6 +202,8 @@ public class FileDataHandler extends DataHandler {
 					
 					writeSoFar += toWrite.getLastWriteSize();
 					
+					this.lastFileSize += toWrite.getLastWriteSize();
+					
 					records++;
 				}
 				
