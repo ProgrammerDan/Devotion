@@ -51,7 +51,7 @@ public class FileDataHandler extends DataHandler {
 	 * @return a valid DataOutputStream of null.
 	 */
 	private DataOutputStream getStream() {
-		if (activeStream != null || lastFileSize > maxFileSize) {
+		if (activeStream != null && lastFileSize > maxFileSize) {
 			try {
 				if (activeStream != null)
 					activeStream.close();
@@ -63,10 +63,13 @@ public class FileDataHandler extends DataHandler {
 		if (lastFileSize > maxFileSize || activeStream == null) {
 			this.lastFileName = generateFileName();
 						
-			File target = new File(this.baseFolder, this.lastFileName);
+			File target = new File(this.baseFolder.getAbsoluteFile(), this.lastFileName);
+			
+			Devotion.logger().info("Generating new streamfile: " + target.getAbsolutePath());
 			
 			try {
 				target.createNewFile();
+				lastFileSize = 0l;
 
 				activeStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(target), ioChunkSize));
 			} catch(FileNotFoundException fnfe) {
@@ -104,6 +107,8 @@ public class FileDataHandler extends DataHandler {
 		FileDataHandler fdh = new FileDataHandler();
 		String baseFolder = config.getString("base");
 		if (baseFolder == null) {
+			Devotion.logger().log(Level.INFO,
+					"Using plugin default data folder");
 			fdh.baseFolder = Devotion.instance().getDataFolder();
 		} else {
 			fdh.baseFolder = new File(baseFolder);
@@ -113,7 +118,7 @@ public class FileDataHandler extends DataHandler {
 		fdh.maxIORate = config.getInt("max_io_rate", Integer.MAX_VALUE);
 		fdh.ioChunkSize = config.getInt("io_chunk_size", 2048);
 		fdh.lastFileSize = 0l;
-		fdh.lastFileName = fdh.generateFileName();
+		fdh.lastFileName = null;
 
 		if (fdh.maxFileSize <= 0 || fdh.maxIORate <= 0 || fdh.ioChunkSize <= 0) {
 			Devotion.logger().log(Level.SEVERE,
@@ -126,6 +131,9 @@ public class FileDataHandler extends DataHandler {
 				Devotion.logger().log( Level.SEVERE, "FileDataHandler base folder can't be created: "
 								+ fdh.baseFolder.getPath());
 				return null;
+			} else {
+				Devotion.logger().log( Level.INFO, "FileDataHandler base folder was found or created: "
+						+ fdh.baseFolder.getAbsolutePath());
 			}
 		} catch (SecurityException se) {
 			Devotion.logger().log(Level.SEVERE,
@@ -137,6 +145,9 @@ public class FileDataHandler extends DataHandler {
 		
 		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 54000 / (int) fdh.getDelay()) );
 		fdh.statistics = new FlowHelper(samples);
+		
+		// prepare stream
+		fdh.getStream();
 
 		return fdh;
 	}
@@ -193,6 +204,8 @@ public class FileDataHandler extends DataHandler {
 					
 					records++;
 				}
+				
+				bos.flush();
 	
 			} else {
 				debug(Level.SEVERE, "FileDataHandler: Data stream is null, cannot commit. Skipping for now.");
@@ -203,10 +216,13 @@ public class FileDataHandler extends DataHandler {
 		
 		long sTime = System.currentTimeMillis();
 		statistics.sample(sTime - this.lastSampleTime, super.getAndClearInsertCount(), records);
-			
+		
 		in = sTime - in;
 		this.lastSampleTime = sTime;
 		debug(Level.INFO, "FileDataHandler: Done commit {0} records ({1} bytes) in {2} milliseconds",
-				new Object[]{records, writeSoFar, in});
+				records, writeSoFar, in);
+		
+		debug(Level.INFO, "FileDataHandler: Inflow {0} -- Outflow {1} over {2} ms", statistics.totalInflow(),
+				statistics.totalOutflow(), statistics.totalSampleTime(), statistics.);
 	}
 }

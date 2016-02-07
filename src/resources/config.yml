@@ -24,7 +24,7 @@ dao:
     delay: 250
     max_run: 100
   file:
-    base: Devotion/
+#    base: Devotion/
     max_file_size: 262144000
     max_io_rate: 1048576
     io_chunk_size: 4096
