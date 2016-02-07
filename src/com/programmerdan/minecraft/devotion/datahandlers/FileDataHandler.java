@@ -143,7 +143,7 @@ public class FileDataHandler extends DataHandler {
 
 		fdh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
 		
-		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 54000 / (int) fdh.getDelay()) );
+		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 5400 / (int) fdh.getDelay()) );
 		fdh.statistics = new FlowHelper(samples);
 		
 		// prepare stream
@@ -207,7 +207,11 @@ public class FileDataHandler extends DataHandler {
 					records++;
 				}
 				
-				bos.flush();
+				try {
+					bos.flush();
+				} catch (IOException e) {
+					debug(Level.SEVERE, "FileDataHandler: Unable to flush output stream.", e);
+				}
 	
 			} else {
 				debug(Level.SEVERE, "FileDataHandler: Data stream is null, cannot commit. Skipping for now.");
@@ -225,6 +229,6 @@ public class FileDataHandler extends DataHandler {
 				records, writeSoFar, in);
 		
 		debug(Level.INFO, "FileDataHandler: Inflow {0} -- Outflow {1} over {2} ms", statistics.totalInflow(),
-				statistics.totalOutflow(), statistics.totalSampleTime(), statistics.);
+				statistics.totalOutflow(), statistics.totalSampleTime());
 	}
 }
