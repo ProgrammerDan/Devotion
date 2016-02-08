@@ -41,6 +41,7 @@ public abstract class Flyweight {
 	protected Flyweight(FlyweightType flyweightType, byte version) {
 		this.flyweightType = flyweightType;
 		this.version = version;
+		this.recordDate = System.currentTimeMillis();
 	}
 
 	private final void computeWrite(int start, int end) {
@@ -58,7 +59,7 @@ public abstract class Flyweight {
 
 			os.writeByte(this.flyweightType.getId());
 			os.writeByte(this.version);
-			os.writeLong(System.currentTimeMillis());
+			os.writeLong(this.recordDate);//System.currentTimeMillis());
 
 			marshallToStream(os); // subclasses inject serialization here
 

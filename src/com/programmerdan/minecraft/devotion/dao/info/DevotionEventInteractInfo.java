@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class DevotionEventInteractInfo {
 	public Timestamp eventTime;
+	public String trace_id;
 	public String playerUUID;
 	public String itemType;
 	public Integer itemAmount;

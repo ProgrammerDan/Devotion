@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class DevotionEventVelocityInfo {
 	public Timestamp eventTime;
+	public String trace_id;
 	public String playerUUID;
 	public double velocityX;
 	public double velocityY;

@@ -15,6 +15,7 @@ import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
+import com.programmerdan.minecraft.devotion.util.IDGenerator;
 
 /**
  * Class to capture critical components of movement in MC.
@@ -26,6 +27,8 @@ public abstract class fPlayer extends Flyweight {
 	private static final byte VERSION = 0x00;
 	
 	protected DevotionEventInfo eventInfo;
+	
+	protected static IDGenerator idg = new IDGenerator();
 
 	protected fPlayer(PlayerEvent playerEvent, FlyweightType flyweightType) {
 		super(flyweightType, VERSION);
@@ -35,7 +38,8 @@ public abstract class fPlayer extends Flyweight {
 			
 			this.eventInfo = new DevotionEventInfo();
 			this.eventInfo.eventType = flyweightType.getName();
-			this.eventInfo.eventTime = new Timestamp(new Date().getTime());
+			this.eventInfo.eventTime = new Timestamp(super.getRecordDate());
+			this.eventInfo.trace_id = idg.generateId().toString();
 			this.eventInfo.playerName = player.getName();
 			this.eventInfo.playerUUID = player.getUniqueId().toString();
 			this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
@@ -62,7 +66,9 @@ public abstract class fPlayer extends Flyweight {
 
 	@Override
 	protected void marshallToStream(DataOutputStream os) throws IOException {
+		os.writeUTF(this.eventInfo.eventType);
 		os.writeLong(this.eventInfo.eventTime.getTime());
+		os.writeUTF(this.eventInfo.trace_id);
 		os.writeUTF(this.eventInfo.playerName);
 		os.writeUTF(this.eventInfo.playerUUID);
 		marshallLocationToStream(this.eventInfo.eyeLocation, os);
@@ -108,8 +114,9 @@ public abstract class fPlayer extends Flyweight {
 	
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		this.eventInfo = new DevotionEventInfo();
-		this.eventInfo.eventTime = new Timestamp(is.readLong());
 		this.eventInfo.eventType = getFlyweightType().getName();
+		this.eventInfo.eventTime = new Timestamp(is.readLong());
+		this.eventInfo.trace_id = is.readUTF();
 		this.eventInfo.playerName = is.readUTF();
 		this.eventInfo.playerUUID = is.readUTF();
 		this.eventInfo.eyeLocation = unmarshallLocationFromStream(is);

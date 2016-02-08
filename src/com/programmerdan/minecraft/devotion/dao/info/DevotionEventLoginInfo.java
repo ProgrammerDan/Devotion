@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class DevotionEventLoginInfo {
 	public Timestamp eventTime;
+	public String trace_id;
 	public String playerUUID;
 	public String address;
 	public String hostname;

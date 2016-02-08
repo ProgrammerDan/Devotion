@@ -26,6 +26,7 @@ public class fPlayerInteract extends fPlayer {
 			this.interactInfo = new DevotionEventInteractInfo();
 			this.interactInfo.eventTime = this.eventInfo.eventTime;
 			this.interactInfo.playerUUID = this.eventInfo.playerUUID;
+			this.interactInfo.trace_id = this.eventInfo.trace_id;
 			
 			ItemStack item = event.getItem();
 			if(item != null) {

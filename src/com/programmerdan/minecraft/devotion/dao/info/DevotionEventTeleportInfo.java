@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class DevotionEventTeleportInfo {
 	public Timestamp eventTime;
+	public String trace_id;
 	public String playerUUID;
 	public String cause;
 	public LocationInfo from;
