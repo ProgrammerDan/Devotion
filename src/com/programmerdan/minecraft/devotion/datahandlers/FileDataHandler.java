@@ -141,9 +141,10 @@ public class FileDataHandler extends DataHandler {
 			return null;
 		}
 
-		fdh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false, config.getBoolean("debug"));
+		fdh.setup(config.getLong("delay", 10l), config.getLong("max_run", 250l), false, config.getBoolean("debug"));
 		
-		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 5400 / (int) fdh.getDelay()) );
+		// Target is sufficient samples for min 60 seconds of windowed average.
+		int samples = Math.max(10, (fdh.getDelay() < 1 ? 10 : 1200 / (int) fdh.getDelay()) );
 		fdh.statistics = new FlowHelper(samples);
 		
 		// prepare stream

@@ -18,7 +18,7 @@ import com.programmerdan.minecraft.devotion.util.FlowHelper;
  * @author Aleksey-Terzi
  */
 public class DatabaseDataHandler extends DataHandler {
-	private FlowHelper statistics = new FlowHelper(); 
+	private FlowHelper statistics; 
 	private long lastSampleTime;
 
 	private SqlDatabase db;
@@ -54,9 +54,14 @@ public class DatabaseDataHandler extends DataHandler {
 		if (!ddh.db.connect())
 			return null;
 
-		ddh.setup(config.getLong("delay", 100l), config.getLong("max_run", 50l), false,
+		// is adaptive!
+		ddh.setup(config.getLong("delay", 500l), config.getLong("max_run", 250l), true,
 				config.getBoolean("debug"));
 
+		// Target is sufficient samples for min 60 seconds of windowed average.
+		int samples = Math.max(10, (ddh.getDelay() < 1 ? 10 : 60000 / (int) ddh.getDelay()) );
+		ddh.statistics = new FlowHelper(samples);
+		
 		return ddh;
 	}
 
@@ -108,8 +113,7 @@ public class DatabaseDataHandler extends DataHandler {
 				this.db.commit();
 	
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				debug(Level.WARNING, "Failed while serializing / commiting to DB", e);
 			}
 		} else {
 			debug(Level.INFO, "DatabaseDataHandler: Event queue is empty, nothing to commit.");
@@ -121,6 +125,10 @@ public class DatabaseDataHandler extends DataHandler {
 		in = sTime - in;
 		this.lastSampleTime = sTime;
 		debug(Level.INFO, "DatabaseDataHandler: Done commit {0} records in {1} milliseconds",
-				new Object[]{records, in});
+				records, in);
+		
+		debug(Level.INFO, "DatabaseDataHandler: Inflow {0} -- Outflow {1} over {2} ms", 
+				statistics.totalInflow(), statistics.totalOutflow(), statistics.totalSampleTime());
+
 	}
 }
