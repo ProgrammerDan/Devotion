@@ -7,7 +7,7 @@ import java.sql.Types;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerEventQuitInfo;
 
 public class PlayerEventQuitSource extends Source {
-	private static final String insertScript = "INSERT player_event_quit (trace_id, quit_message) VALUES (?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_quit (trace_id, quit_message) VALUES (?, ?)";
 	
 	public PlayerEventQuitSource(SqlDatabase db) {
 		super(db);

@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventVelocityInfo;
  */
 
 public class PlayerEventVelocitySource extends Source {
-	private static final String insertScript = "INSERT player_event_velocity (trace_id, velocity_x, velocity_y, velocity_z, event_cancelled) VALUES (?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_velocity (trace_id, velocity_x, velocity_y, velocity_z, event_cancelled) VALUES (?, ?, ?, ?, ?)";
 	
 	public PlayerEventVelocitySource(SqlDatabase db) {
 		super(db);

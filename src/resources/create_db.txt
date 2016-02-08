@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS dev_player_event (
    ,max_health DOUBLE NOT NULL
    ,status_flags CHAR(5) NOT NULL /* inVehicle, sneaking, sprinting, blocking, sleeping */
    
- --   ,CONSTRAINT pk_dev_player_event PRIMARY KEY (player_event_id)
+   ,CONSTRAINT pk_dev_player_event PRIMARY KEY (player_event_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_login (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS dev_player_event_login (
    ,result VARCHAR(15)
    ,kick_message VARCHAR(100)
    
- --   ,CONSTRAINT pk_dev_player_event_login PRIMARY KEY (dev_player_event_login_id)
+   ,CONSTRAINT pk_dev_player_event_login PRIMARY KEY (player_event_login_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_interact (
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS dev_player_event_interact (
    ,block_face VARCHAR(20)
    ,event_cancelled BOOL NOT NULL
    
- --   ,CONSTRAINT pk_dev_player_event_interact PRIMARY KEY (player_event_interact_id)
+   ,CONSTRAINT pk_dev_player_event_interact PRIMARY KEY (player_event_interact_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_kick (
@@ -67,15 +67,15 @@ CREATE TABLE IF NOT EXISTS dev_player_event_kick (
    ,leave_message VARCHAR(500)
    ,kick_reason VARCHAR(500)
    
- --   ,CONSTRAINT pk_dev_player_event_kick PRIMARY KEY (player_event_kick_id)
+   ,CONSTRAINT pk_dev_player_event_kick PRIMARY KEY (player_event_kick_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_quit (
-    dev_player_event_quit_id BIGINT NOT NULL AUTO_INCREMENT
+    player_event_quit_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,quit_message VARCHAR(500)
    
- --   ,CONSTRAINT pk_dev_player_event_quit PRIMARY KEY (player_event_quit_id)
+   ,CONSTRAINT pk_dev_player_event_quit PRIMARY KEY (player_event_quit_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_teleport (
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS dev_player_event_teleport (
    ,to_pitch FLOAT NOT NULL
    ,event_cancelled BOOL NOT NULL
       
- --   ,CONSTRAINT pk_dev_player_event_teleport PRIMARY KEY (player_event_teleport_id)
+   ,CONSTRAINT pk_dev_player_event_teleport PRIMARY KEY (player_event_teleport_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_respawn (
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS dev_player_event_respawn (
    ,trace_id VARCHAR(36) NOT NULL
    ,is_bed_spawn BIT NOT NULL
    
- --   ,CONSTRAINT pk_dev_player_event_respawn PRIMARY KEY (player_event_respawn_id)
+   ,CONSTRAINT pk_dev_player_event_respawn PRIMARY KEY (player_event_respawn_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_toggle (
@@ -113,16 +113,18 @@ CREATE TABLE IF NOT EXISTS dev_player_event_toggle (
    ,toggle_value BIT NOT NULL
    ,event_cancelled BIT NOT NULL
    
- --   ,CONSTRAINT pk_dev_player_event_toggle PRIMARY KEY (player_event_toggle_id)
+   ,CONSTRAINT pk_dev_player_event_toggle PRIMARY KEY (player_event_toggle_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_event_velocity (
     player_event_velocity_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
+   ,event_time DATETIME NOT NULL
+   ,player_uuid VARCHAR(36) NOT NULL
    ,velocity_x DOUBLE NOT NULL
    ,velocity_y DOUBLE NOT NULL
    ,velocity_z DOUBLE NOT NULL
    ,event_cancelled BIT NOT NULL
    
- --   ,CONSTRAINT pk_dev_player_event_velocity PRIMARY KEY (player_event_velocity_id)
+   ,CONSTRAINT pk_dev_player_event_velocity PRIMARY KEY (player_event_velocity_id)
 )

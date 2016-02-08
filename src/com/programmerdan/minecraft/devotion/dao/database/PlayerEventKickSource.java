@@ -12,7 +12,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventKickInfo;
  */
 
 public class PlayerEventKickSource extends Source {
-	private static final String insertScript = "INSERT player_event_kick (trace_id, leave_message, kick_reason) VALUES (?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_kick (trace_id, leave_message, kick_reason) VALUES (?, ?, ?)";
 	
 	public PlayerEventKickSource(SqlDatabase db) {
 		super(db);

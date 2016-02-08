@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventRespawnInfo;
  */
 
 public class PlayerEventRespawnSource extends Source {
-	private static final String insertScript = "INSERT player_event_respawn (is_bed_spawn, trace_id) VALUES (?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_respawn (is_bed_spawn, trace_id) VALUES (?, ?)";
 	
 	public PlayerEventRespawnSource(SqlDatabase db) {
 		super(db);

@@ -13,7 +13,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventInteractInfo;
  */
 
 public class PlayerEventInteractSource extends Source {
-	private static final String insertScript = "INSERT player_event_interact (trace_id, item_type, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block_type, block_face, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_interact (trace_id, item_type, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block_type, block_face, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public PlayerEventInteractSource(SqlDatabase db) {
 		super(db);

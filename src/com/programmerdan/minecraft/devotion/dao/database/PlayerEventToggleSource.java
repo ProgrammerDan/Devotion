@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventToggleInfo;
  */
 
 public class PlayerEventToggleSource extends Source {
-	private static final String insertScript = "INSERT player_event_toggle (trace_id, toggle_value, event_cancelled) VALUES (?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_toggle (trace_id, toggle_value, event_cancelled) VALUES (?, ?, ?)";
 	
 	public PlayerEventToggleSource(SqlDatabase db) {
 		super(db);

@@ -12,7 +12,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventTeleportInfo;
  */
 
 public class PlayerEventTeleportSource extends Source {
-	private static final String insertScript = "INSERT player_event_teleport (trace_id, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_teleport (trace_id, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public PlayerEventTeleportSource(SqlDatabase db) {
 		super(db);

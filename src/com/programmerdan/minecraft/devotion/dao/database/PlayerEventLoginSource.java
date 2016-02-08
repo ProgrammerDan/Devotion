@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventLoginInfo;
  */
 
 public class PlayerEventLoginSource extends Source {
-	private static final String insertScript = "INSERT player_event_login (trace_id, address, hostname, real_address, result, kick_message) VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_event_login (trace_id, address, hostname, real_address, result, kick_message) VALUES (?, ?, ?, ?, ?, ?)";
 	
 	public PlayerEventLoginSource(SqlDatabase db) {
 		super(db);
