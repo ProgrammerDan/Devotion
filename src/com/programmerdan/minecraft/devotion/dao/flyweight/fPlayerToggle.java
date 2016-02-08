@@ -28,6 +28,7 @@ public abstract class fPlayerToggle extends fPlayer {
 			this.toggleFlightInfo = new DevotionEventToggleInfo();
 			this.toggleFlightInfo.eventTime = this.eventInfo.eventTime;
 			this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
+			this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 			this.toggleFlightInfo.toggleValue = toggleValue;
 			this.toggleFlightInfo.eventCancelled = ((Cancellable)event).isCancelled();
 		}
@@ -48,6 +49,7 @@ public abstract class fPlayerToggle extends fPlayer {
 		this.toggleFlightInfo = new DevotionEventToggleInfo();
 		this.toggleFlightInfo.eventTime = this.eventInfo.eventTime;
 		this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
+		this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 
 		this.toggleFlightInfo.toggleValue = is.readBoolean();
 		this.toggleFlightInfo.eventCancelled = is.readBoolean();

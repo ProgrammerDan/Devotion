@@ -27,6 +27,7 @@ public class fPlayerKick extends fPlayer {
 			this.kickInfo = new DevotionEventKickInfo();
 			this.kickInfo.eventTime = this.eventInfo.eventTime;
 			this.kickInfo.playerUUID = this.eventInfo.playerUUID;
+			this.kickInfo.trace_id = this.eventInfo.trace_id;
 			this.kickInfo.leaveMessage = event.getLeaveMessage();
 			this.kickInfo.kickReason = event.getReason();
 		}
@@ -47,6 +48,7 @@ public class fPlayerKick extends fPlayer {
 		this.kickInfo = new DevotionEventKickInfo();
 		this.kickInfo.eventTime = this.eventInfo.eventTime;
 		this.kickInfo.playerUUID = this.eventInfo.playerUUID;
+		this.kickInfo.trace_id = this.eventInfo.trace_id;
 
 		this.kickInfo.leaveMessage = is.readUTF();
 		if(this.kickInfo.leaveMessage == "") this.kickInfo.leaveMessage = null;

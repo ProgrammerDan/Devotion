@@ -84,6 +84,8 @@ public class fPlayerInteract extends fPlayer {
 	protected void marshallToStream(DataOutputStream os) throws IOException {
 		super.marshallToStream(os);
 		
+		// in context of file IO it isn't necessary to write the unique UUID twice b/c the parent
+		// and child records are written together.
 		os.writeUTF(this.interactInfo.itemType != null ? this.interactInfo.itemType: "");
 		os.writeInt(this.interactInfo.itemAmount != null ? this.interactInfo.itemAmount: Integer.MIN_VALUE); 
 		os.writeShort(this.interactInfo.itemDurability != null ? this.interactInfo.itemDurability: Short.MIN_VALUE);
@@ -102,6 +104,7 @@ public class fPlayerInteract extends fPlayer {
 		this.interactInfo = new DevotionEventInteractInfo();
 		this.interactInfo.eventTime = this.eventInfo.eventTime;
 		this.interactInfo.playerUUID = this.eventInfo.playerUUID;
+		this.interactInfo.trace_id = this.eventInfo.trace_id;
 
 		this.interactInfo.itemType = is.readUTF();
 		if(this.interactInfo.itemType == "") this.interactInfo.itemType = null;

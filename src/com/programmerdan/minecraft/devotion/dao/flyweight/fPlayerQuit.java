@@ -19,6 +19,7 @@ public class fPlayerQuit extends fPlayer {
 			this.quitInfo = new DevotionEventQuitInfo();
 			this.quitInfo.eventTime = this.eventInfo.eventTime;
 			this.quitInfo.playerUUID = this.eventInfo.playerUUID;
+			this.quitInfo.trace_id = this.eventInfo.trace_id;
 			this.quitInfo.quitMessage = event.getQuitMessage();
 		}
 	}
@@ -37,6 +38,7 @@ public class fPlayerQuit extends fPlayer {
 		this.quitInfo = new DevotionEventQuitInfo();
 		this.quitInfo.eventTime = this.eventInfo.eventTime;
 		this.quitInfo.playerUUID = this.eventInfo.playerUUID;
+		this.quitInfo.trace_id = this.eventInfo.trace_id;
 
 		this.quitInfo.quitMessage = is.readUTF();
 		if(this.quitInfo.quitMessage == "") this.quitInfo.quitMessage = null;

@@ -13,7 +13,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInteractInfo;
  */
 
 public class DevotionEventInteractSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_interact (event_time, player_uuid, item_type, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block_type, block_face, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_interact (event_time, player_uuid, item_type, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block_type, block_face, event_cancelled, trace_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public DevotionEventInteractSource(SqlDatabase db) {
 		super(db);
@@ -70,6 +70,8 @@ public class DevotionEventInteractSource extends Source {
 		}
 		
 		sql.setBoolean(11, info.eventCancelled);
+		
+		sql.setString(12, info.trace_id);
 		
 		sql.addBatch();
 	}

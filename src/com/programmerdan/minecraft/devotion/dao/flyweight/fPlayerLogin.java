@@ -21,6 +21,7 @@ public class fPlayerLogin extends fPlayer {
 			this.loginInfo = new DevotionEventLoginInfo();
 			this.loginInfo.eventTime = this.eventInfo.eventTime;
 			this.loginInfo.playerUUID = this.eventInfo.playerUUID;
+			this.loginInfo.trace_id = this.eventInfo.trace_id;
 			this.loginInfo.address = event.getAddress().toString();
 			this.loginInfo.hostname = event.getHostname();
 			this.loginInfo.realAddress = event.getRealAddress().toString();
@@ -47,6 +48,7 @@ public class fPlayerLogin extends fPlayer {
 		this.loginInfo = new DevotionEventLoginInfo();
 		this.loginInfo.eventTime = this.eventInfo.eventTime;
 		this.loginInfo.playerUUID = this.eventInfo.playerUUID;
+		this.loginInfo.trace_id = this.eventInfo.trace_id;
 		this.loginInfo.address = is.readUTF();
 		this.loginInfo.hostname = is.readUTF();
 		this.loginInfo.realAddress = is.readUTF();

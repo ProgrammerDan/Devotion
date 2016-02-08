@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventRespawnInfo;
  */
 
 public class DevotionEventRespawnSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_respawn (event_time, player_uuid, is_bed_spawn) VALUES (?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_respawn (event_time, player_uuid, is_bed_spawn, trace_id) VALUES (?, ?, ?, ?)";
 	
 	public DevotionEventRespawnSource(SqlDatabase db) {
 		super(db);
@@ -23,6 +23,7 @@ public class DevotionEventRespawnSource extends Source {
 		sql.setTimestamp(1, info.eventTime);
 		sql.setString(2, info.playerUUID);
 		sql.setBoolean(3, info.isBedSpawn);
+		sql.setString(4, info.trace_id);
 		
 		sql.addBatch();
 	}

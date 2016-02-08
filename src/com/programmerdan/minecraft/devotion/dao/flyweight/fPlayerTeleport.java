@@ -28,6 +28,7 @@ public class fPlayerTeleport extends fPlayer {
 			this.teleportInfo = new DevotionEventTeleportInfo();
 			this.teleportInfo.eventTime = this.eventInfo.eventTime;
 			this.teleportInfo.playerUUID = this.eventInfo.playerUUID;
+			this.teleportInfo.trace_id = this.eventInfo.trace_id;
 			this.teleportInfo.cause = event.getCause().name();
 			this.teleportInfo.from = new LocationInfo(event.getFrom());
 			this.teleportInfo.to = new LocationInfo(event.getTo());
@@ -52,6 +53,7 @@ public class fPlayerTeleport extends fPlayer {
 		this.teleportInfo = new DevotionEventTeleportInfo();
 		this.teleportInfo.eventTime = this.eventInfo.eventTime;
 		this.teleportInfo.playerUUID = this.eventInfo.playerUUID;
+		this.teleportInfo.trace_id = this.eventInfo.trace_id;
 
 		this.teleportInfo.cause = is.readUTF();
 		if(this.teleportInfo.cause == "") this.teleportInfo.cause = null;

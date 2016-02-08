@@ -27,6 +27,7 @@ public class fPlayerRespawn extends fPlayer {
 			this.respawnInfo = new DevotionEventRespawnInfo();
 			this.respawnInfo.eventTime = this.eventInfo.eventTime;
 			this.respawnInfo.playerUUID = this.eventInfo.playerUUID;
+			this.respawnInfo.trace_id = this.eventInfo.trace_id;
 			this.respawnInfo.isBedSpawn = event.isBedSpawn();
 		}
 	}
@@ -45,6 +46,7 @@ public class fPlayerRespawn extends fPlayer {
 		this.respawnInfo = new DevotionEventRespawnInfo();
 		this.respawnInfo.eventTime = this.eventInfo.eventTime;
 		this.respawnInfo.playerUUID = this.eventInfo.playerUUID;
+		this.respawnInfo.trace_id = this.eventInfo.trace_id;
 
 		this.respawnInfo.isBedSpawn = is.readBoolean();
 	}

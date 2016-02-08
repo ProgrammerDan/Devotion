@@ -7,7 +7,7 @@ import java.sql.Types;
 import com.programmerdan.minecraft.devotion.dao.info.DevotionEventQuitInfo;
 
 public class DevotionEventQuitSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_quit (event_time, player_uuid, quit_message) VALUES (?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_quit (event_time, player_uuid, quit_message, trace_id) VALUES (?, ?, ?, ?)";
 	
 	public DevotionEventQuitSource(SqlDatabase db) {
 		super(db);
@@ -24,6 +24,7 @@ public class DevotionEventQuitSource extends Source {
 		} else {
 			sql.setNull(3, Types.VARCHAR);
 		}
+		sql.setString(4, info.trace_id);
 				
 		sql.addBatch();
 	}

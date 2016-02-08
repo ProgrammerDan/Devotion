@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventVelocityInfo;
  */
 
 public class DevotionEventVelocitySource extends Source {
-	private static final String insertScript = "INSERT devotion_event_velocity (event_time, player_uuid, velocity_x, velocity_y, velocity_z, event_cancelled) VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_velocity (event_time, player_uuid, velocity_x, velocity_y, velocity_z, event_cancelled, trace_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
 	public DevotionEventVelocitySource(SqlDatabase db) {
 		super(db);
@@ -27,6 +27,7 @@ public class DevotionEventVelocitySource extends Source {
 		sql.setDouble(4, info.velocityY);
         sql.setDouble(5, info.velocityZ);
 		sql.setBoolean(6, info.eventCancelled);
+		sql.setString(7, info.trace_id);
 		
 		sql.addBatch();
 	}

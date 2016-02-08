@@ -11,7 +11,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInfo;
  */
 
 public class DevotionEventSource extends Source {
-	private static final String insertScript = "INSERT devotion_event (event_time, event_type, player_name, player_uuid, location_worlduuid, location_x, location_y, location_z, location_yaw, location_pitch, location_eye_worlduuid, location_eye_x, location_eye_y, location_eye_z, location_eye_yaw, location_eye_pitch, game_mode, exhaustion, food_level, saturation, total_experience, velocity_x, velocity_y, velocity_z, remaining_air, health, max_health, status_flags) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event (event_time, event_type, player_name, player_uuid, location_worlduuid, location_x, location_y, location_z, location_yaw, location_pitch, location_eye_worlduuid, location_eye_x, location_eye_y, location_eye_z, location_eye_yaw, location_eye_pitch, game_mode, exhaustion, food_level, saturation, total_experience, velocity_x, velocity_y, velocity_z, remaining_air, health, max_health, status_flags, trace_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public DevotionEventSource(SqlDatabase db) {
 		super(db);
@@ -48,6 +48,7 @@ public class DevotionEventSource extends Source {
 		sql.setDouble(26, info.health);
 		sql.setDouble(27, info.maxHealth);
 		sql.setString(28, info.getStatusFlags());
+		sql.setString(29, info.trace_id);
 		
 		sql.addBatch();
 	}

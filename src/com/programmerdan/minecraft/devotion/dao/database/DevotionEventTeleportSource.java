@@ -12,7 +12,7 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventTeleportInfo;
  */
 
 public class DevotionEventTeleportSource extends Source {
-	private static final String insertScript = "INSERT devotion_event_teleport (event_time, player_uuid, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT devotion_event_teleport (event_time, player_uuid, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled, trace_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public DevotionEventTeleportSource(SqlDatabase db) {
 		super(db);
@@ -42,6 +42,7 @@ public class DevotionEventTeleportSource extends Source {
 		sql.setFloat(14, info.to.yaw);
 		sql.setFloat(15, info.to.pitch);
 		sql.setBoolean(16, info.eventCancelled);
+		sql.setString(17, info.trace_id);
 		
 		sql.addBatch();
 	}

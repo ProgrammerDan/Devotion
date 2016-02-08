@@ -21,6 +21,7 @@ public class fPlayerVelocity extends fPlayer {
 			this.velocityInfo = new DevotionEventVelocityInfo();
 			this.velocityInfo.eventTime = this.eventInfo.eventTime;
 			this.velocityInfo.playerUUID = this.eventInfo.playerUUID;
+			this.velocityInfo.trace_id = this.eventInfo.trace_id;
 			this.velocityInfo.velocityX = event.getVelocity().getX();
 			this.velocityInfo.velocityY = event.getVelocity().getY();
 			this.velocityInfo.velocityZ = event.getVelocity().getZ();
@@ -45,6 +46,7 @@ public class fPlayerVelocity extends fPlayer {
 		this.velocityInfo = new DevotionEventVelocityInfo();
 		this.velocityInfo.eventTime = this.eventInfo.eventTime;
 		this.velocityInfo.playerUUID = this.eventInfo.playerUUID;
+		this.velocityInfo.trace_id = this.eventInfo.trace_id;
 
 		this.velocityInfo.velocityX = is.readDouble();
 		this.velocityInfo.velocityY = is.readDouble();
