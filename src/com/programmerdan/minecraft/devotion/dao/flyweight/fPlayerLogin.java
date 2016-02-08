@@ -9,18 +9,16 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventLoginInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventLoginInfo;
 
 public class fPlayerLogin extends fPlayer {
-	private DevotionEventLoginInfo loginInfo;
+	private PlayerEventLoginInfo loginInfo;
 	
 	public fPlayerLogin(PlayerLoginEvent event) {
 		super(event, FlyweightType.Login);
 		
 		if(event != null) {
-			this.loginInfo = new DevotionEventLoginInfo();
-			this.loginInfo.eventTime = this.eventInfo.eventTime;
-			this.loginInfo.playerUUID = this.eventInfo.playerUUID;
+			this.loginInfo = new PlayerEventLoginInfo();
 			this.loginInfo.trace_id = this.eventInfo.trace_id;
 			this.loginInfo.address = event.getAddress().toString();
 			this.loginInfo.hostname = event.getHostname();
@@ -45,9 +43,7 @@ public class fPlayerLogin extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.loginInfo = new DevotionEventLoginInfo();
-		this.loginInfo.eventTime = this.eventInfo.eventTime;
-		this.loginInfo.playerUUID = this.eventInfo.playerUUID;
+		this.loginInfo = new PlayerEventLoginInfo();
 		this.loginInfo.trace_id = this.eventInfo.trace_id;
 		this.loginInfo.address = is.readUTF();
 		this.loginInfo.hostname = is.readUTF();
@@ -63,6 +59,6 @@ public class fPlayerLogin extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getDevotionEventLoginSource().insert(this.loginInfo);
+		db.getPlayerEventLoginSource().insert(this.loginInfo);
 	}
 }

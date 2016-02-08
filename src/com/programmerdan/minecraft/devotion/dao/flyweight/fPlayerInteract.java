@@ -14,18 +14,16 @@ import org.bukkit.inventory.ItemStack;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInteractInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventInteractInfo;
 
 public class fPlayerInteract extends fPlayer {
-	private DevotionEventInteractInfo interactInfo;
+	private PlayerEventInteractInfo interactInfo;
 	
 	public fPlayerInteract(PlayerInteractEvent event) {
 		super(event, FlyweightType.Login);
 		
 		if(event != null) {
-			this.interactInfo = new DevotionEventInteractInfo();
-			this.interactInfo.eventTime = this.eventInfo.eventTime;
-			this.interactInfo.playerUUID = this.eventInfo.playerUUID;
+			this.interactInfo = new PlayerEventInteractInfo();
 			this.interactInfo.trace_id = this.eventInfo.trace_id;
 			
 			ItemStack item = event.getItem();
@@ -101,9 +99,7 @@ public class fPlayerInteract extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.interactInfo = new DevotionEventInteractInfo();
-		this.interactInfo.eventTime = this.eventInfo.eventTime;
-		this.interactInfo.playerUUID = this.eventInfo.playerUUID;
+		this.interactInfo = new PlayerEventInteractInfo();
 		this.interactInfo.trace_id = this.eventInfo.trace_id;
 
 		this.interactInfo.itemType = is.readUTF();
@@ -136,6 +132,6 @@ public class fPlayerInteract extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getDevotionEventInteractSource().insert(this.interactInfo);
+		db.getPlayerEventInteractSource().insert(this.interactInfo);
 	}
 }

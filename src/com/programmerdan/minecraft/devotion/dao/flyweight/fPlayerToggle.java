@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventToggleInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventToggleInfo;
 
 /**
  * Soft wrapper for the abstract underlying class.
@@ -19,15 +19,13 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventToggleInfo;
  */
 
 public abstract class fPlayerToggle extends fPlayer {
-	private DevotionEventToggleInfo toggleFlightInfo;
+	private PlayerEventToggleInfo toggleFlightInfo;
 	
 	protected fPlayerToggle(PlayerEvent event, FlyweightType flyweightType, Boolean toggleValue) {
 		super(event, flyweightType);
 		
 		if(event != null) {
-			this.toggleFlightInfo = new DevotionEventToggleInfo();
-			this.toggleFlightInfo.eventTime = this.eventInfo.eventTime;
-			this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
+			this.toggleFlightInfo = new PlayerEventToggleInfo();
 			this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 			this.toggleFlightInfo.toggleValue = toggleValue;
 			this.toggleFlightInfo.eventCancelled = ((Cancellable)event).isCancelled();
@@ -46,9 +44,7 @@ public abstract class fPlayerToggle extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.toggleFlightInfo = new DevotionEventToggleInfo();
-		this.toggleFlightInfo.eventTime = this.eventInfo.eventTime;
-		this.toggleFlightInfo.playerUUID = this.eventInfo.playerUUID;
+		this.toggleFlightInfo = new PlayerEventToggleInfo();
 		this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 
 		this.toggleFlightInfo.toggleValue = is.readBoolean();
@@ -59,6 +55,6 @@ public abstract class fPlayerToggle extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getDevotionEventToggleSource().insert(this.toggleFlightInfo);
+		db.getPlayerEventToggleSource().insert(this.toggleFlightInfo);
 	}
 }

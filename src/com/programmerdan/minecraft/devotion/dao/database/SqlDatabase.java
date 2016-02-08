@@ -27,49 +27,49 @@ public class SqlDatabase {
     
     private ArrayList<Source> sourceList;
     
-    private DevotionEventSource devotionEventSource;
-    public DevotionEventSource getDevotionEventSource() {
-    	return this.devotionEventSource;
+    private PlayerEventSource playerEventSource;
+    public PlayerEventSource getPlayerEventSource() {
+    	return this.playerEventSource;
     }
 	
-    private DevotionEventLoginSource devotionEventLoginSource;
-    public DevotionEventLoginSource getDevotionEventLoginSource() {
-    	return this.devotionEventLoginSource;
+    private PlayerEventLoginSource playerEventLoginSource;
+    public PlayerEventLoginSource getPlayerEventLoginSource() {
+    	return this.playerEventLoginSource;
     }
     
-    private DevotionEventQuitSource devotionEventQuitSource;
-    public DevotionEventQuitSource getDevotionEventQuitSource() {
-    	return this.devotionEventQuitSource;
+    private PlayerEventQuitSource playerEventQuitSource;
+    public PlayerEventQuitSource getPlayerEventQuitSource() {
+    	return this.playerEventQuitSource;
     }
 
-    private DevotionEventInteractSource devotionEventInteractSource;
-    public DevotionEventInteractSource getDevotionEventInteractSource() {
-    	return this.devotionEventInteractSource;
+    private PlayerEventInteractSource playerEventInteractSource;
+    public PlayerEventInteractSource getPlayerEventInteractSource() {
+    	return this.playerEventInteractSource;
     }
 
-    private DevotionEventKickSource devotionEventKickSource;
-    public DevotionEventKickSource getDevotionEventKickSource() {
-    	return this.devotionEventKickSource;
+    private PlayerEventKickSource playerEventKickSource;
+    public PlayerEventKickSource getPlayerEventKickSource() {
+    	return this.playerEventKickSource;
     }
 
-    private DevotionEventTeleportSource devotionEventTeleportSource;
-    public DevotionEventTeleportSource getDevotionEventTeleportSource() {
-    	return this.devotionEventTeleportSource;
+    private PlayerEventTeleportSource playerEventTeleportSource;
+    public PlayerEventTeleportSource getPlayerEventTeleportSource() {
+    	return this.playerEventTeleportSource;
     }
 
-    private DevotionEventRespawnSource devotionEventRespawnSource;
-    public DevotionEventRespawnSource getDevotionEventRespawnSource() {
-    	return this.devotionEventRespawnSource;
+    private PlayerEventRespawnSource playerEventRespawnSource;
+    public PlayerEventRespawnSource getPlayerEventRespawnSource() {
+    	return this.playerEventRespawnSource;
     }
 
-    private DevotionEventToggleSource devotionEventToggleSource;
-    public DevotionEventToggleSource getDevotionEventToggleSource() {
-    	return this.devotionEventToggleSource;
+    private PlayerEventToggleSource playerEventToggleSource;
+    public PlayerEventToggleSource getPlayerEventToggleSource() {
+    	return this.playerEventToggleSource;
     }
 
-    private DevotionEventVelocitySource devotionEventVelocitySource;
-    public DevotionEventVelocitySource getDevotionEventVelocitySource() {
-    	return this.devotionEventVelocitySource;
+    private PlayerEventVelocitySource playerEventVelocitySource;
+    public PlayerEventVelocitySource getPlayerEventVelocitySource() {
+    	return this.playerEventVelocitySource;
     }
 
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
@@ -105,15 +105,15 @@ public class SqlDatabase {
     private void initDataSources() {
     	this.sourceList = new ArrayList<Source>();
     	
-    	this.sourceList.add(this.devotionEventSource = new DevotionEventSource(this));
-    	this.sourceList.add(this.devotionEventLoginSource = new DevotionEventLoginSource(this));
-    	this.sourceList.add(this.devotionEventInteractSource = new DevotionEventInteractSource(this));
-    	this.sourceList.add(this.devotionEventKickSource = new DevotionEventKickSource(this));
-    	this.sourceList.add(this.devotionEventQuitSource = new DevotionEventQuitSource(this));
-    	this.sourceList.add(this.devotionEventTeleportSource = new DevotionEventTeleportSource(this));
-    	this.sourceList.add(this.devotionEventRespawnSource = new DevotionEventRespawnSource(this));
-    	this.sourceList.add(this.devotionEventToggleSource = new DevotionEventToggleSource(this));
-    	this.sourceList.add(this.devotionEventVelocitySource = new DevotionEventVelocitySource(this));
+    	this.sourceList.add(this.playerEventSource = new PlayerEventSource(this));
+    	this.sourceList.add(this.playerEventLoginSource = new PlayerEventLoginSource(this));
+    	this.sourceList.add(this.playerEventInteractSource = new PlayerEventInteractSource(this));
+    	this.sourceList.add(this.playerEventKickSource = new PlayerEventKickSource(this));
+    	this.sourceList.add(this.playerEventQuitSource = new PlayerEventQuitSource(this));
+    	this.sourceList.add(this.playerEventTeleportSource = new PlayerEventTeleportSource(this));
+    	this.sourceList.add(this.playerEventRespawnSource = new PlayerEventRespawnSource(this));
+    	this.sourceList.add(this.playerEventToggleSource = new PlayerEventToggleSource(this));
+    	this.sourceList.add(this.playerEventVelocitySource = new PlayerEventVelocitySource(this));
     }
     
     public void close() {

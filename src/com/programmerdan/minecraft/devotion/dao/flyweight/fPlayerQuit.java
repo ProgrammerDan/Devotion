@@ -9,16 +9,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventQuitInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventQuitInfo;
 
 public class fPlayerQuit extends fPlayer {
-	private DevotionEventQuitInfo quitInfo;
+	private PlayerEventQuitInfo quitInfo;
 	public fPlayerQuit(PlayerQuitEvent event) {
 		super(event, FlyweightType.Quit);
 		if (event != null) {
-			this.quitInfo = new DevotionEventQuitInfo();
-			this.quitInfo.eventTime = this.eventInfo.eventTime;
-			this.quitInfo.playerUUID = this.eventInfo.playerUUID;
+			this.quitInfo = new PlayerEventQuitInfo();
 			this.quitInfo.trace_id = this.eventInfo.trace_id;
 			this.quitInfo.quitMessage = event.getQuitMessage();
 		}
@@ -35,9 +33,7 @@ public class fPlayerQuit extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.quitInfo = new DevotionEventQuitInfo();
-		this.quitInfo.eventTime = this.eventInfo.eventTime;
-		this.quitInfo.playerUUID = this.eventInfo.playerUUID;
+		this.quitInfo = new PlayerEventQuitInfo();
 		this.quitInfo.trace_id = this.eventInfo.trace_id;
 
 		this.quitInfo.quitMessage = is.readUTF();
@@ -48,6 +44,6 @@ public class fPlayerQuit extends fPlayer {
 	@Override
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
-		db.getDevotionEventQuitSource().insert(this.quitInfo);
+		db.getPlayerEventQuitSource().insert(this.quitInfo);
 	}
 }

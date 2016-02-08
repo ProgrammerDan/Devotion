@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerEvent;
@@ -13,7 +12,7 @@ import org.bukkit.event.player.PlayerEvent;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 import com.programmerdan.minecraft.devotion.util.IDGenerator;
 
@@ -26,7 +25,7 @@ import com.programmerdan.minecraft.devotion.util.IDGenerator;
 public abstract class fPlayer extends Flyweight {
 	private static final byte VERSION = 0x00;
 	
-	protected DevotionEventInfo eventInfo;
+	protected PlayerEventInfo eventInfo;
 	
 	protected static IDGenerator idg = new IDGenerator();
 
@@ -36,7 +35,7 @@ public abstract class fPlayer extends Flyweight {
 		if(playerEvent != null) {
 			Player player = playerEvent.getPlayer();
 			
-			this.eventInfo = new DevotionEventInfo();
+			this.eventInfo = new PlayerEventInfo();
 			this.eventInfo.eventType = flyweightType.getName();
 			this.eventInfo.eventTime = new Timestamp(super.getRecordDate());
 			this.eventInfo.trace_id = idg.generateId().toString();
@@ -100,7 +99,7 @@ public abstract class fPlayer extends Flyweight {
 	
 	@Override
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
-		db.getDevotionEventSource().insert(this.eventInfo);
+		db.getPlayerEventSource().insert(this.eventInfo);
 	}
 
 	protected static Flyweight unmarshallFromStream(DataInputStream is, byte id, byte version) throws IOException {
@@ -113,7 +112,7 @@ public abstract class fPlayer extends Flyweight {
 	}
 	
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
-		this.eventInfo = new DevotionEventInfo();
+		this.eventInfo = new PlayerEventInfo();
 		this.eventInfo.eventType = getFlyweightType().getName();
 		this.eventInfo.eventTime = new Timestamp(is.readLong());
 		this.eventInfo.trace_id = is.readUTF();

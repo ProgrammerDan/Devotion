@@ -47,10 +47,6 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *  <li>PlayerToggleFlightEvent</li>
  *  <li>PlayerToggleSneakEvent</li>
  *  <li>PlayerToggleSprintEvent</li>
- * </ul>
- * 
- * TODO:
- * <ul>
  *  <li>PlayerVelocityEvent</li>
  * </ul>
  * 

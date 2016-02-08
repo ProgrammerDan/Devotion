@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.DevotionEventRespawnInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerEventRespawnInfo;
 
 /**
  * Soft wrapper for the abstract underlying class.
@@ -18,15 +18,13 @@ import com.programmerdan.minecraft.devotion.dao.info.DevotionEventRespawnInfo;
  */
 
 public class fPlayerRespawn extends fPlayer {
-	private DevotionEventRespawnInfo respawnInfo;
+	private PlayerEventRespawnInfo respawnInfo;
 	
 	public fPlayerRespawn(PlayerRespawnEvent event) {
 		super(event, FlyweightType.Respawn);
 		
 		if(event != null) {
-			this.respawnInfo = new DevotionEventRespawnInfo();
-			this.respawnInfo.eventTime = this.eventInfo.eventTime;
-			this.respawnInfo.playerUUID = this.eventInfo.playerUUID;
+			this.respawnInfo = new PlayerEventRespawnInfo();
 			this.respawnInfo.trace_id = this.eventInfo.trace_id;
 			this.respawnInfo.isBedSpawn = event.isBedSpawn();
 		}
@@ -43,9 +41,7 @@ public class fPlayerRespawn extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.respawnInfo = new DevotionEventRespawnInfo();
-		this.respawnInfo.eventTime = this.eventInfo.eventTime;
-		this.respawnInfo.playerUUID = this.eventInfo.playerUUID;
+		this.respawnInfo = new PlayerEventRespawnInfo();
 		this.respawnInfo.trace_id = this.eventInfo.trace_id;
 
 		this.respawnInfo.isBedSpawn = is.readBoolean();
@@ -55,6 +51,6 @@ public class fPlayerRespawn extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getDevotionEventRespawnSource().insert(this.respawnInfo);
+		db.getPlayerEventRespawnSource().insert(this.respawnInfo);
 	}
 }

@@ -1,11 +1,7 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-import java.sql.Timestamp;
-
-public class DevotionEventInteractInfo {
-	public Timestamp eventTime;
+public class PlayerEventInteractInfo {
 	public String trace_id;
-	public String playerUUID;
 	public String itemType;
 	public Integer itemAmount;
 	public Short itemDurability;
