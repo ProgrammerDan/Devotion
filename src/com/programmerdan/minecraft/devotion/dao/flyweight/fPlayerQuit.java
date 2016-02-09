@@ -9,14 +9,14 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventQuitInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerQuitInfo;
 
 public class fPlayerQuit extends fPlayer {
-	private PlayerEventQuitInfo quitInfo;
+	private PlayerQuitInfo quitInfo;
 	public fPlayerQuit(PlayerQuitEvent event) {
 		super(event, FlyweightType.Quit);
 		if (event != null) {
-			this.quitInfo = new PlayerEventQuitInfo();
+			this.quitInfo = new PlayerQuitInfo();
 			this.quitInfo.trace_id = this.eventInfo.trace_id;
 			this.quitInfo.quitMessage = event.getQuitMessage();
 		}
@@ -33,7 +33,7 @@ public class fPlayerQuit extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.quitInfo = new PlayerEventQuitInfo();
+		this.quitInfo = new PlayerQuitInfo();
 		this.quitInfo.trace_id = this.eventInfo.trace_id;
 
 		this.quitInfo.quitMessage = is.readUTF();
@@ -44,6 +44,6 @@ public class fPlayerQuit extends fPlayer {
 	@Override
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
-		db.getPlayerEventQuitSource().insert(this.quitInfo);
+		db.getPlayerQuitSource().insert(this.quitInfo);
 	}
 }

@@ -12,8 +12,9 @@ import org.bukkit.event.player.PlayerEvent;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerInfo;
 import com.programmerdan.minecraft.devotion.util.IDGenerator;
 
 /**
@@ -25,7 +26,7 @@ import com.programmerdan.minecraft.devotion.util.IDGenerator;
 public abstract class fPlayer extends Flyweight {
 	private static final byte VERSION = 0x00;
 	
-	protected PlayerEventInfo eventInfo;
+	protected PlayerInfo eventInfo;
 	
 	protected static IDGenerator idg = new IDGenerator();
 
@@ -35,7 +36,7 @@ public abstract class fPlayer extends Flyweight {
 		if(playerEvent != null) {
 			Player player = playerEvent.getPlayer();
 			
-			this.eventInfo = new PlayerEventInfo();
+			this.eventInfo = new PlayerInfo();
 			this.eventInfo.eventType = flyweightType.getName();
 			this.eventInfo.eventTime = new Timestamp(super.getRecordDate());
 			this.eventInfo.trace_id = idg.generateId().toString();
@@ -97,6 +98,14 @@ public abstract class fPlayer extends Flyweight {
 		os.writeFloat(loc.pitch);
 	}
 	
+	protected static void marshallItemToStream(ItemInfo info, DataOutputStream os) throws IOException {
+		os.writeUTF(info.itemType != null ? info.itemType: "");
+		os.writeInt(info.itemAmount != null ? info.itemAmount: Integer.MIN_VALUE); 
+		os.writeShort(info.itemDurability != null ? info.itemDurability: Short.MIN_VALUE);
+		os.writeUTF(info.itemEnchantments != null ? info.itemEnchantments: ""); 
+		os.writeUTF(info.itemLore != null ? info.itemLore: "");
+	}
+	
 	@Override
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		db.getPlayerEventSource().insert(this.eventInfo);
@@ -112,7 +121,7 @@ public abstract class fPlayer extends Flyweight {
 	}
 	
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
-		this.eventInfo = new PlayerEventInfo();
+		this.eventInfo = new PlayerInfo();
 		this.eventInfo.eventType = getFlyweightType().getName();
 		this.eventInfo.eventTime = new Timestamp(is.readLong());
 		this.eventInfo.trace_id = is.readUTF();
@@ -152,5 +161,26 @@ public abstract class fPlayer extends Flyweight {
 		loc.pitch = is.readFloat();
 		
 		return loc;
+	}
+	
+	protected static ItemInfo unmarshallItemFromStream(DataInputStream is) throws IOException {
+		ItemInfo info = new ItemInfo();
+		
+		info.itemType = is.readUTF();
+		if(info.itemType == "") info.itemType = null;
+		
+		info.itemAmount = is.readInt();
+		if(info.itemAmount == Integer.MIN_VALUE) info.itemAmount = null;
+		
+		info.itemDurability = is.readShort();
+		if(info.itemDurability == Short.MIN_VALUE) info.itemDurability = null;
+		
+		info.itemEnchantments = is.readUTF();
+		if(info.itemEnchantments == "") info.itemEnchantments = null;
+		
+		info.itemLore = is.readUTF();
+		if(info.itemLore == "") info.itemLore = null;
+		
+		return info;
 	}
 }

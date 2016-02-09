@@ -9,16 +9,16 @@ import org.bukkit.event.player.PlayerLoginEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventLoginInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerLoginInfo;
 
 public class fPlayerLogin extends fPlayer {
-	private PlayerEventLoginInfo loginInfo;
+	private PlayerLoginInfo loginInfo;
 	
 	public fPlayerLogin(PlayerLoginEvent event) {
 		super(event, FlyweightType.Login);
 		
 		if(event != null) {
-			this.loginInfo = new PlayerEventLoginInfo();
+			this.loginInfo = new PlayerLoginInfo();
 			this.loginInfo.trace_id = this.eventInfo.trace_id;
 			this.loginInfo.address = event.getAddress().toString();
 			this.loginInfo.hostname = event.getHostname();
@@ -43,7 +43,7 @@ public class fPlayerLogin extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.loginInfo = new PlayerEventLoginInfo();
+		this.loginInfo = new PlayerLoginInfo();
 		this.loginInfo.trace_id = this.eventInfo.trace_id;
 		this.loginInfo.address = is.readUTF();
 		this.loginInfo.hostname = is.readUTF();
@@ -59,6 +59,6 @@ public class fPlayerLogin extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getPlayerEventLoginSource().insert(this.loginInfo);
+		db.getPlayerLoginSource().insert(this.loginInfo);
 	}
 }

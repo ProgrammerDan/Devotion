@@ -4,78 +4,29 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventInteractInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerInteractInfo;
 
 public class fPlayerInteract extends fPlayer {
-	private PlayerEventInteractInfo interactInfo;
+	private PlayerInteractInfo interactInfo;
 	
 	public fPlayerInteract(PlayerInteractEvent event) {
-		super(event, FlyweightType.Login);
+		super(event, FlyweightType.Interact);
 		
 		if(event != null) {
-			this.interactInfo = new PlayerEventInteractInfo();
+			this.interactInfo = new PlayerInteractInfo();
 			this.interactInfo.trace_id = this.eventInfo.trace_id;
-			
-			ItemStack item = event.getItem();
-			if(item != null) {
-				this.interactInfo.itemType = item.getType().name();
-				this.interactInfo.itemAmount = item.getAmount();
-				this.interactInfo.itemDurability = item.getDurability();
-				this.interactInfo.itemEnchantments = getItemEnchantments(item); 
-				this.interactInfo.itemLore = getItemLore(item);
-			}
-			
+			this.interactInfo.item = new ItemInfo(event.getItem());
 			this.interactInfo.actionName = event.getAction().name();
-			this.interactInfo.clickedBlockType = event.getClickedBlock() != null ? event.getClickedBlock().getType().name(): null;
+			this.interactInfo.clickedBlock = event.getClickedBlock() != null ? event.getClickedBlock().getType().name(): null;
 			this.interactInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
 			this.interactInfo.eventCancelled = event.isCancelled();
 		}
-	}
-	
-	private static final String getItemEnchantments(ItemStack item) {
-		if(!item.getItemMeta().hasEnchants()) return null;
-		
-		Map<Enchantment, Integer> enchantments = item.getEnchantments();
-		StringBuilder result = new StringBuilder();
-		
-		for(Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-			if(result.length() > 0) {
-				result.append(",");
-			}
-			
-			result.append(entry.getKey().getName());
-			result.append(" ");
-			result.append(entry.getValue());
-		}
-		
-		return result.toString();
-	}
-	
-	private static final String getItemLore(ItemStack item) {
-		if(!item.getItemMeta().hasLore()) return null;
-		
-		List<String> list = item.getItemMeta().getLore();
-		StringBuilder result = new StringBuilder();
-		
-		for(String line : list) {
-			if(result.length() > 0) {
-				result.append("\n");
-			}
-			
-			result.append(line);
-		}
-		
-		return result.toString();
 	}
 	
 	@Override
@@ -84,13 +35,9 @@ public class fPlayerInteract extends fPlayer {
 		
 		// in context of file IO it isn't necessary to write the unique UUID twice b/c the parent
 		// and child records are written together.
-		os.writeUTF(this.interactInfo.itemType != null ? this.interactInfo.itemType: "");
-		os.writeInt(this.interactInfo.itemAmount != null ? this.interactInfo.itemAmount: Integer.MIN_VALUE); 
-		os.writeShort(this.interactInfo.itemDurability != null ? this.interactInfo.itemDurability: Short.MIN_VALUE);
-		os.writeUTF(this.interactInfo.itemEnchantments != null ? this.interactInfo.itemEnchantments: ""); 
-		os.writeUTF(this.interactInfo.itemLore != null ? this.interactInfo.itemLore: "");
+		marshallItemToStream(this.interactInfo.item, os);
 		os.writeUTF(this.interactInfo.actionName);
-		os.writeUTF(this.interactInfo.clickedBlockType != null ? this.interactInfo.clickedBlockType: "");
+		os.writeUTF(this.interactInfo.clickedBlock != null ? this.interactInfo.clickedBlock: "");
 		os.writeUTF(this.interactInfo.blockFace != null ? this.interactInfo.blockFace: "");
 		os.writeBoolean(this.interactInfo.eventCancelled);
 	}
@@ -99,28 +46,13 @@ public class fPlayerInteract extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.interactInfo = new PlayerEventInteractInfo();
+		this.interactInfo = new PlayerInteractInfo();
 		this.interactInfo.trace_id = this.eventInfo.trace_id;
-
-		this.interactInfo.itemType = is.readUTF();
-		if(this.interactInfo.itemType == "") this.interactInfo.itemType = null;
-		
-		this.interactInfo.itemAmount = is.readInt();
-		if(this.interactInfo.itemAmount == Integer.MIN_VALUE) this.interactInfo.itemAmount = null;
-		
-		this.interactInfo.itemDurability = is.readShort();
-		if(this.interactInfo.itemDurability == Short.MIN_VALUE) this.interactInfo.itemDurability = null;
-		
-		this.interactInfo.itemEnchantments = is.readUTF();
-		if(this.interactInfo.itemEnchantments == "") this.interactInfo.itemEnchantments = null;
-		
-		this.interactInfo.itemLore = is.readUTF();
-		if(this.interactInfo.itemLore == "") this.interactInfo.itemLore = null;
-		
+		this.interactInfo.item = unmarshallItemFromStream(is);
 		this.interactInfo.actionName = is.readUTF();
 		
-		this.interactInfo.clickedBlockType = is.readUTF();
-		if(this.interactInfo.clickedBlockType == "") this.interactInfo.clickedBlockType = null;
+		this.interactInfo.clickedBlock = is.readUTF();
+		if(this.interactInfo.clickedBlock == "") this.interactInfo.clickedBlock = null;
 		
 		this.interactInfo.blockFace = is.readUTF();
 		if(this.interactInfo.blockFace == "") this.interactInfo.blockFace = null;
@@ -132,6 +64,6 @@ public class fPlayerInteract extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getPlayerEventInteractSource().insert(this.interactInfo);
+		db.getPlayerInteractSource().insert(this.interactInfo);
 	}
 }

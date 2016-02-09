@@ -1,7 +1,7 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-public class PlayerEventToggleInfo {
+public class PlayerBedInfo {
 	public String trace_id;
-	public Boolean toggleValue;
+	public String bed;
 	public Boolean eventCancelled;
 }

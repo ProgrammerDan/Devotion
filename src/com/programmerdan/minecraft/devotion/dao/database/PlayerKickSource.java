@@ -4,21 +4,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventKickInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerKickInfo;
 
 /**
  * @author Aleksey Terzi
  *
  */
 
-public class PlayerEventKickSource extends Source {
-	private static final String insertScript = "INSERT dev_player_event_kick (trace_id, leave_message, kick_reason) VALUES (?, ?, ?)";
+public class PlayerKickSource extends Source {
+	private static final String insertScript = "INSERT dev_player_kick (trace_id, leave_message, kick_reason) VALUES (?, ?, ?)";
 	
-	public PlayerEventKickSource(SqlDatabase db) {
+	public PlayerKickSource(SqlDatabase db) {
 		super(db);
 	}
 		
-	public void insert(PlayerEventKickInfo info) throws SQLException {
+	public void insert(PlayerKickInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
 		sql.setString(1, info.trace_id);

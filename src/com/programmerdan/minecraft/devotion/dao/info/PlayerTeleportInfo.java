@@ -1,6 +1,6 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-public class PlayerEventTeleportInfo {
+public class PlayerTeleportInfo {
 	public String trace_id;
 	public String cause;
 	public LocationInfo from;

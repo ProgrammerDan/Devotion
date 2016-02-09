@@ -1,6 +1,6 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-public class PlayerEventQuitInfo {
+public class PlayerRespawnInfo {
 	public String trace_id;
-	public String quitMessage;
+	public Boolean isBedSpawn;
 }

@@ -4,16 +4,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventQuitInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerQuitInfo;
 
-public class PlayerEventQuitSource extends Source {
-	private static final String insertScript = "INSERT dev_player_event_quit (trace_id, quit_message) VALUES (?, ?)";
+public class PlayerQuitSource extends Source {
+	private static final String insertScript = "INSERT dev_player_quit (trace_id, quit_message) VALUES (?, ?)";
 	
-	public PlayerEventQuitSource(SqlDatabase db) {
+	public PlayerQuitSource(SqlDatabase db) {
 		super(db);
 	}
 		
-	public void insert(PlayerEventQuitInfo info) throws SQLException {
+	public void insert(PlayerQuitInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
 		sql.setString(1, info.trace_id);

@@ -4,21 +4,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventTeleportInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerTeleportInfo;
 
 /**
  * @author Aleksey Terzi
  *
  */
 
-public class PlayerEventTeleportSource extends Source {
-	private static final String insertScript = "INSERT dev_player_event_teleport (trace_id, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+public class PlayerTeleportSource extends Source {
+	private static final String insertScript = "INSERT dev_player_teleport (trace_id, cause, from_worlduuid, from_x, from_y, from_z, from_yaw, from_pitch, to_worlduuid, to_x, to_y, to_z, to_yaw, to_pitch, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
-	public PlayerEventTeleportSource(SqlDatabase db) {
+	public PlayerTeleportSource(SqlDatabase db) {
 		super(db);
 	}
 		
-	public void insert(PlayerEventTeleportInfo info) throws SQLException {
+	public void insert(PlayerTeleportInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
 		sql.setString(1, info.trace_id);

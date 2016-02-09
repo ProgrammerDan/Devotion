@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventTeleportInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerTeleportInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 
 /**
@@ -19,13 +19,13 @@ import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
  */
 
 public class fPlayerTeleport extends fPlayer {
-	private PlayerEventTeleportInfo teleportInfo;
+	private PlayerTeleportInfo teleportInfo;
 	
 	public fPlayerTeleport(PlayerTeleportEvent event) {
 		super(event, FlyweightType.Teleport);
 		
 		if(event != null) {
-			this.teleportInfo = new PlayerEventTeleportInfo();
+			this.teleportInfo = new PlayerTeleportInfo();
 			this.teleportInfo.trace_id = this.eventInfo.trace_id;
 			this.teleportInfo.cause = event.getCause().name();
 			this.teleportInfo.from = new LocationInfo(event.getFrom());
@@ -48,7 +48,7 @@ public class fPlayerTeleport extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.teleportInfo = new PlayerEventTeleportInfo();
+		this.teleportInfo = new PlayerTeleportInfo();
 		this.teleportInfo.trace_id = this.eventInfo.trace_id;
 
 		this.teleportInfo.cause = is.readUTF();
@@ -62,6 +62,6 @@ public class fPlayerTeleport extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getPlayerEventTeleportSource().insert(this.teleportInfo);
+		db.getPlayerTeleportSource().insert(this.teleportInfo);
 	}
 }

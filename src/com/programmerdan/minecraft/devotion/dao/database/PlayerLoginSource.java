@@ -3,21 +3,21 @@ package com.programmerdan.minecraft.devotion.dao.database;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventLoginInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerLoginInfo;
 
 /**
  * @author Aleksey Terzi
  *
  */
 
-public class PlayerEventLoginSource extends Source {
-	private static final String insertScript = "INSERT dev_player_event_login (trace_id, address, hostname, real_address, result, kick_message) VALUES (?, ?, ?, ?, ?, ?)";
+public class PlayerLoginSource extends Source {
+	private static final String insertScript = "INSERT dev_player_login (trace_id, address, hostname, real_address, result, kick_message) VALUES (?, ?, ?, ?, ?, ?)";
 	
-	public PlayerEventLoginSource(SqlDatabase db) {
+	public PlayerLoginSource(SqlDatabase db) {
 		super(db);
 	}
 		
-	public void insert(PlayerEventLoginInfo info) throws SQLException {
+	public void insert(PlayerLoginInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
 		sql.setString(1, info.trace_id);

@@ -7,6 +7,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -21,13 +24,13 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  * Current:
  * <ul>
  *     <li>PlayerInteractEvent</li>
+ *     <li>PlayerBedEnterEvent</li>
+ *     <li>PlayerBedLeaveEvent</li>
+ *     <li>PlayerBucketEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
- *     <li>PlayerBedEnterEvent</li>
- *     <li>PlayerBedLeaveEvent</li>
- *     <li>PlayerBucketEvent</li>
  *     <li>PlayerDropItemEvent</li>
  *     <li>PlayerEditBookEvent</li>
  *     <li>PlayerEggThrowEvent</li>
@@ -150,6 +153,27 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerInteractEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedEnterEvent)) {
+			insert(event);
+		} // else skip.
+	}
+
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedLeaveEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerBedLeave(PlayerBucketEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedLeaveEvent)) {
 			insert(event);
 		} // else skip.
 	}

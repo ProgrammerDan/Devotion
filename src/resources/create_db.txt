@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS dev_player_event (
-    player_event_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player (
+    dev_player_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,event_time DATETIME NOT NULL
    ,event_type VARCHAR(50) NOT NULL
@@ -30,11 +30,11 @@ CREATE TABLE IF NOT EXISTS dev_player_event (
    ,max_health DOUBLE NOT NULL
    ,status_flags CHAR(5) NOT NULL /* inVehicle, sneaking, sprinting, blocking, sleeping */
    
-   ,CONSTRAINT pk_dev_player_event PRIMARY KEY (player_event_id)
+   ,CONSTRAINT pk_dev_player PRIMARY KEY (dev_player_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_login (
-    player_event_login_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_login (
+    dev_player_login_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,address VARCHAR(20)
    ,hostname VARCHAR(100)
@@ -42,11 +42,11 @@ CREATE TABLE IF NOT EXISTS dev_player_event_login (
    ,result VARCHAR(15)
    ,kick_message VARCHAR(100)
    
-   ,CONSTRAINT pk_dev_player_event_login PRIMARY KEY (player_event_login_id)
+   ,CONSTRAINT pk_dev_player_login PRIMARY KEY (dev_player_login_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_interact (
-    player_event_interact_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_interact (
+    dev_player_interact_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
    ,item_amount INT
@@ -54,32 +54,32 @@ CREATE TABLE IF NOT EXISTS dev_player_event_interact (
    ,item_enchantments VARCHAR(500)
    ,item_lore VARCHAR(500)
    ,action_name VARCHAR(20) NOT NULL
-   ,clicked_block_type VARCHAR(50)
+   ,clicked_block VARCHAR(50)
    ,block_face VARCHAR(20)
    ,event_cancelled BOOL NOT NULL
    
-   ,CONSTRAINT pk_dev_player_event_interact PRIMARY KEY (player_event_interact_id)
+   ,CONSTRAINT pk_dev_player_interact PRIMARY KEY (dev_player_interact_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_kick (
-    player_event_kick_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_kick (
+    dev_player_kick_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,leave_message VARCHAR(500)
    ,kick_reason VARCHAR(500)
    
-   ,CONSTRAINT pk_dev_player_event_kick PRIMARY KEY (player_event_kick_id)
+   ,CONSTRAINT pk_dev_player_kick PRIMARY KEY (dev_player_kick_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_quit (
-    player_event_quit_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_quit (
+    player_quit_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,quit_message VARCHAR(500)
    
-   ,CONSTRAINT pk_dev_player_event_quit PRIMARY KEY (player_event_quit_id)
+   ,CONSTRAINT pk_dev_player_quit PRIMARY KEY (dev_player_quit_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_teleport (
-    player_event_teleport_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_teleport (
+    dev_player_teleport_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,cause VARCHAR(20)
    ,from_worlduuid VARCHAR(36) NOT NULL
@@ -96,33 +96,57 @@ CREATE TABLE IF NOT EXISTS dev_player_event_teleport (
    ,to_pitch FLOAT NOT NULL
    ,event_cancelled BOOL NOT NULL
       
-   ,CONSTRAINT pk_dev_player_event_teleport PRIMARY KEY (player_event_teleport_id)
+   ,CONSTRAINT pk_dev_player_teleport PRIMARY KEY (dev_player_teleport_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_respawn (
-    player_event_respawn_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_respawn (
+    dev_player_respawn_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,is_bed_spawn BIT NOT NULL
    
-   ,CONSTRAINT pk_dev_player_event_respawn PRIMARY KEY (player_event_respawn_id)
+   ,CONSTRAINT pk_dev_player_respawn PRIMARY KEY (dev_player_respawn_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_toggle (
-    player_event_toggle_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_toggle (
+    dev_player_toggle_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,toggle_value BIT NOT NULL
    ,event_cancelled BIT NOT NULL
    
-   ,CONSTRAINT pk_dev_player_event_toggle PRIMARY KEY (player_event_toggle_id)
+   ,CONSTRAINT pk_dev_player_toggle PRIMARY KEY (dev_player_toggle_id)
 );
 
-CREATE TABLE IF NOT EXISTS dev_player_event_velocity (
-    player_event_velocity_id BIGINT NOT NULL AUTO_INCREMENT
+CREATE TABLE IF NOT EXISTS dev_player_velocity (
+    dev_player_velocity_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,velocity_x DOUBLE NOT NULL
    ,velocity_y DOUBLE NOT NULL
    ,velocity_z DOUBLE NOT NULL
    ,event_cancelled BIT NOT NULL
    
-   ,CONSTRAINT pk_dev_player_event_velocity PRIMARY KEY (player_event_velocity_id)
+   ,CONSTRAINT pk_dev_player_velocity PRIMARY KEY (dev_player_velocity_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_bed (
+    dev_player_bed_id BIGINT NOT NULL AUTO_INCREMENT
+   ,bed VARCHAR(50)
+   ,event_cancelled BIT NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_bed PRIMARY KEY (dev_player_bed_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_bucket (
+    dev_player_bucket_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,item_type VARCHAR(50)
+   ,item_amount INT
+   ,item_durability SMALLINT
+   ,item_enchantments VARCHAR(500)
+   ,item_lore VARCHAR(500)
+   ,clicked_block VARCHAR(50)
+   ,block_face VARCHAR(20)
+   ,bucket VARCHAR(50)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_bucket PRIMARY KEY (dev_player_bucket_id)
 )

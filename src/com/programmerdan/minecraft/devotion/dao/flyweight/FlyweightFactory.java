@@ -2,6 +2,9 @@ package com.programmerdan.minecraft.devotion.dao.flyweight;
 
 import java.util.ArrayList;
 
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -41,6 +44,9 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ToggleSneak.getId(), PlayerToggleSneakEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ToggleSprint.getId(), PlayerToggleSprintEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Velocity.getId(), PlayerVelocityEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.BedEnter.getId(), PlayerBedEnterEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.BedLeave.getId(), PlayerBedLeaveEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -66,6 +72,9 @@ public class FlyweightFactory {
 		if(id == FlyweightType.ToggleSneak.getId()) return new fPlayerToggleSneak((PlayerToggleSneakEvent)event);
 		if(id == FlyweightType.ToggleSprint.getId()) return new fPlayerToggleSprint((PlayerToggleSprintEvent)event);
 		if(id == FlyweightType.Velocity.getId()) return new fPlayerVelocity((PlayerVelocityEvent)event);
+		if(id == FlyweightType.BedEnter.getId()) return new fPlayerBedEnter((PlayerBedEnterEvent)event);
+		if(id == FlyweightType.BedLeave.getId()) return new fPlayerBedLeave((PlayerBedLeaveEvent)event);
+		if(id == FlyweightType.Bucket.getId()) return new fPlayerBucket((PlayerBucketEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

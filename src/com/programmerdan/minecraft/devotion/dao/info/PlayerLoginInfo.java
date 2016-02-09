@@ -1,6 +1,6 @@
 package com.programmerdan.minecraft.devotion.dao.info;
 
-public class PlayerEventLoginInfo {
+public class PlayerLoginInfo {
 	public String trace_id;
 	public String address;
 	public String hostname;

@@ -27,49 +27,59 @@ public class SqlDatabase {
     
     private ArrayList<Source> sourceList;
     
-    private PlayerEventSource playerEventSource;
-    public PlayerEventSource getPlayerEventSource() {
+    private PlayerSource playerEventSource;
+    public PlayerSource getPlayerEventSource() {
     	return this.playerEventSource;
     }
 	
-    private PlayerEventLoginSource playerEventLoginSource;
-    public PlayerEventLoginSource getPlayerEventLoginSource() {
-    	return this.playerEventLoginSource;
+    private PlayerLoginSource playerLoginSource;
+    public PlayerLoginSource getPlayerLoginSource() {
+    	return this.playerLoginSource;
     }
     
-    private PlayerEventQuitSource playerEventQuitSource;
-    public PlayerEventQuitSource getPlayerEventQuitSource() {
-    	return this.playerEventQuitSource;
+    private PlayerQuitSource playerQuitSource;
+    public PlayerQuitSource getPlayerQuitSource() {
+    	return this.playerQuitSource;
     }
 
-    private PlayerEventInteractSource playerEventInteractSource;
-    public PlayerEventInteractSource getPlayerEventInteractSource() {
-    	return this.playerEventInteractSource;
+    private PlayerInteractSource playerInteractSource;
+    public PlayerInteractSource getPlayerInteractSource() {
+    	return this.playerInteractSource;
     }
 
-    private PlayerEventKickSource playerEventKickSource;
-    public PlayerEventKickSource getPlayerEventKickSource() {
-    	return this.playerEventKickSource;
+    private PlayerKickSource playerKickSource;
+    public PlayerKickSource getPlayerKickSource() {
+    	return this.playerKickSource;
     }
 
-    private PlayerEventTeleportSource playerEventTeleportSource;
-    public PlayerEventTeleportSource getPlayerEventTeleportSource() {
-    	return this.playerEventTeleportSource;
+    private PlayerTeleportSource playerTeleportSource;
+    public PlayerTeleportSource getPlayerTeleportSource() {
+    	return this.playerTeleportSource;
     }
 
-    private PlayerEventRespawnSource playerEventRespawnSource;
-    public PlayerEventRespawnSource getPlayerEventRespawnSource() {
-    	return this.playerEventRespawnSource;
+    private PlayerRespawnSource playerRespawnSource;
+    public PlayerRespawnSource getPlayerRespawnSource() {
+    	return this.playerRespawnSource;
     }
 
-    private PlayerEventToggleSource playerEventToggleSource;
-    public PlayerEventToggleSource getPlayerEventToggleSource() {
-    	return this.playerEventToggleSource;
+    private PlayerToggleSource playerToggleSource;
+    public PlayerToggleSource getPlayerToggleSource() {
+    	return this.playerToggleSource;
     }
 
-    private PlayerEventVelocitySource playerEventVelocitySource;
-    public PlayerEventVelocitySource getPlayerEventVelocitySource() {
-    	return this.playerEventVelocitySource;
+    private PlayerVelocitySource playerVelocitySource;
+    public PlayerVelocitySource getPlayerVelocitySource() {
+    	return this.playerVelocitySource;
+    }
+
+    private PlayerBedSource playerBedSource;
+    public PlayerBedSource getPlayerBedSource() {
+    	return this.playerBedSource;
+    }
+
+    private PlayerBucketSource playerBucketSource;
+    public PlayerBucketSource getPlayerBucketSource() {
+    	return this.playerBucketSource;
     }
 
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
@@ -105,15 +115,17 @@ public class SqlDatabase {
     private void initDataSources() {
     	this.sourceList = new ArrayList<Source>();
     	
-    	this.sourceList.add(this.playerEventSource = new PlayerEventSource(this));
-    	this.sourceList.add(this.playerEventLoginSource = new PlayerEventLoginSource(this));
-    	this.sourceList.add(this.playerEventInteractSource = new PlayerEventInteractSource(this));
-    	this.sourceList.add(this.playerEventKickSource = new PlayerEventKickSource(this));
-    	this.sourceList.add(this.playerEventQuitSource = new PlayerEventQuitSource(this));
-    	this.sourceList.add(this.playerEventTeleportSource = new PlayerEventTeleportSource(this));
-    	this.sourceList.add(this.playerEventRespawnSource = new PlayerEventRespawnSource(this));
-    	this.sourceList.add(this.playerEventToggleSource = new PlayerEventToggleSource(this));
-    	this.sourceList.add(this.playerEventVelocitySource = new PlayerEventVelocitySource(this));
+    	this.sourceList.add(this.playerEventSource = new PlayerSource(this));
+    	this.sourceList.add(this.playerLoginSource = new PlayerLoginSource(this));
+    	this.sourceList.add(this.playerInteractSource = new PlayerInteractSource(this));
+    	this.sourceList.add(this.playerKickSource = new PlayerKickSource(this));
+    	this.sourceList.add(this.playerQuitSource = new PlayerQuitSource(this));
+    	this.sourceList.add(this.playerTeleportSource = new PlayerTeleportSource(this));
+    	this.sourceList.add(this.playerRespawnSource = new PlayerRespawnSource(this));
+    	this.sourceList.add(this.playerToggleSource = new PlayerToggleSource(this));
+    	this.sourceList.add(this.playerVelocitySource = new PlayerVelocitySource(this));
+    	this.sourceList.add(this.playerBedSource = new PlayerBedSource(this));
+    	this.sourceList.add(this.playerBucketSource = new PlayerBucketSource(this));
     }
     
     public void close() {

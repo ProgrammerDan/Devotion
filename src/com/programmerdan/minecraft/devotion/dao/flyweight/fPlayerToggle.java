@@ -10,7 +10,7 @@ import org.bukkit.event.player.PlayerEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventToggleInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerToggleInfo;
 
 /**
  * Soft wrapper for the abstract underlying class.
@@ -19,13 +19,13 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerEventToggleInfo;
  */
 
 public abstract class fPlayerToggle extends fPlayer {
-	private PlayerEventToggleInfo toggleFlightInfo;
+	private PlayerToggleInfo toggleFlightInfo;
 	
 	protected fPlayerToggle(PlayerEvent event, FlyweightType flyweightType, Boolean toggleValue) {
 		super(event, flyweightType);
 		
 		if(event != null) {
-			this.toggleFlightInfo = new PlayerEventToggleInfo();
+			this.toggleFlightInfo = new PlayerToggleInfo();
 			this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 			this.toggleFlightInfo.toggleValue = toggleValue;
 			this.toggleFlightInfo.eventCancelled = ((Cancellable)event).isCancelled();
@@ -44,7 +44,7 @@ public abstract class fPlayerToggle extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.toggleFlightInfo = new PlayerEventToggleInfo();
+		this.toggleFlightInfo = new PlayerToggleInfo();
 		this.toggleFlightInfo.trace_id = this.eventInfo.trace_id;
 
 		this.toggleFlightInfo.toggleValue = is.readBoolean();
@@ -55,6 +55,6 @@ public abstract class fPlayerToggle extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getPlayerEventToggleSource().insert(this.toggleFlightInfo);
+		db.getPlayerToggleSource().insert(this.toggleFlightInfo);
 	}
 }

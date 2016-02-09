@@ -9,16 +9,16 @@ import org.bukkit.event.player.PlayerVelocityEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.PlayerEventVelocityInfo;
+import com.programmerdan.minecraft.devotion.dao.info.PlayerVelocityInfo;
 
 public class fPlayerVelocity extends fPlayer {
-	private PlayerEventVelocityInfo velocityInfo;
+	private PlayerVelocityInfo velocityInfo;
 	
 	public fPlayerVelocity(PlayerVelocityEvent event) {
 		super(event, FlyweightType.Velocity);
 		
 		if(event != null) {
-			this.velocityInfo = new PlayerEventVelocityInfo();
+			this.velocityInfo = new PlayerVelocityInfo();
 			this.velocityInfo.trace_id = this.eventInfo.trace_id;
 			this.velocityInfo.velocityX = event.getVelocity().getX();
 			this.velocityInfo.velocityY = event.getVelocity().getY();
@@ -41,7 +41,7 @@ public class fPlayerVelocity extends fPlayer {
 	protected void unmarshallFromStream(DataInputStream is) throws IOException {
 		super.unmarshallFromStream(is);
 		
-		this.velocityInfo = new PlayerEventVelocityInfo();
+		this.velocityInfo = new PlayerVelocityInfo();
 		this.velocityInfo.trace_id = this.eventInfo.trace_id;
 
 		this.velocityInfo.velocityX = is.readDouble();
@@ -54,6 +54,6 @@ public class fPlayerVelocity extends fPlayer {
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		super.marshallToDatabase(db);
 		
-		db.getPlayerEventVelocitySource().insert(this.velocityInfo);
+		db.getPlayerVelocitySource().insert(this.velocityInfo);
 	}
 }
