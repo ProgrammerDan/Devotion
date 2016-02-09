@@ -3,6 +3,9 @@ package com.programmerdan.minecraft.devotion.datahandlers;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 
+import net.minecraft.server.v1_8_R3.MinecraftServer;
+
+import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.programmerdan.minecraft.devotion.Devotion;
@@ -15,19 +18,14 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
 public abstract class DataHandler extends BukkitRunnable {
-
-	private static final long CheckAdaptiveRunInTicks = 1;
-	
 	private long delay = -1;
 	private boolean adaptive = false;
 	private long maxRun;
 	private ConcurrentLinkedQueue<Flyweight> insertQueue = new ConcurrentLinkedQueue<Flyweight>(); 
-	private long insertCount = 0l;
+	long insertCount = 0l;
+	
 	private boolean debug = false;
 	private boolean active = false;
-	private long lastRunTime = 0;
-	private Boolean isRunExecuting = false;
-	private Object syncRoot = new Object();
 	
 	/**
 	 * @return Indicates if this handler is live and handling flyweights.
@@ -148,22 +146,27 @@ public abstract class DataHandler extends BukkitRunnable {
 		}
 		
 		buildUp();
-		
-		// 2016-02-08: Aleksey - Using of runTaskLaterAsynchronously inside run() method will throw
-		// exception IllegalStateException "already scheduled"
-		// Therefore we should check "next adaptive run" manually
-
-		this.lastRunTime = System.currentTimeMillis();
-		this.isRunExecuting = false;
 
 		if (adaptive) {
-			this.runTaskTimerAsynchronously(Devotion.instance(), CheckAdaptiveRunInTicks, CheckAdaptiveRunInTicks );
+			Bukkit.getScheduler().runTaskLaterAsynchronously(Devotion.instance(), (Runnable) this, convertToTicks(this.delay) ); // convert milliseconds into ticks
 		} else {
 			this.runTaskTimerAsynchronously(Devotion.instance(), this.delay, this.delay);
 		}
 		active = true;
 
 		return true;
+	}
+
+	/**
+	 * Helper that uses the minecraft internal tps handler to convert an expected delay in milliseconds into 
+	 * an actual delay in ticks.
+	 */
+	protected final long convertToTicks(long milliseconds) {
+		double curtick = 20.0;
+		try {
+			curtick = MinecraftServer.getServer().recentTps[0];
+		} catch (NullPointerException npe) {}
+		return (long) ( (double) milliseconds / (1000.0 / curtick));
 	}
 
 	/**
@@ -239,27 +242,18 @@ public abstract class DataHandler extends BukkitRunnable {
 	 * Called by the scheduler.
 	 */
 	public final void run() {
-		synchronized(this.syncRoot) {
-			if(this.isRunExecuting) return;
-
-			this.isRunExecuting = true;
+		if (!active) {
+			this.cancel();
+			return;
 		}
 		
-		if (!active) {
-			cancel();
-		}			
-		else if(!this.adaptive || this.lastRunTime + this.delay <= System.currentTimeMillis()) {
-			process();
-			
-			this.lastRunTime = System.currentTimeMillis();
+		process();
 
-			if (!this.active) {
-				cancel();
-			}
-		}
-
-		synchronized(this.syncRoot) {
-			this.isRunExecuting = false;
+		if (adaptive && active) {
+			Bukkit.getScheduler().runTaskLaterAsynchronously(Devotion.instance(), (Runnable) this, convertToTicks(this.delay) ); // convert milliseconds into ticks
+		} else if (!active) {
+			this.cancel();
 		}
 	}
+
 }
