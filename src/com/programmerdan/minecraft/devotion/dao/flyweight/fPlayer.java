@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerEvent;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerInfo;
 import com.programmerdan.minecraft.devotion.util.IDGenerator;
@@ -98,7 +98,7 @@ public abstract class fPlayer extends Flyweight {
 		os.writeFloat(loc.pitch);
 	}
 	
-	protected static void marshallItemToStream(ItemInfo info, DataOutputStream os) throws IOException {
+	protected static void marshallItemStackToStream(ItemStackInfo info, DataOutputStream os) throws IOException {
 		os.writeUTF(info.itemType != null ? info.itemType: "");
 		os.writeInt(info.itemAmount != null ? info.itemAmount: Integer.MIN_VALUE); 
 		os.writeShort(info.itemDurability != null ? info.itemDurability: Short.MIN_VALUE);
@@ -163,8 +163,8 @@ public abstract class fPlayer extends Flyweight {
 		return loc;
 	}
 	
-	protected static ItemInfo unmarshallItemFromStream(DataInputStream is) throws IOException {
-		ItemInfo info = new ItemInfo();
+	protected static ItemStackInfo unmarshallItemStackFromStream(DataInputStream is) throws IOException {
+		ItemStackInfo info = new ItemStackInfo();
 		
 		info.itemType = is.readUTF();
 		if(info.itemType == "") info.itemType = null;

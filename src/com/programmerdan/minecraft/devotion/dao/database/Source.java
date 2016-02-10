@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 
 /**
  * @author Aleksey Terzi
@@ -41,7 +41,7 @@ public abstract class Source {
 		return this.sql;
 	}
 	
-	protected void setItemParams(int startIndex, ItemInfo info) throws SQLException {
+	protected void setItemParams(int startIndex, ItemStackInfo info) throws SQLException {
 		if(info.itemType != null) {
 			this.sql.setString(startIndex, info.itemType); 
 		} else {

@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS dev_player_teleport (
 CREATE TABLE IF NOT EXISTS dev_player_respawn (
     dev_player_respawn_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
-   ,is_bed_spawn BIT NOT NULL
+   ,is_bed_spawn BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_respawn PRIMARY KEY (dev_player_respawn_id)
 );
@@ -110,8 +110,8 @@ CREATE TABLE IF NOT EXISTS dev_player_respawn (
 CREATE TABLE IF NOT EXISTS dev_player_toggle (
     dev_player_toggle_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
-   ,toggle_value BIT NOT NULL
-   ,event_cancelled BIT NOT NULL
+   ,toggle_value BOOL NOT NULL
+   ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_toggle PRIMARY KEY (dev_player_toggle_id)
 );
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS dev_player_velocity (
    ,velocity_x DOUBLE NOT NULL
    ,velocity_y DOUBLE NOT NULL
    ,velocity_z DOUBLE NOT NULL
-   ,event_cancelled BIT NOT NULL
+   ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_velocity PRIMARY KEY (dev_player_velocity_id)
 );
@@ -130,7 +130,7 @@ CREATE TABLE IF NOT EXISTS dev_player_velocity (
 CREATE TABLE IF NOT EXISTS dev_player_bed (
     dev_player_bed_id BIGINT NOT NULL AUTO_INCREMENT
    ,bed VARCHAR(50)
-   ,event_cancelled BIT NOT NULL
+   ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_bed PRIMARY KEY (dev_player_bed_id)
 );
@@ -149,4 +149,31 @@ CREATE TABLE IF NOT EXISTS dev_player_bucket (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_bucket PRIMARY KEY (dev_player_bucket_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_drop_item (
+    dev_player_drop_item_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,drop_item_type VARCHAR(50)
+   ,drop_item_amount INT
+   ,drop_item_durability SMALLINT
+   ,drop_item_enchantments VARCHAR(500)
+   ,drop_item_lore VARCHAR(500)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_drop_item PRIMARY KEY (dev_player_drop_item_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_edit_book (
+    dev_player_edit_book_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,slot INT NOT NULL
+   ,signing BOOL NOT NULL
+   ,title_changed BOOL NOT NULL
+   ,author_changed BOOL NOT NULL
+   ,content_changed BOOL NOT NULL
+   ,page_count_changed BOOL NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_edit_book PRIMARY KEY (dev_player_edit_book_id)
 )

@@ -10,6 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -27,12 +29,12 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerBedEnterEvent</li>
  *     <li>PlayerBedLeaveEvent</li>
  *     <li>PlayerBucketEvent</li>
+ *     <li>PlayerDropItemEvent</li>
+ *     <li>PlayerEditBookEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
- *     <li>PlayerDropItemEvent</li>
- *     <li>PlayerEditBookEvent</li>
  *     <li>PlayerEggThrowEvent</li>
  *     <li>PlayerExpChangeEvent</li>
  *     <li>PlayerFishEvent</li>
@@ -174,6 +176,20 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerBedLeave(PlayerBucketEvent event) {
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedLeaveEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerDropItemEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerEditBook(PlayerEditBookEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerEditBookEvent)) {
 			insert(event);
 		} // else skip.
 	}

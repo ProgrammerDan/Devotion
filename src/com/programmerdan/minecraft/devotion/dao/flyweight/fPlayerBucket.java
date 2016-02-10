@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerBucketEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerBucketInfo;
 
 public class fPlayerBucket extends fPlayer {
@@ -21,7 +21,7 @@ public class fPlayerBucket extends fPlayer {
 		if(event != null) {
 			this.bucketInfo = new PlayerBucketInfo();
 			this.bucketInfo.trace_id = this.eventInfo.trace_id;
-			this.bucketInfo.item = new ItemInfo(event.getItemStack());
+			this.bucketInfo.item = new ItemStackInfo(event.getItemStack());
 			this.bucketInfo.clickedBlock = event.getBlockClicked() != null ? event.getBlockClicked().getType().name(): null;
 			this.bucketInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
 			this.bucketInfo.bucket = event.getBucket() != null ? event.getBucket().name(): null;
@@ -35,7 +35,7 @@ public class fPlayerBucket extends fPlayer {
 		
 		// in context of file IO it isn't necessary to write the unique UUID twice b/c the parent
 		// and child records are written together.
-		marshallItemToStream(this.bucketInfo.item, os);
+		marshallItemStackToStream(this.bucketInfo.item, os);
 		os.writeUTF(this.bucketInfo.clickedBlock != null ? this.bucketInfo.clickedBlock: "");
 		os.writeUTF(this.bucketInfo.blockFace != null ? this.bucketInfo.blockFace: "");
 		os.writeUTF(this.bucketInfo.bucket != null ? this.bucketInfo.bucket: "");
@@ -48,7 +48,7 @@ public class fPlayerBucket extends fPlayer {
 		
 		this.bucketInfo = new PlayerBucketInfo();
 		this.bucketInfo.trace_id = this.eventInfo.trace_id;
-		this.bucketInfo.item = unmarshallItemFromStream(is);
+		this.bucketInfo.item = unmarshallItemStackFromStream(is);
 		
 		this.bucketInfo.clickedBlock = is.readUTF();
 		if(this.bucketInfo.clickedBlock == "") this.bucketInfo.clickedBlock = null;

@@ -6,6 +6,8 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -47,6 +49,8 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.BedEnter.getId(), PlayerBedEnterEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.BedLeave.getId(), PlayerBedLeaveEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.DropItem.getId(), PlayerDropItemEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.EditBook.getId(), PlayerEditBookEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -75,6 +79,8 @@ public class FlyweightFactory {
 		if(id == FlyweightType.BedEnter.getId()) return new fPlayerBedEnter((PlayerBedEnterEvent)event);
 		if(id == FlyweightType.BedLeave.getId()) return new fPlayerBedLeave((PlayerBedLeaveEvent)event);
 		if(id == FlyweightType.Bucket.getId()) return new fPlayerBucket((PlayerBucketEvent)event);
+		if(id == FlyweightType.DropItem.getId()) return new fPlayerDropItem((PlayerDropItemEvent)event);
+		if(id == FlyweightType.EditBook.getId()) return new fPlayerEditBook((PlayerEditBookEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

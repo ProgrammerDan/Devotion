@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
-import com.programmerdan.minecraft.devotion.dao.info.ItemInfo;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerInteractInfo;
 
 public class fPlayerInteract extends fPlayer {
@@ -21,7 +21,7 @@ public class fPlayerInteract extends fPlayer {
 		if(event != null) {
 			this.interactInfo = new PlayerInteractInfo();
 			this.interactInfo.trace_id = this.eventInfo.trace_id;
-			this.interactInfo.item = new ItemInfo(event.getItem());
+			this.interactInfo.item = new ItemStackInfo(event.getItem());
 			this.interactInfo.actionName = event.getAction().name();
 			this.interactInfo.clickedBlock = event.getClickedBlock() != null ? event.getClickedBlock().getType().name(): null;
 			this.interactInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
@@ -35,7 +35,7 @@ public class fPlayerInteract extends fPlayer {
 		
 		// in context of file IO it isn't necessary to write the unique UUID twice b/c the parent
 		// and child records are written together.
-		marshallItemToStream(this.interactInfo.item, os);
+		marshallItemStackToStream(this.interactInfo.item, os);
 		os.writeUTF(this.interactInfo.actionName);
 		os.writeUTF(this.interactInfo.clickedBlock != null ? this.interactInfo.clickedBlock: "");
 		os.writeUTF(this.interactInfo.blockFace != null ? this.interactInfo.blockFace: "");
@@ -48,7 +48,7 @@ public class fPlayerInteract extends fPlayer {
 		
 		this.interactInfo = new PlayerInteractInfo();
 		this.interactInfo.trace_id = this.eventInfo.trace_id;
-		this.interactInfo.item = unmarshallItemFromStream(is);
+		this.interactInfo.item = unmarshallItemStackFromStream(is);
 		this.interactInfo.actionName = is.readUTF();
 		
 		this.interactInfo.clickedBlock = is.readUTF();

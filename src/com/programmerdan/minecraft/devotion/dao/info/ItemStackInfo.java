@@ -7,17 +7,17 @@ import java.util.Map.Entry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
-public class ItemInfo {
+public class ItemStackInfo {
 	public String itemType;
 	public Integer itemAmount;
 	public Short itemDurability;
 	public String itemEnchantments;
 	public String itemLore;
 	
-	public ItemInfo() {
+	public ItemStackInfo() {
 	}
 	
-	public ItemInfo(ItemStack item) {
+	public ItemStackInfo(ItemStack item) {
 		if(item != null) {
 			itemType = item.getType().name();
 			itemAmount = item.getAmount();
