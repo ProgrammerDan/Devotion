@@ -6,5 +6,6 @@ public class PlayerBucketInfo {
 	public String clickedBlock;
 	public String blockFace;
 	public String bucket;
+	public Boolean isFill;
 	public Boolean eventCancelled;
 }

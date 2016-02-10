@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
@@ -49,6 +51,8 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.BedEnter.getId(), PlayerBedEnterEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.BedLeave.getId(), PlayerBedLeaveEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketFillEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketEmptyEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.DropItem.getId(), PlayerDropItemEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.EditBook.getId(), PlayerEditBookEvent.class));
 	}

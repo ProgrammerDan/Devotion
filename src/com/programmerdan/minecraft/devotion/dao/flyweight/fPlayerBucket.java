@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import org.bukkit.event.player.PlayerBucketEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
@@ -25,6 +26,11 @@ public class fPlayerBucket extends fPlayer {
 			this.bucketInfo.clickedBlock = event.getBlockClicked() != null ? event.getBlockClicked().getType().name(): null;
 			this.bucketInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
 			this.bucketInfo.bucket = event.getBucket() != null ? event.getBucket().name(): null;
+			if (event instanceof PlayerBucketFillEvent) {
+				this.bucketInfo.isFill = true;
+			} else {
+				this.bucketInfo.isFill = false;
+			}
 			this.bucketInfo.eventCancelled = event.isCancelled();
 		}
 	}
@@ -39,6 +45,7 @@ public class fPlayerBucket extends fPlayer {
 		os.writeUTF(this.bucketInfo.clickedBlock != null ? this.bucketInfo.clickedBlock: "");
 		os.writeUTF(this.bucketInfo.blockFace != null ? this.bucketInfo.blockFace: "");
 		os.writeUTF(this.bucketInfo.bucket != null ? this.bucketInfo.bucket: "");
+		os.writeBoolean(this.bucketInfo.isFill);
 		os.writeBoolean(this.bucketInfo.eventCancelled);
 	}
 	
@@ -58,6 +65,8 @@ public class fPlayerBucket extends fPlayer {
 		
 		this.bucketInfo.bucket = is.readUTF();
 		if(this.bucketInfo.bucket == "") this.bucketInfo.bucket = null;
+		
+		this.bucketInfo.isFill = is.readBoolean();
 
 		this.bucketInfo.eventCancelled = is.readBoolean();
 	}
