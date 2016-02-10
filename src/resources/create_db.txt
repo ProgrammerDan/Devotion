@@ -110,11 +110,7 @@ CREATE TABLE IF NOT EXISTS dev_player_respawn (
 CREATE TABLE IF NOT EXISTS dev_player_toggle (
     dev_player_toggle_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
-<<<<<<< HEAD
    ,toggle_value BOOL NOT NULL
-=======
-   ,toggle_value BIT NOT NULL
->>>>>>> d2b039d4948ac32ba70468e6221bd14f02504241
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_toggle PRIMARY KEY (dev_player_toggle_id)
