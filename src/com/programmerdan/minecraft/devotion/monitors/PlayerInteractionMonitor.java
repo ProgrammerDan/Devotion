@@ -9,7 +9,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -172,8 +174,15 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerBedLeave(PlayerBucketEvent event) {
-		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedLeaveEvent)) {
+	public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBucketFillEvent)) {
+			insert(event);
+		} // else skip.
+	}
+
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerBucketFill(PlayerBucketEmptyEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBucketEmptyEvent)) {
 			insert(event);
 		} // else skip.
 	}

@@ -4,27 +4,28 @@ public enum PlayerInteractionType {
 	PlayerInteractEvent(0),
 	PlayerBedEnterEvent(1),
 	PlayerBedLeaveEvent(2),
-	PlayerBucketEvent(3),
-	PlayerDropItemEvent(4),
-	PlayerEditBookEvent(5),
-	PlayerEggThrowEvent(6),
-	PlayerExpChangeEvent(7),
-	PlayerFishEvent(8),
-	PlayerGameModeChangeEvent(9),
-	PlayerInteractEntityEvent(10),
-	PlayerInventoryEvent(11),
-	PlayerItemBreakEvent(12),
-	PlayerItemConsumeEvent(13),
-	PlayerItemHeldEvent(14),
-	PlayerLevelChangeEvent(15),
-	PlayerPickupItemEvent(16),
-	PlayerResourcePackStatusEvent(17),
-	PlayerShearEntityEvent(18),
-	PlayerStatisticIncrementEvent(19),
-	PlayerDeathEvent(20);
+	PlayerBucketFillEvent(3),
+	PlayerBucketEmptyEvent(4),
+	PlayerDropItemEvent(5),
+	PlayerEditBookEvent(6),
+	PlayerEggThrowEvent(7),
+	PlayerExpChangeEvent(8),
+	PlayerFishEvent(9),
+	PlayerGameModeChangeEvent(10),
+	PlayerInteractEntityEvent(11),
+	PlayerInventoryEvent(12),
+	PlayerItemBreakEvent(13),
+	PlayerItemConsumeEvent(14),
+	PlayerItemHeldEvent(15),
+	PlayerLevelChangeEvent(16),
+	PlayerPickupItemEvent(17),
+	PlayerResourcePackStatusEvent(18),
+	PlayerShearEntityEvent(19),
+	PlayerStatisticIncrementEvent(20),
+	PlayerDeathEvent(21);
 	
-	public static final int MAX_IDX = 20; // UPDATE THIS if you alter the above
-	public static final int SIZE = 21; // UPDATE THIS if you alter the above.
+	public static final int MAX_IDX = 21; // UPDATE THIS if you alter the above
+	public static final int SIZE = 22; // UPDATE THIS if you alter the above.
 	
 	private int idx;
 	
