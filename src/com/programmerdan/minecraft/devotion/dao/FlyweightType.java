@@ -34,4 +34,7 @@ public class FlyweightType {
 	public static final FlyweightType Bucket = new FlyweightType((byte) 0x10, "Bucket");
 	public static final FlyweightType DropItem = new FlyweightType((byte) 0x11, "DropItem");
 	public static final FlyweightType EditBook = new FlyweightType((byte) 0x12, "EditBook");
+	public static final FlyweightType EggThrow = new FlyweightType((byte) 0x13, "EggThrow");
+	public static final FlyweightType ExpChange = new FlyweightType((byte) 0x14, "ExpChange");
+	public static final FlyweightType Fish = new FlyweightType((byte) 0x15, "Fish");
 }

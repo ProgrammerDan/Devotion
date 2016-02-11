@@ -10,7 +10,10 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
+import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
@@ -55,6 +58,9 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.Bucket.getId(), PlayerBucketEmptyEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.DropItem.getId(), PlayerDropItemEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.EditBook.getId(), PlayerEditBookEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.EggThrow.getId(), PlayerEggThrowEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ExpChange.getId(), PlayerExpChangeEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.Fish.getId(), PlayerFishEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -85,6 +91,9 @@ public class FlyweightFactory {
 		if(id == FlyweightType.Bucket.getId()) return new fPlayerBucket((PlayerBucketEvent)event);
 		if(id == FlyweightType.DropItem.getId()) return new fPlayerDropItem((PlayerDropItemEvent)event);
 		if(id == FlyweightType.EditBook.getId()) return new fPlayerEditBook((PlayerEditBookEvent)event);
+		if(id == FlyweightType.EggThrow.getId()) return new fPlayerEggThrow((PlayerEggThrowEvent)event);
+		if(id == FlyweightType.ExpChange.getId()) return new fPlayerExpChange((PlayerExpChangeEvent)event);
+		if(id == FlyweightType.Fish.getId()) return new fPlayerFish((PlayerFishEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

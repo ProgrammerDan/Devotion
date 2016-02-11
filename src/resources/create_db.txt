@@ -178,4 +178,33 @@ CREATE TABLE IF NOT EXISTS dev_player_edit_book (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_edit_book PRIMARY KEY (dev_player_edit_book_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_egg_throw (
+    dev_player_egg_throw_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,hatching BOOL NOT NULL
+   ,hatching_type VARCHAR(50)
+   ,num_hatches TINYINT NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_egg_throw PRIMARY KEY (dev_player_egg_throw_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_exp_change (
+    dev_player_exp_change_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,amount INT NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_exp_change PRIMARY KEY (dev_player_exp_change_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_fish (
+    dev_player_fish_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,caught_entity VARCHAR(50)
+   ,exp INT NOT NULL
+   ,state VARCHAR(50) 
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_fish PRIMARY KEY (dev_player_fish_id)
 )

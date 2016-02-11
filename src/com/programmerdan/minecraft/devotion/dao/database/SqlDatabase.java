@@ -92,6 +92,21 @@ public class SqlDatabase {
     	return this.playerEditBookSource;
     }
 
+    private PlayerEggThrowSource playerEggThrowSource;
+    public PlayerEggThrowSource getPlayerEggThrowSource() {
+    	return this.playerEggThrowSource;
+    }
+
+    private PlayerExpChangeSource playerExpChangeSource;
+    public PlayerExpChangeSource getPlayerExpChangeSource() {
+    	return this.playerExpChangeSource;
+    }
+    
+    private PlayerFishSource playerFishSource;
+    public PlayerFishSource getPlayerFishSource() {
+    	return this.playerFishSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -138,6 +153,9 @@ public class SqlDatabase {
     	this.sourceList.add(this.playerBucketSource = new PlayerBucketSource(this));
     	this.sourceList.add(this.playerDropItemSource = new PlayerDropItemSource(this));
     	this.sourceList.add(this.playerEditBookSource = new PlayerEditBookSource(this));
+    	this.sourceList.add(this.playerEggThrowSource = new PlayerEggThrowSource(this));
+    	this.sourceList.add(this.playerExpChangeSource = new PlayerExpChangeSource(this));
+    	this.sourceList.add(this.playerFishSource = new PlayerFishSource(this));
     }
     
     public void close() {
