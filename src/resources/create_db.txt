@@ -207,4 +207,35 @@ CREATE TABLE IF NOT EXISTS dev_player_fish (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_fish PRIMARY KEY (dev_player_fish_id)
-)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_game_mode_change (
+    dev_player_game_mode_change_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,new_game_mode VARCHAR(50) NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_game_mode_change PRIMARY KEY (dev_player_game_mode_change_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_interact_entity (
+    dev_player_interact_entity_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,clicked_entity VARCHAR(50)
+   ,clicked_entity_uuid VARCHAR(36)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_interact_entity PRIMARY KEY (dev_player_interact_entity_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_item_break (
+    dev_player_item_break_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,broken_item_type VARCHAR(50)
+   ,broken_item_amount INT
+   ,broken_item_durability SMALLINT
+   ,broken_item_enchantments VARCHAR(500)
+   ,broken_item_lore VARCHAR(500)
+   
+   ,CONSTRAINT pk_dev_player_item_break PRIMARY KEY (dev_player_item_break_id)
+);

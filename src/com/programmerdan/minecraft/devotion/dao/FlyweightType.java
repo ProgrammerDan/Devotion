@@ -37,4 +37,7 @@ public class FlyweightType {
 	public static final FlyweightType EggThrow = new FlyweightType((byte) 0x13, "EggThrow");
 	public static final FlyweightType ExpChange = new FlyweightType((byte) 0x14, "ExpChange");
 	public static final FlyweightType Fish = new FlyweightType((byte) 0x15, "Fish");
+	public static final FlyweightType GameModeChange = new FlyweightType((byte) 0x16, "GameModeChange");
+	public static final FlyweightType InteractEntity = new FlyweightType((byte) 0x17, "InteractEntity");
+	public static final FlyweightType ItemBreak = new FlyweightType((byte) 0x18, "ItemBreak");
 }

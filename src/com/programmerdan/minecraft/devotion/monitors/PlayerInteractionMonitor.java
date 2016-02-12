@@ -17,7 +17,10 @@ import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerInteractionMonitorConfig;
@@ -38,14 +41,14 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerEggThrowEvent</li>
  *     <li>PlayerExpChangeEvent</li>
  *     <li>PlayerFishEvent</li>
+ *     <li>PlayerGameModeChangeEvent</li>
+ *     <li>PlayerInteractEntityEvent</li>
+ *     <li>PlayerItemBreakEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
- *     <li>PlayerGameModeChangeEvent</li>
- *     <li>PlayerInteractEntityEvent</li>
  *     <li>PlayerInventoryEvent</li>
- *     <li>PlayerItemBreakEvent</li>
  *     <li>PlayerItemConsumeEvent</li>
  *     <li>PlayerItemHeldEvent</li>
  *     <li>PlayerLevelChangeEvent</li>
@@ -222,6 +225,27 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerFish(PlayerFishEvent event) {
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerFishEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerGameModeChangeEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerInteractEntityEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerItemBreakEvent(PlayerItemBreakEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemBreakEvent)) {
 			insert(event);
 		} // else skip.
 	}

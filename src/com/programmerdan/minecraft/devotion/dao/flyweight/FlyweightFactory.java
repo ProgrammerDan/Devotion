@@ -14,7 +14,10 @@ import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -61,6 +64,9 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.EggThrow.getId(), PlayerEggThrowEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ExpChange.getId(), PlayerExpChangeEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.Fish.getId(), PlayerFishEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.GameModeChange.getId(), PlayerGameModeChangeEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.InteractEntity.getId(), PlayerInteractEntityEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ItemBreak.getId(), PlayerItemBreakEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -94,6 +100,9 @@ public class FlyweightFactory {
 		if(id == FlyweightType.EggThrow.getId()) return new fPlayerEggThrow((PlayerEggThrowEvent)event);
 		if(id == FlyweightType.ExpChange.getId()) return new fPlayerExpChange((PlayerExpChangeEvent)event);
 		if(id == FlyweightType.Fish.getId()) return new fPlayerFish((PlayerFishEvent)event);
+		if(id == FlyweightType.GameModeChange.getId()) return new fPlayerGameModeChange((PlayerGameModeChangeEvent)event);
+		if(id == FlyweightType.InteractEntity.getId()) return new fPlayerInteractEntity((PlayerInteractEntityEvent)event);
+		if(id == FlyweightType.ItemBreak.getId()) return new fPlayerItemBreak((PlayerItemBreakEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}
