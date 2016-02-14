@@ -122,6 +122,21 @@ public class SqlDatabase {
     	return this.playerItemBreakSource;
     }
     
+    private PlayerItemConsumeSource playerItemConsumeSource;
+    public PlayerItemConsumeSource getPlayerItemConsumeSource() {
+    	return this.playerItemConsumeSource;
+    }
+
+    private PlayerItemHeldSource playerItemHeldSource;
+    public PlayerItemHeldSource getPlayerItemHeldSource() {
+    	return this.playerItemHeldSource;
+    }
+    
+    private PlayerLevelChangeSource playerLevelChangeSource;
+    public PlayerLevelChangeSource getPlayerLevelChangeSource() {
+    	return this.playerLevelChangeSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -174,6 +189,9 @@ public class SqlDatabase {
     	this.sourceList.add(this.playerGameModeChangeSource = new PlayerGameModeChangeSource(this));
     	this.sourceList.add(this.playerInteractEntitySource = new PlayerInteractEntitySource(this));
     	this.sourceList.add(this.playerItemBreakSource = new PlayerItemBreakSource(this));
+    	this.sourceList.add(this.playerItemConsumeSource = new PlayerItemConsumeSource(this));
+    	this.sourceList.add(this.playerItemHeldSource = new PlayerItemHeldSource(this));
+    	this.sourceList.add(this.playerLevelChangeSource = new PlayerLevelChangeSource(this));
     }
     
     public void close() {

@@ -40,4 +40,7 @@ public class FlyweightType {
 	public static final FlyweightType GameModeChange = new FlyweightType((byte) 0x16, "GameModeChange");
 	public static final FlyweightType InteractEntity = new FlyweightType((byte) 0x17, "InteractEntity");
 	public static final FlyweightType ItemBreak = new FlyweightType((byte) 0x18, "ItemBreak");
+	public static final FlyweightType ItemConsume = new FlyweightType((byte) 0x19, "ItemConsume");
+	public static final FlyweightType ItemHeld = new FlyweightType((byte) 0xA0, "ItemHeld");
+	public static final FlyweightType LevelChange = new FlyweightType((byte) 0xA1, "LevelChange");
 }

@@ -239,3 +239,36 @@ CREATE TABLE IF NOT EXISTS dev_player_item_break (
    
    ,CONSTRAINT pk_dev_player_item_break PRIMARY KEY (dev_player_item_break_id)
 );
+
+CREATE TABLE IF NOT EXISTS dev_player_item_consume (
+    dev_dev_player_item_consume_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,item_type VARCHAR(50)
+   ,item_amount INT
+   ,item_durability SMALLINT
+   ,item_enchantments VARCHAR(500)
+   ,item_lore VARCHAR(500)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_item_consume PRIMARY KEY (dev_dev_player_item_consume_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_item_held (
+    dev_dev_player_item_held_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,previousSlot INT NOT NULL
+   ,newSlot INT NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_item_held PRIMARY KEY (dev_dev_player_item_held_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_level_change (
+    dev_player_level_change_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,oldLevel INT NOT NULL
+   ,newLevel INT NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_level_change PRIMARY KEY (dev_player_level_change_id)
+)

@@ -21,6 +21,9 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerInteractionMonitorConfig;
@@ -44,14 +47,14 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerGameModeChangeEvent</li>
  *     <li>PlayerInteractEntityEvent</li>
  *     <li>PlayerItemBreakEvent</li>
+ *     <li>PlayerItemConsumeEvent</li>
+ *     <li>PlayerItemHeldEvent</li>
+ *     <li>PlayerLevelChangeEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
  *     <li>PlayerInventoryEvent</li>
- *     <li>PlayerItemConsumeEvent</li>
- *     <li>PlayerItemHeldEvent</li>
- *     <li>PlayerLevelChangeEvent</li>
  *     <li>PlayerPickupItemEvent</li>
  *     <li>PlayerResourcePackStatusEvent</li>
  *     <li>PlayerShearEntityEvent</li>
@@ -244,8 +247,29 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
-	public void onPlayerItemBreakEvent(PlayerItemBreakEvent event) {
+	public void onPlayerItemBreak(PlayerItemBreakEvent event) {
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemBreakEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemConsumeEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemHeldEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerLevelChange(PlayerLevelChangeEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerLevelChangeEvent)) {
 			insert(event);
 		} // else skip.
 	}

@@ -11,8 +11,7 @@
   <url>https://github.com/Devoted/Devotion</url>
   
   <build>
-    <pluginManagement>
-      <plugins>
+    <plugins>
       
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -23,8 +22,25 @@
             <compilerArgument></compilerArgument>
           </configuration>
         </plugin>
-      </plugins>
-    </pluginManagement>
+        
+        <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <configuration>
+                <tasks>
+                    <copy file="${project.build.directory}/${project.name}-${project.version}.jar" tofile="C:/Games/Minecraft Server (Civcraft)/plugins/${project.name}-${project.version}.jar"/>
+                </tasks>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>install</phase>
+                    <goals>
+                        <goal>run</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+    </plugins>
         
     <sourceDirectory>${basedir}/src</sourceDirectory>
     

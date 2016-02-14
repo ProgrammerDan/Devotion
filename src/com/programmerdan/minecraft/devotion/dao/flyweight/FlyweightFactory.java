@@ -18,8 +18,11 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -67,6 +70,9 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.GameModeChange.getId(), PlayerGameModeChangeEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.InteractEntity.getId(), PlayerInteractEntityEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ItemBreak.getId(), PlayerItemBreakEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ItemConsume.getId(), PlayerItemConsumeEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ItemHeld.getId(), PlayerItemHeldEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.LevelChange.getId(), PlayerLevelChangeEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -103,6 +109,9 @@ public class FlyweightFactory {
 		if(id == FlyweightType.GameModeChange.getId()) return new fPlayerGameModeChange((PlayerGameModeChangeEvent)event);
 		if(id == FlyweightType.InteractEntity.getId()) return new fPlayerInteractEntity((PlayerInteractEntityEvent)event);
 		if(id == FlyweightType.ItemBreak.getId()) return new fPlayerItemBreak((PlayerItemBreakEvent)event);
+		if(id == FlyweightType.ItemConsume.getId()) return new fPlayerItemConsume((PlayerItemConsumeEvent)event);
+		if(id == FlyweightType.ItemHeld.getId()) return new fPlayerItemHeld((PlayerItemHeldEvent)event);
+		if(id == FlyweightType.LevelChange.getId()) return new fPlayerLevelChange((PlayerLevelChangeEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}
