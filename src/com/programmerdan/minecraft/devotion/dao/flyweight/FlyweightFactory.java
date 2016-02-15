@@ -25,8 +25,11 @@ import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -73,6 +76,9 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ItemConsume.getId(), PlayerItemConsumeEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ItemHeld.getId(), PlayerItemHeldEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.LevelChange.getId(), PlayerLevelChangeEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.PickupItem.getId(), PlayerPickupItemEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ResourcePackStatus.getId(), PlayerResourcePackStatusEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.ShearEntity.getId(), PlayerShearEntityEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -112,6 +118,9 @@ public class FlyweightFactory {
 		if(id == FlyweightType.ItemConsume.getId()) return new fPlayerItemConsume((PlayerItemConsumeEvent)event);
 		if(id == FlyweightType.ItemHeld.getId()) return new fPlayerItemHeld((PlayerItemHeldEvent)event);
 		if(id == FlyweightType.LevelChange.getId()) return new fPlayerLevelChange((PlayerLevelChangeEvent)event);
+		if(id == FlyweightType.PickupItem.getId()) return new fPlayerPickupItem((PlayerPickupItemEvent)event);
+		if(id == FlyweightType.ResourcePackStatus.getId()) return new fPlayerResourcePackStatus((PlayerResourcePackStatusEvent)event);
+		if(id == FlyweightType.ShearEntity.getId()) return new fPlayerShearEntity((PlayerShearEntityEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

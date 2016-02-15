@@ -24,6 +24,9 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerLevelChangeEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerInteractionMonitorConfig;
@@ -50,14 +53,14 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerItemConsumeEvent</li>
  *     <li>PlayerItemHeldEvent</li>
  *     <li>PlayerLevelChangeEvent</li>
+ *     <li>PlayerPickupItemEvent</li>
+ *     <li>PlayerResourcePackStatusEvent</li>
+ *     <li>PlayerShearEntityEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
  *     <li>PlayerInventoryEvent</li>
- *     <li>PlayerPickupItemEvent</li>
- *     <li>PlayerResourcePackStatusEvent</li>
- *     <li>PlayerShearEntityEvent</li>
  *     <li>PlayerStatisticIncrementEvent</li>
  * 	   <li>PlayerDeathEvent</li>
  * </ul>
@@ -270,6 +273,27 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerLevelChange(PlayerLevelChangeEvent event) {
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerLevelChangeEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerPickupItemEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerResourcePackStatus(PlayerResourcePackStatusEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerResourcePackStatusEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerShearEntityEvent)) {
 			insert(event);
 		} // else skip.
 	}

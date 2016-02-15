@@ -137,6 +137,21 @@ public class SqlDatabase {
     	return this.playerLevelChangeSource;
     }
 
+    private PlayerPickupItemSource playerPickupItemSource;
+    public PlayerPickupItemSource getPlayerPickupItemSource() {
+    	return this.playerPickupItemSource;
+    }
+
+    private PlayerResourcePackStatusSource playerResourcePackStatusSource;
+    public PlayerResourcePackStatusSource getPlayerResourcePackStatusSource() {
+    	return this.playerResourcePackStatusSource;
+    }
+    
+    private PlayerShearEntitySource playerShearEntitySource;
+    public PlayerShearEntitySource getPlayerShearEntitySource() {
+    	return this.playerShearEntitySource;
+    }
+    
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -192,6 +207,9 @@ public class SqlDatabase {
     	this.sourceList.add(this.playerItemConsumeSource = new PlayerItemConsumeSource(this));
     	this.sourceList.add(this.playerItemHeldSource = new PlayerItemHeldSource(this));
     	this.sourceList.add(this.playerLevelChangeSource = new PlayerLevelChangeSource(this));
+    	this.sourceList.add(this.playerPickupItemSource = new PlayerPickupItemSource(this));
+    	this.sourceList.add(this.playerResourcePackStatusSource = new PlayerResourcePackStatusSource(this));
+    	this.sourceList.add(this.playerShearEntitySource = new PlayerShearEntitySource(this));
     }
     
     public void close() {

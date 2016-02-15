@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_consume (
    ,item_lore VARCHAR(500)
    ,event_cancelled BOOL NOT NULL
    
-   ,CONSTRAINT pk_dev_player_item_consume PRIMARY KEY (dev_dev_player_item_consume_id)
+   ,CONSTRAINT pk_dev_player_item_consume PRIMARY KEY (dev_player_item_consume_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_item_held (
@@ -260,7 +260,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_held (
    ,newSlot INT NOT NULL
    ,event_cancelled BOOL NOT NULL
    
-   ,CONSTRAINT pk_dev_player_item_held PRIMARY KEY (dev_dev_player_item_held_id)
+   ,CONSTRAINT pk_dev_player_item_held PRIMARY KEY (dev_player_item_held_id)
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_level_change (
@@ -271,4 +271,36 @@ CREATE TABLE IF NOT EXISTS dev_player_level_change (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_level_change PRIMARY KEY (dev_player_level_change_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_pickup_item (
+    dev_player_pickup_item_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,item_type VARCHAR(50)
+   ,item_amount INT
+   ,item_durability SMALLINT
+   ,item_enchantments VARCHAR(500)
+   ,item_lore VARCHAR(500)
+   ,remaining INT NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_pickup_item PRIMARY KEY (dev_player_pickup_item_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_resource_pack_status (
+    dev_player_resource_pack_status_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,status VARCHAR(50)
+   
+   ,CONSTRAINT pk_dev_player_resource_pack_status PRIMARY KEY (dev_player_resource_pack_status_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_shear_entity (
+    dev_player_shear_entity_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,entity VARCHAR(50)
+   ,entity_uuid VARCHAR(36)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_shear_entity PRIMARY KEY (dev_player_shear_entity_id)
 )
