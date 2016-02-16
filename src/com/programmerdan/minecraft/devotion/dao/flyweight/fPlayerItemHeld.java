@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerItemHeldInfo;
 
 public class fPlayerItemHeld extends fPlayer {
@@ -22,6 +23,7 @@ public class fPlayerItemHeld extends fPlayer {
 			this.itemHeldInfo.trace_id = this.eventInfo.trace_id;
 			this.itemHeldInfo.previousSlot = event.getPreviousSlot();
 			this.itemHeldInfo.newSlot = event.getNewSlot();
+			this.itemHeldInfo.newItem = new ItemStackInfo(event.getPlayer().getItemInHand());
 			this.itemHeldInfo.eventCancelled = event.isCancelled();
 		}
 	}
@@ -32,6 +34,7 @@ public class fPlayerItemHeld extends fPlayer {
 		
 		os.writeInt(this.itemHeldInfo.previousSlot);
 		os.writeInt(this.itemHeldInfo.newSlot);
+		marshallItemStackToStream(this.itemHeldInfo.newItem, os);
 		os.writeBoolean(this.itemHeldInfo.eventCancelled);
 	}
 	
@@ -43,6 +46,7 @@ public class fPlayerItemHeld extends fPlayer {
 		this.itemHeldInfo.trace_id = this.eventInfo.trace_id;
 		this.itemHeldInfo.previousSlot = is.readInt();
 		this.itemHeldInfo.newSlot = is.readInt();
+		this.itemHeldInfo.newItem = unmarshallItemStackFromStream(is);
 		this.itemHeldInfo.eventCancelled = is.readBoolean();
 	}
 	

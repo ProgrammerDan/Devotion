@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
@@ -79,6 +80,7 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.PickupItem.getId(), PlayerPickupItemEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ResourcePackStatus.getId(), PlayerResourcePackStatusEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ShearEntity.getId(), PlayerShearEntityEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.StatisticIncrement.getId(), PlayerStatisticIncrementEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
@@ -121,6 +123,7 @@ public class FlyweightFactory {
 		if(id == FlyweightType.PickupItem.getId()) return new fPlayerPickupItem((PlayerPickupItemEvent)event);
 		if(id == FlyweightType.ResourcePackStatus.getId()) return new fPlayerResourcePackStatus((PlayerResourcePackStatusEvent)event);
 		if(id == FlyweightType.ShearEntity.getId()) return new fPlayerShearEntity((PlayerShearEntityEvent)event);
+		if(id == FlyweightType.StatisticIncrement.getId()) return new fPlayerStatisticIncrement((PlayerStatisticIncrementEvent)event);
 		
 		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}

@@ -28,9 +28,10 @@ public class fPlayerEditBook extends fPlayer {
 			BookMeta prevBookMeta = event.getPreviousBookMeta();
 			BookMeta newBookMeta = event.getNewBookMeta();
 			
-			//TODO should record titles as well for edit tracking
-			
 			if(prevBookMeta != null && newBookMeta != null) {
+				this.editBookInfo.prevTitle = prevBookMeta.getTitle();
+				this.editBookInfo.newTitle = newBookMeta.getTitle();
+				
 				this.editBookInfo.titleChanged = prevBookMeta.hasTitle() != newBookMeta.hasTitle()
 						|| prevBookMeta.hasTitle() && !prevBookMeta.getTitle().equals(newBookMeta.getTitle());
 				
@@ -65,6 +66,8 @@ public class fPlayerEditBook extends fPlayer {
 		
 		os.writeInt(this.editBookInfo.slot);
 		os.writeBoolean(this.editBookInfo.signing);
+		os.writeUTF(this.editBookInfo.prevTitle != null ? this.editBookInfo.prevTitle: "");
+		os.writeUTF(this.editBookInfo.newTitle != null ? this.editBookInfo.newTitle: "");
 		os.writeBoolean(this.editBookInfo.titleChanged);
 		os.writeBoolean(this.editBookInfo.authorChanged);
 		os.writeBoolean(this.editBookInfo.contentChanged);
@@ -80,6 +83,13 @@ public class fPlayerEditBook extends fPlayer {
 		this.editBookInfo.trace_id = this.eventInfo.trace_id;
 		this.editBookInfo.slot = is.readInt();
 		this.editBookInfo.signing = is.readBoolean();
+		
+		this.editBookInfo.prevTitle = is.readUTF();
+		if(this.editBookInfo.prevTitle == "") this.editBookInfo.prevTitle = null;
+		
+		this.editBookInfo.newTitle = is.readUTF();
+		if(this.editBookInfo.newTitle == "") this.editBookInfo.newTitle = null;
+
 		this.editBookInfo.titleChanged = is.readBoolean();
 		this.editBookInfo.authorChanged = is.readBoolean();
 		this.editBookInfo.contentChanged = is.readBoolean();

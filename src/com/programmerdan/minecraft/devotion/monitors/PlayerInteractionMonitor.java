@@ -27,6 +27,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerStatisticIncrementEvent;
 
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.config.PlayerInteractionMonitorConfig;
@@ -56,12 +57,12 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerPickupItemEvent</li>
  *     <li>PlayerResourcePackStatusEvent</li>
  *     <li>PlayerShearEntityEvent</li>
+ *     <li>PlayerStatisticIncrementEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
  *     <li>PlayerInventoryEvent</li>
- *     <li>PlayerStatisticIncrementEvent</li>
  * 	   <li>PlayerDeathEvent</li>
  * </ul>
  * 
@@ -314,6 +315,14 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
 		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerShearEntityEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerStatisticIncrement(PlayerStatisticIncrementEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerStatisticIncrementEvent)) {
 			insert(event);
 		} // else skip.
 	}
