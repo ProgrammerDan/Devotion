@@ -15,6 +15,8 @@ public class PlayerItemHeldSource extends Source {
 	public void insert(PlayerItemHeldInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
+		//TODO: Item data? 
+		
 		sql.setString(1, info.trace_id);
 		sql.setInt(2, info.previousSlot);
 		sql.setInt(3, info.newSlot);

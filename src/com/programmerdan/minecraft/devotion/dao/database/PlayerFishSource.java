@@ -15,6 +15,7 @@ public class PlayerFishSource extends Source {
 	public void insert(PlayerFishInfo info) throws SQLException {
 		PreparedStatement sql = getSql(insertScript);
 
+		// TODO: can we get more info on what was caught?
 		sql.setString(1, info.trace_id);
 		sql.setString(2, info.caughtEntity);
 		sql.setInt(3, info.exp);

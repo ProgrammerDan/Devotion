@@ -48,28 +48,34 @@ public abstract class Source {
 			this.sql.setNull(startIndex, Types.VARCHAR);
 		}
 		
-		if(info.itemAmount != null) {
-			this.sql.setInt(startIndex + 1, info.itemAmount);
+		if (info.itemDisplayName != null) {
+			this.sql.setString(startIndex + 1, info.itemDisplayName);
 		} else {
-			this.sql.setNull(startIndex + 1, Types.INTEGER);
+			this.sql.setNull(startIndex + 1, Types.VARCHAR);
+		}
+		
+		if(info.itemAmount != null) {
+			this.sql.setInt(startIndex + 2, info.itemAmount);
+		} else {
+			this.sql.setNull(startIndex + 2, Types.INTEGER);
 		}
 		
 		if(info.itemDurability != null) {
-			this.sql.setShort(startIndex + 2, info.itemDurability);
+			this.sql.setShort(startIndex + 3, info.itemDurability);
 		} else {
-			this.sql.setNull(startIndex + 2, Types.SMALLINT);
+			this.sql.setNull(startIndex + 3, Types.SMALLINT);
 		}
 		
 		if(info.itemEnchantments != null) {
-			this.sql.setString(startIndex + 3, info.itemEnchantments);
+			this.sql.setString(startIndex + 4, info.itemEnchantments);
 		} else {
-			this.sql.setNull(startIndex + 3, Types.VARCHAR);
+			this.sql.setNull(startIndex + 4, Types.VARCHAR);
 		}
 		
 		if(info.itemLore != null) {
-			this.sql.setString(startIndex + 4, info.itemLore);
+			this.sql.setString(startIndex + 5, info.itemLore);
 		} else {
-			this.sql.setNull(startIndex + 4, Types.VARCHAR);
+			this.sql.setNull(startIndex + 5, Types.VARCHAR);
 		}
 	}
 }

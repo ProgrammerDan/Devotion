@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import com.programmerdan.minecraft.devotion.Devotion;
+import com.programmerdan.minecraft.devotion.commands.command.Control;
+import com.programmerdan.minecraft.devotion.commands.command.Stats;
 
 public class CommandHandler implements CommandExecutor {
 
@@ -22,7 +24,8 @@ public class CommandHandler implements CommandExecutor {
 		plugin.getCommand("devotion").setExecutor(this);
 
 		registerCommands(new AbstractCommand[] {
-					// TODO
+					new Stats(instance, "stats"),
+					new Control(instance, "control")
 				});
 	}
 

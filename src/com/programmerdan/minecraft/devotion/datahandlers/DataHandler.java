@@ -18,6 +18,8 @@ import com.programmerdan.minecraft.devotion.dao.Flyweight;
  * @author ProgrammerDan <programmerdan@gmail.com>
  */
 public abstract class DataHandler extends BukkitRunnable {
+	
+	private final String name;
 	private long delay = -1;
 	private boolean adaptive = false;
 	private long maxRun;
@@ -26,6 +28,23 @@ public abstract class DataHandler extends BukkitRunnable {
 	
 	private boolean debug = false;
 	private boolean active = false;
+	
+	/**
+	 * Allows subclasses to give it a name
+	 * @param name
+	 */
+	DataHandler(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * Get the name of the handler
+	 * 
+	 * @return handler name
+	 */
+	public String getName() {
+		return this.name;
+	}
 	
 	/**
 	 * @return Indicates if this handler is live and handling flyweights.
@@ -140,6 +159,10 @@ public abstract class DataHandler extends BukkitRunnable {
 	 * @return true if able to begin, false otherwise.
 	 */
 	public final boolean begin() {
+		if (active) {
+			Devotion.logger().warning("Handler is already active");
+			return true;
+		}
 		if (delay < 0) {
 			Devotion.logger().warning("Cannot begin before calling setup()");
 			return false;

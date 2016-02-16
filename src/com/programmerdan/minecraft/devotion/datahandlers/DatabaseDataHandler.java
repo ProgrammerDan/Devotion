@@ -24,6 +24,7 @@ public class DatabaseDataHandler extends DataHandler {
 	private SqlDatabase db;
 
 	private DatabaseDataHandler() {
+		super("database");
 	}
 
 	/**

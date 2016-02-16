@@ -100,6 +100,7 @@ public abstract class fPlayer extends Flyweight {
 	
 	protected static void marshallItemStackToStream(ItemStackInfo info, DataOutputStream os) throws IOException {
 		os.writeUTF(info.itemType != null ? info.itemType: "");
+		os.writeUTF(info.itemDisplayName != null ? info.itemDisplayName: "");
 		os.writeInt(info.itemAmount != null ? info.itemAmount: Integer.MIN_VALUE); 
 		os.writeShort(info.itemDurability != null ? info.itemDurability: Short.MIN_VALUE);
 		os.writeUTF(info.itemEnchantments != null ? info.itemEnchantments: ""); 
@@ -168,6 +169,9 @@ public abstract class fPlayer extends Flyweight {
 		
 		info.itemType = is.readUTF();
 		if(info.itemType == "") info.itemType = null;
+		
+		info.itemDisplayName = is.readUTF();
+		if (info.itemDisplayName == "") info.itemDisplayName = null;
 		
 		info.itemAmount = is.readInt();
 		if(info.itemAmount == Integer.MIN_VALUE) info.itemAmount = null;

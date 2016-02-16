@@ -14,8 +14,25 @@ import com.programmerdan.minecraft.devotion.Devotion;
  */
 public abstract class Monitor {
 
+	private final String name;
 	private boolean debug = false;
 	private boolean enabled = false;
+	
+	/**
+	 * Leveraged by subclasses to set the name of this Monitor
+	 * @param name
+	 */
+	Monitor(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * Gets the internal name of this Monitor.
+	 * @return
+	 */
+	public String getName() {
+		return this.name;
+	}
 	
 	/**
 	 * Convenience method for implementations, easy access to plugin

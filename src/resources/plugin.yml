@@ -9,19 +9,14 @@ commands:
       usage: To view help, use /devotion help
    devotion stats:
       description: Outputs throughput and capture statistics. Exclusively reads from internally maintained fields.
-      usage: /devotion stats [monitor]
+      usage: /devotion stats [monitor/handler]
       aliases: dev-s
       permission: Devotion.passive
    devotion control:
-      description: Turn on or off various monitors, or display active status of a specific monitor
-      usage: /devotion control <monitor> [on|off]
+      description: Turn on or off various monitors or data handlers
+      usage: /devotion control <monitor/handler> [on|off]
       aliases: dev-c
       permissions: Devotion.active
-   devotion invisible:
-      description: Toggle invisible permission
-      usage: /devotion invisible <player name or UUID>
-      aliases: dev-i
-      permissions: [Devotion.active, Devotion.invisible]
 permissions:
     Devotion.*:
       description: Gives access to all Devotion commands

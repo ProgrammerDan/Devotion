@@ -74,6 +74,7 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	}
 	
 	private PlayerMovementMonitor(PlayerMovementMonitorConfig config) {
+		super("movement");
 		this.config = config;
 	}
 	
@@ -137,24 +138,28 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerLogin(PlayerLoginEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 		checkAdd(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 		checkAdd(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerQuit(PlayerQuitEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 		setRemove(event.getPlayer().getUniqueId());
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerMove(PlayerMoveEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (onlyAsynch) {
 			checkAdd(event.getPlayer().getUniqueId());
 			return;
@@ -178,41 +183,49 @@ public class PlayerMovementMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerKick(PlayerKickEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerTeleport(PlayerTeleportEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerToggleFlight(PlayerToggleFlightEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerToggleSneak(PlayerToggleSneakEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerToggleSprint(PlayerToggleSprintEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerVelocity(PlayerVelocityEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		insert(event);
 	}
 

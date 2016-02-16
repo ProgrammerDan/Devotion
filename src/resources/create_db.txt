@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS dev_player_interact (
     dev_player_interact_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
+   ,item_displayname VARCHAR(500)
    ,item_amount INT
    ,item_durability SMALLINT
    ,item_enchantments VARCHAR(500)
@@ -140,6 +141,7 @@ CREATE TABLE IF NOT EXISTS dev_player_bucket (
     dev_player_bucket_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
+   ,item_displayname VARCHAR(500)
    ,item_amount INT
    ,item_durability SMALLINT
    ,item_enchantments VARCHAR(500)
@@ -157,6 +159,7 @@ CREATE TABLE IF NOT EXISTS dev_player_drop_item (
     dev_player_drop_item_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,drop_item_type VARCHAR(50)
+   ,drop_item_displayname VARCHAR(500)
    ,drop_item_amount INT
    ,drop_item_durability SMALLINT
    ,drop_item_enchantments VARCHAR(500)
@@ -232,6 +235,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_break (
     dev_player_item_break_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,broken_item_type VARCHAR(50)
+   ,broken_item_displayname VARCHAR(500)
    ,broken_item_amount INT
    ,broken_item_durability SMALLINT
    ,broken_item_enchantments VARCHAR(500)
@@ -244,6 +248,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_consume (
     dev_dev_player_item_consume_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
+   ,item_displayname VARCHAR(500)
    ,item_amount INT
    ,item_durability SMALLINT
    ,item_enchantments VARCHAR(500)
@@ -277,6 +282,7 @@ CREATE TABLE IF NOT EXISTS dev_player_pickup_item (
     dev_player_pickup_item_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
+   ,item_displayname VARCHAR(500)
    ,item_amount INT
    ,item_durability SMALLINT
    ,item_enchantments VARCHAR(500)

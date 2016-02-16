@@ -35,6 +35,7 @@ public class FileDataHandler extends DataHandler {
 	private DataOutputStream activeStream;
 
 	private FileDataHandler() {
+		super("file");
 	}
 
 	private String generateFileName() {

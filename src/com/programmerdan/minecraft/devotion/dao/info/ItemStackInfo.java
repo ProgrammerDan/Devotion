@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemStackInfo {
 	public String itemType;
+	public String itemDisplayName;
 	public Integer itemAmount;
 	public Short itemDurability;
 	public String itemEnchantments;
@@ -20,11 +21,17 @@ public class ItemStackInfo {
 	public ItemStackInfo(ItemStack item) {
 		if(item != null) {
 			itemType = item.getType().name();
+			itemDisplayName = getItemDisplayName(item);
 			itemAmount = item.getAmount();
 			itemDurability = item.getDurability();
 			itemEnchantments = getItemEnchantments(item); 
 			itemLore = getItemLore(item);
 		}
+	}
+	
+	private static final String getItemDisplayName(ItemStack item) {
+		if (!item.getItemMeta().hasDisplayName()) return null;
+		return item.getItemMeta().getDisplayName();
 	}
 	
 	private static final String getItemEnchantments(ItemStack item) {

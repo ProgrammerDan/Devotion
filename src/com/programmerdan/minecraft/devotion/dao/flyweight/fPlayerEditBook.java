@@ -28,6 +28,8 @@ public class fPlayerEditBook extends fPlayer {
 			BookMeta prevBookMeta = event.getPreviousBookMeta();
 			BookMeta newBookMeta = event.getNewBookMeta();
 			
+			//TODO should record titles as well for edit tracking
+			
 			if(prevBookMeta != null && newBookMeta != null) {
 				this.editBookInfo.titleChanged = prevBookMeta.hasTitle() != newBookMeta.hasTitle()
 						|| prevBookMeta.hasTitle() && !prevBookMeta.getTitle().equals(newBookMeta.getTitle());

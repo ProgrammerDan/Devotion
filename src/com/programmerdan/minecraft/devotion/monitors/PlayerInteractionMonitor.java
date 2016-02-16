@@ -102,6 +102,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	}
 	
 	private PlayerInteractionMonitor(PlayerInteractionMonitorConfig config) {
+		super("interaction");
 		this.config = config;
 	}
 	
@@ -167,6 +168,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	 */
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerInteractEvent)) {
 			insert(event);
 		} // else skip.
@@ -174,6 +176,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedEnterEvent)) {
 			insert(event);
 		} // else skip.
@@ -181,6 +184,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerBedLeave(PlayerBedLeaveEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBedLeaveEvent)) {
 			insert(event);
 		} // else skip.
@@ -188,6 +192,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerBucketFill(PlayerBucketFillEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBucketFillEvent)) {
 			insert(event);
 		} // else skip.
@@ -195,6 +200,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerBucketFill(PlayerBucketEmptyEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerBucketEmptyEvent)) {
 			insert(event);
 		} // else skip.
@@ -202,6 +208,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerDropItemEvent)) {
 			insert(event);
 		} // else skip.
@@ -209,6 +216,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerEditBook(PlayerEditBookEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerEditBookEvent)) {
 			insert(event);
 		} // else skip.
@@ -216,6 +224,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerEggThrowBook(PlayerEggThrowEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerEggThrowEvent)) {
 			insert(event);
 		} // else skip.
@@ -223,6 +232,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerExpChange(PlayerExpChangeEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerExpChangeEvent)) {
 			insert(event);
 		} // else skip.
@@ -230,6 +240,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerFish(PlayerFishEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerFishEvent)) {
 			insert(event);
 		} // else skip.
@@ -237,6 +248,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerGameModeChangeEvent)) {
 			insert(event);
 		} // else skip.
@@ -244,6 +256,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerInteractEntityEvent)) {
 			insert(event);
 		} // else skip.
@@ -251,6 +264,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerItemBreak(PlayerItemBreakEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemBreakEvent)) {
 			insert(event);
 		} // else skip.
@@ -258,6 +272,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerItemConsume(PlayerItemConsumeEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemConsumeEvent)) {
 			insert(event);
 		} // else skip.
@@ -265,6 +280,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerItemHeldEvent)) {
 			insert(event);
 		} // else skip.
@@ -272,6 +288,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerLevelChange(PlayerLevelChangeEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerLevelChangeEvent)) {
 			insert(event);
 		} // else skip.
@@ -279,6 +296,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerPickupItemEvent)) {
 			insert(event);
 		} // else skip.
@@ -286,6 +304,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerResourcePackStatus(PlayerResourcePackStatusEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerResourcePackStatusEvent)) {
 			insert(event);
 		} // else skip.
@@ -293,6 +312,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
 	public void onPlayerShearEntity(PlayerShearEntityEvent event) {
+		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerShearEntityEvent)) {
 			insert(event);
 		} // else skip.

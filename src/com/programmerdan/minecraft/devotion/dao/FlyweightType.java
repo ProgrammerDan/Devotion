@@ -41,9 +41,9 @@ public class FlyweightType {
 	public static final FlyweightType InteractEntity = new FlyweightType((byte) 0x17, "InteractEntity");
 	public static final FlyweightType ItemBreak = new FlyweightType((byte) 0x18, "ItemBreak");
 	public static final FlyweightType ItemConsume = new FlyweightType((byte) 0x19, "ItemConsume");
-	public static final FlyweightType ItemHeld = new FlyweightType((byte) 0xA0, "ItemHeld");
-	public static final FlyweightType LevelChange = new FlyweightType((byte) 0xA1, "LevelChange");
-	public static final FlyweightType PickupItem = new FlyweightType((byte) 0xA2, "PickupItem");
-	public static final FlyweightType ResourcePackStatus = new FlyweightType((byte) 0xA3, "ResourcePackStatus");
-	public static final FlyweightType ShearEntity = new FlyweightType((byte) 0xA4, "ShearEntity");
+	public static final FlyweightType ItemHeld = new FlyweightType((byte) 0x1A, "ItemHeld");
+	public static final FlyweightType LevelChange = new FlyweightType((byte) 0x1B, "LevelChange");
+	public static final FlyweightType PickupItem = new FlyweightType((byte) 0x1C, "PickupItem");
+	public static final FlyweightType ResourcePackStatus = new FlyweightType((byte) 0x1D, "ResourcePackStatus");
+	public static final FlyweightType ShearEntity = new FlyweightType((byte) 0x1E, "ShearEntity");
 }

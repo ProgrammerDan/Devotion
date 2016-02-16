@@ -8,8 +8,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.programmerdan.minecraft.devotion.datahandlers.DataHandler;
-import com.programmerdan.minecraft.devotion.datahandlers.DatabaseDataHandler;
-import com.programmerdan.minecraft.devotion.datahandlers.FileDataHandler;
 import com.programmerdan.minecraft.devotion.monitors.Monitor;
 
 /**
@@ -131,31 +129,6 @@ public class ConfigurationReader {
 			}
 		}
 		
-		/*
-		// Get Database information, wire up DAO
-		ConfigurationSection database = dao.getConfigurationSection("database");
-		
-		if (database != null) {
-			DataHandler dataHandler = DatabaseDataHandler.generate(database);
-			
-			if(dataHandler != null) {
-				Devotion.instance().registerDataHandler(dataHandler);
-				log("DatabaseDataHandler is registered.");
-			}
-		}
-
-		// Get file information, wire up file
-		ConfigurationSection file = dao.getConfigurationSection("file");
-		
-		if (file != null) {
-			DataHandler dataHandler = FileDataHandler.generate(file);
-			
-			if(dataHandler != null) {
-				Devotion.instance().registerDataHandler(dataHandler);
-				log("FileDataHandler is registered.");
-			}
-		}*/
-	
 		return true;
 	}
 
