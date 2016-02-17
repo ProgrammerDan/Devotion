@@ -2,6 +2,8 @@ package com.programmerdan.minecraft.devotion.dao.flyweight;
 
 import java.util.ArrayList;
 
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -46,6 +48,7 @@ import com.programmerdan.minecraft.devotion.dao.FlyweightType;
  */
 public class FlyweightFactory {
 	private static final ArrayList<EventDefinition> Definitions = new ArrayList<EventDefinition>();
+	private static final ArrayList<EventDefinition> Definitions2 = new ArrayList<EventDefinition>();
 	
 	public static void init() {
 		Definitions.add(new EventDefinition(FlyweightType.Login.getId(), PlayerLoginEvent.class));
@@ -81,15 +84,38 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ResourcePackStatus.getId(), PlayerResourcePackStatusEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ShearEntity.getId(), PlayerShearEntityEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.StatisticIncrement.getId(), PlayerStatisticIncrementEvent.class));
+		
+		Definitions2.add(new EventDefinition(FlyweightType.PlayerDeath.getId(), PlayerDeathEvent.class));
 	}
 	
 	public static fPlayer create(PlayerEvent event) {
 		byte id = getId(event);
-		return create(id, event);
+		
+		fPlayer flyweight = create(id, event);
+
+		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
+		
+		return flyweight;
+	}
+	
+	public static fPlayer create(EntityEvent event) {
+		byte id = getId(event);
+		
+		fPlayer flyweight = create(id, event);
+
+		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
+		
+		return flyweight;
 	}
 	
 	public static fPlayer create(byte id) {
-		return create(id, null);
+		fPlayer flyweight = create(id, (PlayerEvent)null);
+		
+		if(flyweight == null) flyweight = create(id, (EntityEvent)null);
+		
+		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
+		
+		return flyweight;
 	}
 
 	private static fPlayer create(byte id, PlayerEvent event) {
@@ -125,13 +151,29 @@ public class FlyweightFactory {
 		if(id == FlyweightType.ShearEntity.getId()) return new fPlayerShearEntity((PlayerShearEntityEvent)event);
 		if(id == FlyweightType.StatisticIncrement.getId()) return new fPlayerStatisticIncrement((PlayerStatisticIncrementEvent)event);
 		
-		throw new DAOException("Event with ID = " + id + " is not registered.");
+		return null;
+	}
+	
+	private static fPlayer create(byte id, EntityEvent event) {
+		if(id == FlyweightType.PlayerDeath.getId()) return new fPlayerDeath((PlayerDeathEvent)event);
+		
+		return null;
 	}
 	
 	private static byte getId(PlayerEvent event) {
 		Class<?> cls = event.getClass();
 		
 		for(EventDefinition def : Definitions) {
+			if(def.cls == cls) return def.id;
+		}
+		
+		throw new DAOException("Event " + cls.toString() + " is not registered.");
+	}
+	
+	private static byte getId(EntityEvent event) {
+		Class<?> cls = event.getClass();
+		
+		for(EventDefinition def : Definitions2) {
 			if(def.cls == cls) return def.id;
 		}
 		

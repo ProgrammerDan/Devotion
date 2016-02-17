@@ -47,4 +47,5 @@ public class FlyweightType {
 	public static final FlyweightType ResourcePackStatus = new FlyweightType((byte) 0x1D, "ResourcePackStatus");
 	public static final FlyweightType ShearEntity = new FlyweightType((byte) 0x1E, "ShearEntity");
 	public static final FlyweightType StatisticIncrement = new FlyweightType((byte) 0x1F, "StatisticIncrement");
+	public static final FlyweightType PlayerDeath = new FlyweightType((byte) 0x20, "PlayerDeath");
 }

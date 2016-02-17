@@ -330,4 +330,16 @@ CREATE TABLE IF NOT EXISTS dev_player_statistic_increment (
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_statistic_increment PRIMARY KEY (dev_player_statistic_increment_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_player_death (
+    dev_player_death_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,new_exp INT NOT NULL
+   ,new_level INT NOT NULL
+   ,new_total_exp INT NOT NULL
+   ,keep_level BOOL NOT NULL
+   ,keep_inventory BOOL NOT NULL
+   
+   ,CONSTRAINT pk_dev_player_death PRIMARY KEY (dev_player_death_id)
 )

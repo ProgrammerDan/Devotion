@@ -157,6 +157,11 @@ public class SqlDatabase {
     	return this.playerStatisticIncrementSource;
     }
 
+    private PlayerDeathSource playerDeathSource;
+    public PlayerDeathSource getPlayerDeathSource() {
+    	return this.playerDeathSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -216,6 +221,7 @@ public class SqlDatabase {
     	this.sourceList.add(this.playerResourcePackStatusSource = new PlayerResourcePackStatusSource(this));
     	this.sourceList.add(this.playerShearEntitySource = new PlayerShearEntitySource(this));
     	this.sourceList.add(this.playerStatisticIncrementSource = new PlayerStatisticIncrementSource(this));
+    	this.sourceList.add(this.playerDeathSource = new PlayerDeathSource(this));
     }
     
     public void close() {

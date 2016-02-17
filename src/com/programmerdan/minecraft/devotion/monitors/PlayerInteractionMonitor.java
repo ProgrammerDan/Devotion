@@ -7,6 +7,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -58,12 +60,12 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerResourcePackStatusEvent</li>
  *     <li>PlayerShearEntityEvent</li>
  *     <li>PlayerStatisticIncrementEvent</li>
+ * 	   <li>PlayerDeathEvent</li>
  * </ul>
  * 
  * TODO:
  * <ul>
  *     <li>PlayerInventoryEvent</li>
- * 	   <li>PlayerDeathEvent</li>
  * </ul>
  * 
  * TODO: extract inventory events into PlayerInventoryMonitor
@@ -160,6 +162,12 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 		Devotion.instance().insert(flyweight);
 	}
 	
+	private void insert(EntityEvent event) {
+		Flyweight flyweight = FlyweightFactory.create(event);
+		
+		Devotion.instance().insert(flyweight);
+	}
+
 	/**
 	 * Follow this pattern. Each new monitor uses checkInsert which sees if it's time to update.
 	 * If no delay is set, it retuns fast with "true", else checks the last time a record was made ...
@@ -323,6 +331,14 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	public void onPlayerStatisticIncrement(PlayerStatisticIncrementEvent event) {
 		if (event.getPlayer().hasPermission("Devotion.invisible")) return;
 		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.PlayerStatisticIncrementEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onPlayerDeath(PlayerDeathEvent event) {
+		if (event.getEntity().hasPermission("Devotion.invisible")) return;
+		if (checkInsert(event.getEntity().getUniqueId(), PlayerInteractionType.PlayerDeathEvent)) {
 			insert(event);
 		} // else skip.
 	}

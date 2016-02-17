@@ -34,34 +34,43 @@ public abstract class fPlayer extends Flyweight {
 		super(flyweightType, VERSION);
 		
 		if(playerEvent != null) {
-			Player player = playerEvent.getPlayer();
-			
-			this.eventInfo = new PlayerInfo();
-			this.eventInfo.eventType = flyweightType.getName();
-			this.eventInfo.eventTime = new Timestamp(super.getRecordDate());
-			this.eventInfo.trace_id = idg.generateId().toString();
-			this.eventInfo.playerName = player.getName();
-			this.eventInfo.playerUUID = player.getUniqueId().toString();
-			this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
-			this.eventInfo.location = new LocationInfo(player.getLocation());
-			this.eventInfo.gameMode = player.getGameMode() != null ? player.getGameMode().name(): "unknown";
-			this.eventInfo.exhaustion = player.getExhaustion();
-			this.eventInfo.foodLevel = player.getFoodLevel();
-			this.eventInfo.saturation = player.getSaturation();
-			this.eventInfo.totalExperience = player.getTotalExperience();
-			this.eventInfo.inVehicle = player.isInsideVehicle();
-			this.eventInfo.velocityX = player.getVelocity().getX();
-			this.eventInfo.velocityY = player.getVelocity().getY();
-			this.eventInfo.velocityZ = player.getVelocity().getZ();
-			this.eventInfo.remainingAir = player.getRemainingAir();
-			this.eventInfo.sneaking = player.isSneaking();
-			this.eventInfo.sprinting = player.isSprinting();
-			this.eventInfo.blocking = player.isBlocking();
-			this.eventInfo.sleeping = player.isSleeping();
-			this.eventInfo.health = player.getHealth();
-			this.eventInfo.maxHealth = player.getMaxHealth();
-			
+			init(playerEvent.getPlayer(), flyweightType);
 		}
+	}
+	
+	protected fPlayer(Player player, FlyweightType flyweightType) {
+		super(flyweightType, VERSION);
+		
+		if(player != null) {
+			init(player, flyweightType);
+		}
+	}
+
+	private void init(Player player, FlyweightType flyweightType) {
+		this.eventInfo = new PlayerInfo();
+		this.eventInfo.eventType = flyweightType.getName();
+		this.eventInfo.eventTime = new Timestamp(super.getRecordDate());
+		this.eventInfo.trace_id = idg.generateId().toString();
+		this.eventInfo.playerName = player.getName();
+		this.eventInfo.playerUUID = player.getUniqueId().toString();
+		this.eventInfo.eyeLocation = new LocationInfo(player.getEyeLocation());
+		this.eventInfo.location = new LocationInfo(player.getLocation());
+		this.eventInfo.gameMode = player.getGameMode() != null ? player.getGameMode().name(): "unknown";
+		this.eventInfo.exhaustion = player.getExhaustion();
+		this.eventInfo.foodLevel = player.getFoodLevel();
+		this.eventInfo.saturation = player.getSaturation();
+		this.eventInfo.totalExperience = player.getTotalExperience();
+		this.eventInfo.inVehicle = player.isInsideVehicle();
+		this.eventInfo.velocityX = player.getVelocity().getX();
+		this.eventInfo.velocityY = player.getVelocity().getY();
+		this.eventInfo.velocityZ = player.getVelocity().getZ();
+		this.eventInfo.remainingAir = player.getRemainingAir();
+		this.eventInfo.sneaking = player.isSneaking();
+		this.eventInfo.sprinting = player.isSprinting();
+		this.eventInfo.blocking = player.isBlocking();
+		this.eventInfo.sleeping = player.isSleeping();
+		this.eventInfo.health = player.getHealth();
+		this.eventInfo.maxHealth = player.getMaxHealth();
 	}
 
 	@Override
