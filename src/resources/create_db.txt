@@ -247,7 +247,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_break (
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_item_consume (
-    dev_dev_player_item_consume_id BIGINT NOT NULL AUTO_INCREMENT
+    dev_player_item_consume_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,item_type VARCHAR(50)
    ,item_displayname VARCHAR(500)
@@ -261,7 +261,7 @@ CREATE TABLE IF NOT EXISTS dev_player_item_consume (
 );
 
 CREATE TABLE IF NOT EXISTS dev_player_item_held (
-    dev_dev_player_item_held_id BIGINT NOT NULL AUTO_INCREMENT
+    dev_player_item_held_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,previous_slot INT NOT NULL
    ,new_slot INT NOT NULL

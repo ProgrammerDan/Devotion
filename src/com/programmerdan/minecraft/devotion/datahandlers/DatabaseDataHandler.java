@@ -22,6 +22,11 @@ public class DatabaseDataHandler extends DataHandler {
 	private long lastSampleTime;
 
 	private SqlDatabase db;
+	
+	public FlowHelper getStatistics() {
+		return statistics;
+	}
+
 
 	private DatabaseDataHandler() {
 		super("database");

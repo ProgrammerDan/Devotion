@@ -34,6 +34,10 @@ public class FileDataHandler extends DataHandler {
 	private long lastFileSize;
 	private DataOutputStream activeStream;
 
+	public FlowHelper getStatistics() {
+		return statistics;
+	}
+	
 	private FileDataHandler() {
 		super("file");
 	}

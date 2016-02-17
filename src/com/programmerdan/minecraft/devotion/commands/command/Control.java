@@ -7,11 +7,7 @@ import org.bukkit.command.CommandSender;
 import com.programmerdan.minecraft.devotion.Devotion;
 import com.programmerdan.minecraft.devotion.commands.AbstractCommand;
 import com.programmerdan.minecraft.devotion.datahandlers.DataHandler;
-import com.programmerdan.minecraft.devotion.datahandlers.DatabaseDataHandler;
-import com.programmerdan.minecraft.devotion.datahandlers.FileDataHandler;
 import com.programmerdan.minecraft.devotion.monitors.Monitor;
-import com.programmerdan.minecraft.devotion.monitors.PlayerInteractionMonitor;
-import com.programmerdan.minecraft.devotion.monitors.PlayerMovementMonitor;
 
 public final class Control extends AbstractCommand {
 
