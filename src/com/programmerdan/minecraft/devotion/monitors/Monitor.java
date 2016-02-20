@@ -2,6 +2,8 @@ package com.programmerdan.minecraft.devotion.monitors;
 
 import java.util.logging.Level;
 
+import org.bukkit.entity.Player;
+
 import com.programmerdan.minecraft.devotion.Devotion;
 
 /**
@@ -151,4 +153,8 @@ public abstract class Monitor {
 	 * Should be used to actually _do_ sampling if sampling is active.
 	 */
 	abstract void doSample();
+	
+	protected boolean canWriteLog(Player player) {
+		return !player.hasPermission("Devotion.invisible");
+	}
 }

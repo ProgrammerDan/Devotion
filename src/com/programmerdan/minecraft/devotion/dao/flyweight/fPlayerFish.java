@@ -5,10 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.bukkit.entity.Item;
 import org.bukkit.event.player.PlayerFishEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
+import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerFishInfo;
 
 public class fPlayerFish extends fPlayer {
@@ -20,7 +22,8 @@ public class fPlayerFish extends fPlayer {
 		if(event != null) {
 			this.fishInfo = new PlayerFishInfo();
 			this.fishInfo.trace_id = this.eventInfo.trace_id;
-			this.fishInfo.caughtEntity = event.getCaught().getType().name();
+			this.fishInfo.caughtEntity = event.getCaught() != null ? event.getCaught().getType().name(): null;
+			this.fishInfo.caughtItem = new ItemStackInfo(event.getCaught() != null ? ((Item)event.getCaught()).getItemStack(): null);
 			this.fishInfo.exp = event.getExpToDrop();
 			this.fishInfo.state = event.getState().name();
 			this.fishInfo.eventCancelled = event.isCancelled();
@@ -32,6 +35,7 @@ public class fPlayerFish extends fPlayer {
 		super.marshallToStream(os);
 		
 		os.writeUTF(this.fishInfo.caughtEntity != null ? this.fishInfo.caughtEntity: "");
+		marshallItemStackToStream(this.fishInfo.caughtItem, os);
 		os.writeInt(this.fishInfo.exp);
 		os.writeUTF(this.fishInfo.state != null ? this.fishInfo.state: "");
 		os.writeBoolean(this.fishInfo.eventCancelled);
@@ -47,6 +51,7 @@ public class fPlayerFish extends fPlayer {
 		this.fishInfo.caughtEntity = is.readUTF();
 		if(this.fishInfo.caughtEntity == "") this.fishInfo.caughtEntity = null;
 		
+		this.fishInfo.caughtItem = unmarshallItemStackFromStream(is);
 		this.fishInfo.exp = is.readInt();
 		
 		this.fishInfo.state = is.readUTF();

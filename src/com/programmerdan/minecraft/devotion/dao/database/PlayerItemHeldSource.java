@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerItemHeldInfo;
 
 public class PlayerItemHeldSource extends Source {
-	private static final String insertScript = "INSERT dev_player_item_consume (trace_id, previous_slot, new_slot, new_item_type, new_item_displayname, new_item_amount, new_item_durability, new_item_enchantments, new_item_lore, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_item_held (trace_id, previous_slot, new_slot, new_item_type, new_item_displayname, new_item_amount, new_item_durability, new_item_enchantments, new_item_lore, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public PlayerItemHeldSource(SqlDatabase db) {
 		super(db);

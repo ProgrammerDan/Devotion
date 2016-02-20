@@ -207,6 +207,12 @@ CREATE TABLE IF NOT EXISTS dev_player_fish (
     dev_player_fish_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,caught_entity VARCHAR(50)
+   ,caught_item_type VARCHAR(50)
+   ,caught_item_displayname VARCHAR(500)
+   ,caught_item_amount INT
+   ,caught_item_durability SMALLINT
+   ,caught_item_enchantments VARCHAR(500)
+   ,caught_item_lore VARCHAR(500)
    ,exp INT NOT NULL
    ,state VARCHAR(50) 
    ,event_cancelled BOOL NOT NULL
@@ -281,7 +287,6 @@ CREATE TABLE IF NOT EXISTS dev_player_level_change (
    ,trace_id VARCHAR(36) NOT NULL
    ,oldLevel INT NOT NULL
    ,newLevel INT NOT NULL
-   ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_level_change PRIMARY KEY (dev_player_level_change_id)
 );

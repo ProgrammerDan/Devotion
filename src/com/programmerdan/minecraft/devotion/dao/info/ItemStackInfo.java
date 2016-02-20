@@ -7,6 +7,8 @@ import java.util.Map.Entry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
+import com.programmerdan.minecraft.devotion.util.ItemNameHelper;
+
 public class ItemStackInfo {
 	public String itemType;
 	public String itemDisplayName;
@@ -21,7 +23,7 @@ public class ItemStackInfo {
 	public ItemStackInfo(ItemStack item) {
 		if(item != null) {
 			itemType = item.getType().name();
-			itemDisplayName = getItemDisplayName(item);
+			itemDisplayName = ItemNameHelper.lookup(item);
 			itemAmount = item.getAmount();
 			itemDurability = item.getDurability();
 			itemEnchantments = getItemEnchantments(item); 
@@ -29,13 +31,8 @@ public class ItemStackInfo {
 		}
 	}
 	
-	private static final String getItemDisplayName(ItemStack item) {
-		if (!item.getItemMeta().hasDisplayName()) return null;
-		return item.getItemMeta().getDisplayName();
-	}
-	
 	private static final String getItemEnchantments(ItemStack item) {
-		if(!item.getItemMeta().hasEnchants()) return null;
+		if(!item.hasItemMeta() || !item.getItemMeta().hasEnchants()) return null;
 		
 		Map<Enchantment, Integer> enchantments = item.getEnchantments();
 		StringBuilder result = new StringBuilder();
@@ -54,7 +51,7 @@ public class ItemStackInfo {
 	}
 	
 	private static final String getItemLore(ItemStack item) {
-		if(!item.getItemMeta().hasLore()) return null;
+		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
 		
 		List<String> list = item.getItemMeta().getLore();
 		StringBuilder result = new StringBuilder();
