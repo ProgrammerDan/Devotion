@@ -4,10 +4,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -16,7 +18,6 @@ import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
@@ -61,6 +62,8 @@ import com.programmerdan.minecraft.devotion.dao.flyweight.FlyweightFactory;
  *     <li>PlayerShearEntityEvent</li>
  *     <li>PlayerStatisticIncrementEvent</li>
  * 	   <li>PlayerDeathEvent</li>
+ *	   <li>BlockPlaceEvent</li>
+ *     <li>BlockBreakEvent</li>
  * </ul>
  * 
  * TODO:
@@ -156,13 +159,7 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	 * Quickly create a flyweight and pass it along to the active handlers.
 	 * @param event
 	 */
-	private void insert(PlayerEvent event) {
-		Flyweight flyweight = FlyweightFactory.create(event);
-		
-		Devotion.instance().insert(flyweight);
-	}
-	
-	private void insert(EntityEvent event) {
+	private void insert(Event event) {
 		Flyweight flyweight = FlyweightFactory.create(event);
 		
 		Devotion.instance().insert(flyweight);
@@ -339,6 +336,22 @@ public class PlayerInteractionMonitor extends Monitor implements Listener {
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		if (!canWriteLog(event.getEntity())) return;
 		if (checkInsert(event.getEntity().getUniqueId(), PlayerInteractionType.PlayerDeathEvent)) {
+			insert(event);
+		} // else skip.
+	}
+
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onBlockPlace(BlockPlaceEvent event) {		
+		if (!canWriteLog(event.getPlayer())) return;
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.BlockPlaceEvent)) {
+			insert(event);
+		} // else skip.
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=false)
+	public void onBlockBreak(BlockBreakEvent event) {
+		if (!canWriteLog(event.getPlayer())) return;
+		if (checkInsert(event.getPlayer().getUniqueId(), PlayerInteractionType.BlockBreakEvent)) {
 			insert(event);
 		} // else skip.
 	}

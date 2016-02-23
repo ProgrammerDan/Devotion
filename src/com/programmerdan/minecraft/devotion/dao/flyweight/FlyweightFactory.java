@@ -2,7 +2,9 @@ package com.programmerdan.minecraft.devotion.dao.flyweight;
 
 import java.util.ArrayList;
 
-import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedLeaveEvent;
@@ -13,7 +15,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
-import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
@@ -48,7 +49,6 @@ import com.programmerdan.minecraft.devotion.dao.FlyweightType;
  */
 public class FlyweightFactory {
 	private static final ArrayList<EventDefinition> Definitions = new ArrayList<EventDefinition>();
-	private static final ArrayList<EventDefinition> Definitions2 = new ArrayList<EventDefinition>();
 	
 	public static void init() {
 		Definitions.add(new EventDefinition(FlyweightType.Login.getId(), PlayerLoginEvent.class));
@@ -84,41 +84,22 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ResourcePackStatus.getId(), PlayerResourcePackStatusEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ShearEntity.getId(), PlayerShearEntityEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.StatisticIncrement.getId(), PlayerStatisticIncrementEvent.class));
-		
-		Definitions2.add(new EventDefinition(FlyweightType.PlayerDeath.getId(), PlayerDeathEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.PlayerDeath.getId(), PlayerDeathEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.BlockPlace.getId(), BlockPlaceEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.BlockBreak.getId(), BlockBreakEvent.class));
 	}
 	
-	public static fPlayer create(PlayerEvent event) {
+	public static fPlayer create(Event event) {
 		byte id = getId(event);
 		
-		fPlayer flyweight = create(id, event);
-
-		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
-		
-		return flyweight;
-	}
-	
-	public static fPlayer create(EntityEvent event) {
-		byte id = getId(event);
-		
-		fPlayer flyweight = create(id, event);
-
-		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
-		
-		return flyweight;
+		return create(id, event);
 	}
 	
 	public static fPlayer create(byte id) {
-		fPlayer flyweight = create(id, (PlayerEvent)null);
-		
-		if(flyweight == null) flyweight = create(id, (EntityEvent)null);
-		
-		if(flyweight == null) throw new DAOException("Event with ID = " + id + " is not registered.");
-		
-		return flyweight;
+		return create(id, null);
 	}
 
-	private static fPlayer create(byte id, PlayerEvent event) {
+	private static fPlayer create(byte id, Event event) {
 		if(id == FlyweightType.Login.getId()) return new fPlayerLogin((PlayerLoginEvent)event);
 		if(id == FlyweightType.Join.getId()) return new fPlayerJoin((PlayerJoinEvent)event);
 		if(id == FlyweightType.Quit.getId()) return new fPlayerQuit((PlayerQuitEvent)event);
@@ -150,30 +131,17 @@ public class FlyweightFactory {
 		if(id == FlyweightType.ResourcePackStatus.getId()) return new fPlayerResourcePackStatus((PlayerResourcePackStatusEvent)event);
 		if(id == FlyweightType.ShearEntity.getId()) return new fPlayerShearEntity((PlayerShearEntityEvent)event);
 		if(id == FlyweightType.StatisticIncrement.getId()) return new fPlayerStatisticIncrement((PlayerStatisticIncrementEvent)event);
-		
-		return null;
-	}
-	
-	private static fPlayer create(byte id, EntityEvent event) {
 		if(id == FlyweightType.PlayerDeath.getId()) return new fPlayerDeath((PlayerDeathEvent)event);
+		if(id == FlyweightType.BlockPlace.getId()) return new fBlockPlace((BlockPlaceEvent)event);
+		if(id == FlyweightType.BlockBreak.getId()) return new fBlockBreak((BlockBreakEvent)event);
 		
-		return null;
+		throw new DAOException("Event with ID = " + id + " is not registered.");
 	}
 	
-	private static byte getId(PlayerEvent event) {
+	private static byte getId(Event event) {
 		Class<?> cls = event.getClass();
 		
 		for(EventDefinition def : Definitions) {
-			if(def.cls == cls) return def.id;
-		}
-		
-		throw new DAOException("Event " + cls.toString() + " is not registered.");
-	}
-	
-	private static byte getId(EntityEvent event) {
-		Class<?> cls = event.getClass();
-		
-		for(EventDefinition def : Definitions2) {
 			if(def.cls == cls) return def.id;
 		}
 		

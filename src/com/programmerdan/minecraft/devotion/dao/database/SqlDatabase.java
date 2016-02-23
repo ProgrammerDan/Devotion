@@ -162,6 +162,21 @@ public class SqlDatabase {
     	return this.playerDeathSource;
     }
 
+    private BlockPlaceSource blockPlaceSource;
+    public BlockPlaceSource getBlockPlaceSource() {
+    	return this.blockPlaceSource;
+    }
+
+    private BlockBreakSource blockBreakSource;
+    public BlockBreakSource getBlockBreakSource() {
+    	return this.blockBreakSource;
+    }
+
+    private DropItemSource dropItemSource;
+    public DropItemSource getDropItemSource() {
+    	return this.dropItemSource;
+    }
+
     public SqlDatabase(String host, int port, String db, String user, String password, Logger logger) {
         this.host = host;
         this.port = port;
@@ -222,6 +237,9 @@ public class SqlDatabase {
     	this.sourceList.add(this.playerShearEntitySource = new PlayerShearEntitySource(this));
     	this.sourceList.add(this.playerStatisticIncrementSource = new PlayerStatisticIncrementSource(this));
     	this.sourceList.add(this.playerDeathSource = new PlayerDeathSource(this));
+    	this.sourceList.add(this.blockPlaceSource = new BlockPlaceSource(this));
+    	this.sourceList.add(this.blockBreakSource = new BlockBreakSource(this));
+    	this.sourceList.add(this.dropItemSource = new DropItemSource(this));
     }
     
     public void close() {

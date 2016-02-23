@@ -347,4 +347,45 @@ CREATE TABLE IF NOT EXISTS dev_player_death (
    ,keep_inventory BOOL NOT NULL
    
    ,CONSTRAINT pk_dev_player_death PRIMARY KEY (dev_player_death_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_block_place (
+    dev_block_place_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,canBuild BOOL NOT NULL
+   ,item_in_hand_type VARCHAR(50)
+   ,item_in_hand_displayname VARCHAR(500)
+   ,item_in_hand_amount INT
+   ,item_in_hand_durability SMALLINT
+   ,item_in_hand_enchantments VARCHAR(500)
+   ,item_in_hand_lore VARCHAR(500)
+   ,block_against VARCHAR(50)
+   ,block_placed VARCHAR(50)
+   ,block_replaced VARCHAR(50)
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_block_place PRIMARY KEY (dev_block_place_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_block_break (
+    dev_block_break_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,block VARCHAR(50)
+   ,expToDrop INT NOT NULL
+   ,event_cancelled BOOL NOT NULL
+   
+   ,CONSTRAINT pk_block_break PRIMARY KEY (dev_block_break_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_drop_item (
+    dev_drop_item_id BIGINT NOT NULL AUTO_INCREMENT
+   ,trace_id VARCHAR(36) NOT NULL
+   ,item_type VARCHAR(50)
+   ,item_displayname VARCHAR(500)
+   ,item_amount INT
+   ,item_durability SMALLINT
+   ,item_enchantments VARCHAR(500)
+   ,item_lore VARCHAR(500)
+   
+   ,CONSTRAINT pk_dev_drop_item PRIMARY KEY (dev_drop_item_id)
 )

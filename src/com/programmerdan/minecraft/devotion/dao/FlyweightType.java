@@ -48,4 +48,6 @@ public class FlyweightType {
 	public static final FlyweightType ShearEntity = new FlyweightType((byte) 0x1E, "ShearEntity");
 	public static final FlyweightType StatisticIncrement = new FlyweightType((byte) 0x1F, "StatisticIncrement");
 	public static final FlyweightType PlayerDeath = new FlyweightType((byte) 0x20, "PlayerDeath");
+	public static final FlyweightType BlockPlace = new FlyweightType((byte) 0x21, "BlockPlace");
+	public static final FlyweightType BlockBreak = new FlyweightType((byte) 0x22, "BlockBreak");
 }
