@@ -7,7 +7,7 @@ import java.sql.Types;
 import com.programmerdan.minecraft.devotion.dao.info.BlockBreakInfo;
 
 public class BlockBreakSource extends Source {
-	private static final String insertScript = "INSERT dev_block_place (trace_id, block, exp_to_drop, event_cancelled) VALUES (?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_block_break (trace_id, block, exp_to_drop, event_cancelled) VALUES (?, ?, ?, ?)";
 	
 	public BlockBreakSource(SqlDatabase db) {
 		super(db);

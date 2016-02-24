@@ -24,7 +24,7 @@ public class fBlockPlace extends fPlayer {
 			this.placeInfo.canBuild = event.canBuild();
 			this.placeInfo.itemInHand = new ItemStackInfo(event.getItemInHand());
 			this.placeInfo.blockAgainst = event.getBlockAgainst() != null ? event.getBlockAgainst().getType().name(): null;
-			this.placeInfo.blockPlaced = event.getBlockAgainst() != null ? event.getBlockAgainst().getType().name(): null;
+			this.placeInfo.blockPlaced = event.getBlockPlaced() != null ? event.getBlockPlaced().getType().name(): null;
 			this.placeInfo.blockReplaced = event.getBlockReplacedState() != null && event.getBlockReplacedState().getBlock() != null ? event.getBlockReplacedState().getBlock().getType().name(): null;
 			this.placeInfo.eventCancelled = event.isCancelled();
 		}

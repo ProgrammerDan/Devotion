@@ -39,7 +39,7 @@ public class BlockPlaceSource extends Source {
 			sql.setNull(11, Types.VARCHAR);
 		}
 		
-		sql.setBoolean(11, info.eventCancelled);
+		sql.setBoolean(12, info.eventCancelled);
 		
 		sql.addBatch();
 	}

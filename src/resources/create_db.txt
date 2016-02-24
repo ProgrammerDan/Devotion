@@ -371,7 +371,7 @@ CREATE TABLE IF NOT EXISTS dev_block_break (
     dev_block_break_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,block VARCHAR(50)
-   ,expToDrop INT NOT NULL
+   ,exp_to_drop INT NOT NULL
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_block_break PRIMARY KEY (dev_block_break_id)

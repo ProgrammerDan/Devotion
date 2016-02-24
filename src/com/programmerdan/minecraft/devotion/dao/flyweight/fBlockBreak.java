@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -40,12 +41,34 @@ public class fBlockBreak extends fPlayer {
 						DropItemInfo dropItemInfo = new DropItemInfo();
 						dropItemInfo.trace_id = this.eventInfo.trace_id;
 						dropItemInfo.item = new ItemStackInfo(itemStack);
-						
-						this.dropItems.add(dropItemInfo);
+											
+						if(!mergeDropItems(dropItemInfo)) {
+							this.dropItems.add(dropItemInfo);
+						}
 					}
 				}
 			}
 		}
+	}
+	
+	private Boolean mergeDropItems(DropItemInfo dropItemInfo) {
+		ItemStackInfo item1 = dropItemInfo.item;
+				
+		for(DropItemInfo existent : this.dropItems) {
+			ItemStackInfo item2 = existent.item;
+			
+			if(Objects.equals(item1.itemType, item2.itemType)
+				&& Objects.equals(item1.itemDisplayName, item2.itemDisplayName)
+				&& item1.itemDurability == item2.itemDurability
+				&& Objects.equals(item1.itemEnchantments, item2.itemEnchantments)
+				&& Objects.equals(item1.itemLore, item2.itemLore)
+				) {
+				item2.itemAmount += item1.itemAmount;
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	@Override
