@@ -9,6 +9,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
+import com.programmerdan.minecraft.devotion.dao.info.BlockInfo;
 import com.programmerdan.minecraft.devotion.dao.info.BlockPlaceInfo;
 import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 
@@ -23,9 +24,8 @@ public class fBlockPlace extends fPlayer {
 			this.placeInfo.trace_id = this.eventInfo.trace_id;
 			this.placeInfo.canBuild = event.canBuild();
 			this.placeInfo.itemInHand = new ItemStackInfo(event.getItemInHand());
-			this.placeInfo.blockAgainst = event.getBlockAgainst() != null ? event.getBlockAgainst().getType().name(): null;
-			this.placeInfo.blockPlaced = event.getBlockPlaced() != null ? event.getBlockPlaced().getType().name(): null;
-			this.placeInfo.blockReplaced = event.getBlockReplacedState() != null && event.getBlockReplacedState().getBlock() != null ? event.getBlockReplacedState().getBlock().getType().name(): null;
+			this.placeInfo.blockAgainst = new BlockInfo(event.getBlockAgainst());
+			this.placeInfo.blockPlaced = new BlockInfo(event.getBlockPlaced());
 			this.placeInfo.eventCancelled = event.isCancelled();
 		}
 	}
@@ -38,9 +38,8 @@ public class fBlockPlace extends fPlayer {
 		// and child records are written together.
 		os.writeBoolean(this.placeInfo.canBuild);
 		marshallItemStackToStream(this.placeInfo.itemInHand, os);
-		os.writeUTF(this.placeInfo.blockAgainst != null ? this.placeInfo.blockAgainst: "");
-		os.writeUTF(this.placeInfo.blockPlaced != null ? this.placeInfo.blockPlaced: "");
-		os.writeUTF(this.placeInfo.blockReplaced != null ? this.placeInfo.blockReplaced: "");
+		marshallBlockToStream(this.placeInfo.blockAgainst, os);
+		marshallBlockToStream(this.placeInfo.blockPlaced, os);
 		os.writeBoolean(this.placeInfo.eventCancelled);
 	}
 	
@@ -51,16 +50,8 @@ public class fBlockPlace extends fPlayer {
 		this.placeInfo = new BlockPlaceInfo();
 		this.placeInfo.trace_id = this.eventInfo.trace_id;
 		this.placeInfo.itemInHand = unmarshallItemStackFromStream(is);
-		
-		this.placeInfo.blockAgainst = is.readUTF();
-		if(this.placeInfo.blockAgainst == "") this.placeInfo.blockAgainst = null;
-		
-		this.placeInfo.blockPlaced = is.readUTF();
-		if(this.placeInfo.blockPlaced == "") this.placeInfo.blockPlaced = null;
-		
-		this.placeInfo.blockReplaced = is.readUTF();
-		if(this.placeInfo.blockReplaced == "") this.placeInfo.blockReplaced = null;
-
+		this.placeInfo.blockAgainst = unmarshallBlockFromStream(is);
+		this.placeInfo.blockPlaced = unmarshallBlockFromStream(is);
 		this.placeInfo.eventCancelled = is.readBoolean();
 	}
 	

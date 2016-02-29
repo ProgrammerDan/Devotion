@@ -12,6 +12,7 @@ import org.bukkit.event.player.PlayerEvent;
 import com.programmerdan.minecraft.devotion.dao.Flyweight;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
+import com.programmerdan.minecraft.devotion.dao.info.BlockInfo;
 import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.LocationInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerInfo;
@@ -116,6 +117,13 @@ public abstract class fPlayer extends Flyweight {
 		os.writeUTF(info.itemLore != null ? info.itemLore: "");
 	}
 	
+	protected static void marshallBlockToStream(BlockInfo info, DataOutputStream os) throws IOException {
+		os.writeUTF(info.blockType != null ? info.blockType: "");
+		os.writeInt(info.x != null ? info.x: Integer.MIN_VALUE);
+		os.writeInt(info.y != null ? info.y: Integer.MIN_VALUE);
+		os.writeInt(info.z != null ? info.z: Integer.MIN_VALUE);
+	}
+
 	@Override
 	protected void marshallToDatabase(SqlDatabase db) throws SQLException {
 		db.getPlayerEventSource().insert(this.eventInfo);
@@ -194,6 +202,24 @@ public abstract class fPlayer extends Flyweight {
 		info.itemLore = is.readUTF();
 		if(info.itemLore == "") info.itemLore = null;
 		
+		return info;
+	}
+	
+	protected static BlockInfo unmarshallBlockFromStream(DataInputStream is) throws IOException {
+		BlockInfo info = new BlockInfo();
+		
+		info.blockType = is.readUTF();
+		if(info.blockType == "") info.blockType = null;
+		
+		info.x = is.readInt();
+		if(info.x == Integer.MIN_VALUE) info.x = null;
+		
+		info.y = is.readInt();
+		if(info.y == Integer.MIN_VALUE) info.y = null;
+
+		info.z = is.readInt();
+		if(info.z == Integer.MIN_VALUE) info.z = null;
+
 		return info;
 	}
 }

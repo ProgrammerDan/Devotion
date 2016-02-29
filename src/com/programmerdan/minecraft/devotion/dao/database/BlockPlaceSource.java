@@ -2,12 +2,11 @@ package com.programmerdan.minecraft.devotion.dao.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import com.programmerdan.minecraft.devotion.dao.info.BlockPlaceInfo;
 
 public class BlockPlaceSource extends Source {
-	private static final String insertScript = "INSERT dev_block_place (trace_id, canBuild, item_in_hand_type, item_in_hand_displayname, item_in_hand_amount, item_in_hand_durability, item_in_hand_enchantments, item_in_hand_lore, block_against, block_placed, block_replaced, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_block_place (trace_id, can_build, item_in_hand_type, item_in_hand_displayname, item_in_hand_amount, item_in_hand_durability, item_in_hand_enchantments, item_in_hand_lore, block_against_type, block_against_x, block_against_y, block_against_z, block_placed_type, block_placed_x, block_placed_y, block_placed_z, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public BlockPlaceSource(SqlDatabase db) {
 		super(db);
@@ -21,25 +20,11 @@ public class BlockPlaceSource extends Source {
 		
 		setItemParams(3, info.itemInHand);
 		
-		if(info.blockAgainst != null) {
-			sql.setString(9, info.blockAgainst);
-		} else {
-			sql.setNull(9, Types.VARCHAR);
-		}
+		int nextIndex = setBlockParams(9, info.blockAgainst);
 		
-		if(info.blockPlaced != null) {
-			sql.setString(10, info.blockPlaced);
-		} else {
-			sql.setNull(10, Types.VARCHAR);
-		}
-
-		if(info.blockReplaced != null) {
-			sql.setString(11, info.blockReplaced);
-		} else {
-			sql.setNull(11, Types.VARCHAR);
-		}
+		nextIndex = setBlockParams(nextIndex, info.blockPlaced);
 		
-		sql.setBoolean(12, info.eventCancelled);
+		sql.setBoolean(nextIndex, info.eventCancelled);
 		
 		sql.addBatch();
 	}

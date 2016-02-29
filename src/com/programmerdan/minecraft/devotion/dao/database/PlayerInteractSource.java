@@ -13,7 +13,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerInteractInfo;
  */
 
 public class PlayerInteractSource extends Source {
-	private static final String insertScript = "INSERT dev_player_interact (trace_id, item_type, item_displayname, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block, block_face, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_interact (trace_id, item_type, item_displayname, item_amount, item_durability, item_enchantments, item_lore, action_name, clicked_block_type, clicked_block_x, clicked_block_y, clicked_block_z, block_face, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	public PlayerInteractSource(SqlDatabase db) {
 		super(db);
@@ -28,19 +28,15 @@ public class PlayerInteractSource extends Source {
 		
 		sql.setString(8, info.actionName);
 		
-		if(info.clickedBlock != null) {
-			sql.setString(9, info.clickedBlock);
-		} else {
-			sql.setNull(9, Types.VARCHAR);
-		}
+		int nextIndex = setBlockParams(9, info.clickedBlock);
 		
 		if(info.blockFace != null) {
-			sql.setString(10, info.blockFace);
+			sql.setString(nextIndex, info.blockFace);
 		} else {
-			sql.setNull(10, Types.VARCHAR);
+			sql.setNull(nextIndex, Types.VARCHAR);
 		}
 		
-		sql.setBoolean(11, info.eventCancelled);
+		sql.setBoolean(nextIndex + 1, info.eventCancelled);
 		
 		sql.addBatch();
 	}

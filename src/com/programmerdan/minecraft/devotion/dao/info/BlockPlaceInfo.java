@@ -4,8 +4,7 @@ public class BlockPlaceInfo {
 	public String trace_id;
 	public Boolean canBuild;
 	public ItemStackInfo itemInHand;
-	public String blockAgainst;
-	public String blockPlaced;
-	public String blockReplaced;
+	public BlockInfo blockAgainst;
+	public BlockInfo blockPlaced;
 	public Boolean eventCancelled;
 }

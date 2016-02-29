@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerLevelChangeInfo;
 
 public class PlayerLevelChangeSource extends Source {
-	private static final String insertScript = "INSERT dev_player_level_change (trace_id, oldLevel, newLevel) VALUES (?, ?, ?)";
+	private static final String insertScript = "INSERT dev_player_level_change (trace_id, old_level, new_level) VALUES (?, ?, ?)";
 	
 	public PlayerLevelChangeSource(SqlDatabase db) {
 		super(db);

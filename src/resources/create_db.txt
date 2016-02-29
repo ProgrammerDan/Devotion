@@ -55,7 +55,10 @@ CREATE TABLE IF NOT EXISTS dev_player_interact (
    ,item_enchantments VARCHAR(500)
    ,item_lore VARCHAR(500)
    ,action_name VARCHAR(20) NOT NULL
-   ,clicked_block VARCHAR(50)
+   ,clicked_block_type VARCHAR(50)
+   ,clicked_block_x INT
+   ,clicked_block_y INT
+   ,clicked_block_z INT
    ,block_face VARCHAR(20)
    ,event_cancelled BOOL NOT NULL
    
@@ -146,7 +149,10 @@ CREATE TABLE IF NOT EXISTS dev_player_bucket (
    ,item_durability SMALLINT
    ,item_enchantments VARCHAR(500)
    ,item_lore VARCHAR(500)
-   ,clicked_block VARCHAR(50)
+   ,clicked_block_type VARCHAR(50)
+   ,clicked_block_x INT
+   ,clicked_block_y INT
+   ,clicked_block_z INT
    ,block_face VARCHAR(20)
    ,bucket VARCHAR(50)
    ,is_fill BOOL NOT NULL
@@ -285,8 +291,8 @@ CREATE TABLE IF NOT EXISTS dev_player_item_held (
 CREATE TABLE IF NOT EXISTS dev_player_level_change (
     dev_player_level_change_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
-   ,oldLevel INT NOT NULL
-   ,newLevel INT NOT NULL
+   ,old_level INT NOT NULL
+   ,new_level INT NOT NULL
    
    ,CONSTRAINT pk_dev_player_level_change PRIMARY KEY (dev_player_level_change_id)
 );
@@ -352,16 +358,21 @@ CREATE TABLE IF NOT EXISTS dev_player_death (
 CREATE TABLE IF NOT EXISTS dev_block_place (
     dev_block_place_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
-   ,canBuild BOOL NOT NULL
+   ,can_build BOOL NOT NULL
    ,item_in_hand_type VARCHAR(50)
    ,item_in_hand_displayname VARCHAR(500)
    ,item_in_hand_amount INT
    ,item_in_hand_durability SMALLINT
    ,item_in_hand_enchantments VARCHAR(500)
    ,item_in_hand_lore VARCHAR(500)
-   ,block_against VARCHAR(50)
-   ,block_placed VARCHAR(50)
-   ,block_replaced VARCHAR(50)
+   ,block_against_type VARCHAR(50)
+   ,block_against_x INT
+   ,block_against_y INT
+   ,block_against_z INT
+   ,block_placed_type VARCHAR(50)
+   ,block_placed_x INT
+   ,block_placed_y INT
+   ,block_placed_z INT
    ,event_cancelled BOOL NOT NULL
    
    ,CONSTRAINT pk_block_place PRIMARY KEY (dev_block_place_id)

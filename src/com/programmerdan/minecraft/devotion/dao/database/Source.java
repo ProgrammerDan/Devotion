@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import com.programmerdan.minecraft.devotion.dao.info.BlockInfo;
 import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 
 /**
@@ -41,7 +42,7 @@ public abstract class Source {
 		return this.sql;
 	}
 	
-	protected void setItemParams(int startIndex, ItemStackInfo info) throws SQLException {
+	protected int setItemParams(int startIndex, ItemStackInfo info) throws SQLException {
 		if(info.itemType != null) {
 			this.sql.setString(startIndex, info.itemType); 
 		} else {
@@ -77,5 +78,35 @@ public abstract class Source {
 		} else {
 			this.sql.setNull(startIndex + 5, Types.VARCHAR);
 		}
+		
+		return startIndex + 6;
+	}
+	
+	protected int setBlockParams(int startIndex, BlockInfo info) throws SQLException {
+		if(info.blockType != null) {
+			this.sql.setString(startIndex, info.blockType); 
+		} else {
+			this.sql.setNull(startIndex, Types.VARCHAR);
+		}
+		
+		if(info.x != null) {
+			this.sql.setInt(startIndex + 1, info.x);
+		} else {
+			this.sql.setNull(startIndex + 1, Types.INTEGER);
+		}
+
+		if(info.y != null) {
+			this.sql.setInt(startIndex + 2, info.y);
+		} else {
+			this.sql.setNull(startIndex + 2, Types.INTEGER);
+		}
+		
+		if(info.z != null) {
+			this.sql.setInt(startIndex + 3, info.z);
+		} else {
+			this.sql.setNull(startIndex + 3, Types.INTEGER);
+		}
+		
+		return startIndex + 4;
 	}
 }

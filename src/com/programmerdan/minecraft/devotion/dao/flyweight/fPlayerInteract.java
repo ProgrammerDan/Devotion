@@ -9,6 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
+import com.programmerdan.minecraft.devotion.dao.info.BlockInfo;
 import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 import com.programmerdan.minecraft.devotion.dao.info.PlayerInteractInfo;
 
@@ -23,7 +24,7 @@ public class fPlayerInteract extends fPlayer {
 			this.interactInfo.trace_id = this.eventInfo.trace_id;
 			this.interactInfo.item = new ItemStackInfo(event.getItem());
 			this.interactInfo.actionName = event.getAction().name();
-			this.interactInfo.clickedBlock = event.getClickedBlock() != null ? event.getClickedBlock().getType().name(): null;
+			this.interactInfo.clickedBlock = new BlockInfo(event.getClickedBlock());
 			this.interactInfo.blockFace = event.getBlockFace() != null ? event.getBlockFace().name(): null;
 			this.interactInfo.eventCancelled = event.isCancelled();
 		}
@@ -37,7 +38,7 @@ public class fPlayerInteract extends fPlayer {
 		// and child records are written together.
 		marshallItemStackToStream(this.interactInfo.item, os);
 		os.writeUTF(this.interactInfo.actionName);
-		os.writeUTF(this.interactInfo.clickedBlock != null ? this.interactInfo.clickedBlock: "");
+		marshallBlockToStream(this.interactInfo.clickedBlock, os);
 		os.writeUTF(this.interactInfo.blockFace != null ? this.interactInfo.blockFace: "");
 		os.writeBoolean(this.interactInfo.eventCancelled);
 	}
@@ -50,9 +51,7 @@ public class fPlayerInteract extends fPlayer {
 		this.interactInfo.trace_id = this.eventInfo.trace_id;
 		this.interactInfo.item = unmarshallItemStackFromStream(is);
 		this.interactInfo.actionName = is.readUTF();
-		
-		this.interactInfo.clickedBlock = is.readUTF();
-		if(this.interactInfo.clickedBlock == "") this.interactInfo.clickedBlock = null;
+		this.interactInfo.clickedBlock = unmarshallBlockFromStream(is);
 		
 		this.interactInfo.blockFace = is.readUTF();
 		if(this.interactInfo.blockFace == "") this.interactInfo.blockFace = null;

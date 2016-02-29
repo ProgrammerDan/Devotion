@@ -4,7 +4,7 @@ public class PlayerInteractInfo {
 	public String trace_id;
 	public ItemStackInfo item;
 	public String actionName;
-	public String clickedBlock;
+	public BlockInfo clickedBlock;
 	public String blockFace;
 	public Boolean eventCancelled;
 }
