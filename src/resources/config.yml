@@ -1,6 +1,5 @@
-# To disable database DAO, set driver: none. All output will then be to file, exclusively.
-# Under monitor section, any section without a buffer size and count will use the defaults.
-# Don't mess with these lightly. 
+# To disable database DAO, remove the database section. All output will then be to file, exclusively.
+# To disable all output, delete both sections (why?)
 
 configuration_file_version: 1
 

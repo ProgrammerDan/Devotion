@@ -42,8 +42,9 @@ public class ConfigurationReader {
 					clz = "com.programmerdan.minecraft.devotion.monitors.PlayerMovementMonitor";
 				} else if (monitor.getName().equalsIgnoreCase("interaction")) {
 					clz = "com.programmerdan.minecraft.devotion.monitors.PlayerInteractionMonitor";
+				} else if (monitor.getName().equalsIgnoreCase("inventory")) {
+					clz = "com.programmerdan.minecraft.devotion.monitors.PlayerInventoryMonitor";
 				}
-				// TODO: next monitor is inventory
 			}
 			if (clz != null) {
 				log("Trying to add Monitor " + key + " using class " + clz);
@@ -93,7 +94,6 @@ public class ConfigurationReader {
 				} else if (handler.getName().equalsIgnoreCase("file")) {
 					clz = "com.programmerdan.minecraft.devotion.datahandlers.FileDataHandler";
 				}
-				// TODO: next monitor is inventory
 			}
 			if (clz != null) {
 				log("Trying to add DataHandler " + key + " using class " + clz);
