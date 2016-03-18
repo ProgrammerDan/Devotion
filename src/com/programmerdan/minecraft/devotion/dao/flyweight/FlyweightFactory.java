@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -86,6 +87,7 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.StatisticIncrement.getId(), PlayerStatisticIncrementEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.PlayerDeath.getId(), PlayerDeathEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.BlockPlace.getId(), BlockPlaceEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.BlockPlace.getId(), BlockMultiPlaceEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.BlockBreak.getId(), BlockBreakEvent.class));
 	}
 	
