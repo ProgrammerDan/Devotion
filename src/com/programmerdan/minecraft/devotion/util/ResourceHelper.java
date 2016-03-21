@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import com.programmerdan.minecraft.devotion.Devotion;
 
 public class ResourceHelper {
-	public static ArrayList<String> readScript(String resourcePath) {
+	public static ArrayList<String> readScriptList(String resourcePath) {
 		InputStream stream = Devotion.class.getResourceAsStream(resourcePath);
     	StringBuilder script = new StringBuilder("");
     	ArrayList<String> list = new ArrayList<String>(); 
@@ -38,5 +38,24 @@ public class ResourceHelper {
     	}
     	
     	return list;
+	}
+	
+	public static String readScript(String resourcePath) {
+		InputStream stream = Devotion.class.getResourceAsStream(resourcePath);
+    	StringBuilder script = new StringBuilder("");
+    	
+    	try {
+    		BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+    		String line;
+    		
+            while ((line = reader.readLine()) != null) { 
+            	script.append(line);
+            	script.append("\n");
+            }
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
+    	
+    	return script.toString();
 	}
 }

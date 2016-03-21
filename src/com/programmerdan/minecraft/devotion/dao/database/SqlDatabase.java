@@ -291,7 +291,7 @@ public class SqlDatabase {
     public boolean initDb() {
     	this.logger.log(Level.INFO, "Database initialization started...");
     	
-    	ArrayList<String> list = ResourceHelper.readScript("/create_db.txt");
+    	ArrayList<String> list = ResourceHelper.readScriptList("/create_db.txt");
     	
 		for(String script : list) {
 			try {
@@ -305,6 +305,23 @@ public class SqlDatabase {
 		}
 		
 		this.logger.log(Level.INFO, "Database initialized.");
+		
+		this.logger.log(Level.INFO, "Apply patches to database...");
+		
+		String patch = ResourceHelper.readScript("/patch_db.txt");
+		
+		try {
+			prepareStatement(patch).execute();
+			prepareStatement(patch).execute("call sp_dev_alter()");
+			prepareStatement(patch).execute("DROP PROCEDURE sp_dev_alter");
+    	} catch (SQLException e) {
+    		this.logger.log(Level.SEVERE, "Failed to apply patch: \n" + patch);
+			e.printStackTrace();
+			return false;
+		}
+		
+		this.logger.log(Level.INFO, "Patch applied to database...");
+		
 		return true;
     }
 }

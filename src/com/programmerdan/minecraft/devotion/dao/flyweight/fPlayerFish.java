@@ -23,7 +23,8 @@ public class fPlayerFish extends fPlayer {
 			this.fishInfo = new PlayerFishInfo();
 			this.fishInfo.trace_id = this.eventInfo.trace_id;
 			this.fishInfo.caughtEntity = event.getCaught() != null ? event.getCaught().getType().name(): null;
-			this.fishInfo.caughtItem = new ItemStackInfo(event.getCaught() != null ? ((Item)event.getCaught()).getItemStack(): null);
+			this.fishInfo.caughtEntityId = event.getCaught() != null ? event.getCaught().getUniqueId().toString(): null;
+			this.fishInfo.caughtItem = new ItemStackInfo(event.getCaught() != null && event.getCaught() instanceof Item ? ((Item)event.getCaught()).getItemStack(): null);
 			this.fishInfo.exp = event.getExpToDrop();
 			this.fishInfo.state = event.getState().name();
 			this.fishInfo.eventCancelled = event.isCancelled();
@@ -35,6 +36,7 @@ public class fPlayerFish extends fPlayer {
 		super.marshallToStream(os);
 		
 		os.writeUTF(this.fishInfo.caughtEntity != null ? this.fishInfo.caughtEntity: "");
+		os.writeUTF(this.fishInfo.caughtEntityId != null ? this.fishInfo.caughtEntityId: "");
 		marshallItemStackToStream(this.fishInfo.caughtItem, os);
 		os.writeInt(this.fishInfo.exp);
 		os.writeUTF(this.fishInfo.state != null ? this.fishInfo.state: "");
@@ -51,6 +53,9 @@ public class fPlayerFish extends fPlayer {
 		this.fishInfo.caughtEntity = is.readUTF();
 		if(this.fishInfo.caughtEntity == "") this.fishInfo.caughtEntity = null;
 		
+		this.fishInfo.caughtEntityId = is.readUTF();
+		if(this.fishInfo.caughtEntityId == "") this.fishInfo.caughtEntityId = null;
+
 		this.fishInfo.caughtItem = unmarshallItemStackFromStream(is);
 		this.fishInfo.exp = is.readInt();
 		

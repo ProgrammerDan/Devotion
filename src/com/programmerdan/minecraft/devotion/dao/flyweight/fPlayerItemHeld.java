@@ -23,7 +23,7 @@ public class fPlayerItemHeld extends fPlayer {
 			this.itemHeldInfo.trace_id = this.eventInfo.trace_id;
 			this.itemHeldInfo.previousSlot = event.getPreviousSlot();
 			this.itemHeldInfo.newSlot = event.getNewSlot();
-			this.itemHeldInfo.newItem = new ItemStackInfo(event.getPlayer().getItemInHand());
+			this.itemHeldInfo.newItem = new ItemStackInfo(event.getPlayer().getInventory().getItemInMainHand());
 			this.itemHeldInfo.eventCancelled = event.isCancelled();
 		}
 	}
