@@ -1,6 +1,6 @@
 package com.programmerdan.minecraft.devotion.monitors;
 
-import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_9_R1.MinecraftServer;
 
 import org.bukkit.scheduler.BukkitRunnable;
 

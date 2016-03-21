@@ -6,7 +6,7 @@
   <groupId>com.programmerdan.minecraft</groupId>
   <artifactId>devotion</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>Devotion</name>
   <url>https://github.com/Devoted/Devotion</url>
   
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.8.8-R0.1-SNAPSHOT</version>
+      <version>1.9</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
