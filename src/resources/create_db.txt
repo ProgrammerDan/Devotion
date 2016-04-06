@@ -213,7 +213,6 @@ CREATE TABLE IF NOT EXISTS dev_player_fish (
     dev_player_fish_id BIGINT NOT NULL AUTO_INCREMENT
    ,trace_id VARCHAR(36) NOT NULL
    ,caught_entity VARCHAR(50)
-   ,caught_entity_id VARCHAR(50)
    ,caught_item_type VARCHAR(50)
    ,caught_item_displayname VARCHAR(500)
    ,caught_item_amount INT

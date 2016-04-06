@@ -1,0 +1,13 @@
+ALTER TABLE dev_player_item_held CHANGE new_item_type main_hand_type VARCHAR(50);
+ALTER TABLE dev_player_item_held CHANGE new_item_displayname main_hand_displayname VARCHAR(500);
+ALTER TABLE dev_player_item_held CHANGE new_item_amount main_hand_amount INT;
+ALTER TABLE dev_player_item_held CHANGE new_item_durability main_hand_durability SMALLINT;
+ALTER TABLE dev_player_item_held CHANGE new_item_enchantments main_hand_enchantments VARCHAR(500);
+ALTER TABLE dev_player_item_held CHANGE new_item_lore main_hand_lore VARCHAR(500);
+
+ALTER TABLE dev_player_item_held ADD off_hand_type VARCHAR(50) AFTER main_hand_lore;
+ALTER TABLE dev_player_item_held ADD off_hand_displayname VARCHAR(500) AFTER off_hand_type;
+ALTER TABLE dev_player_item_held ADD off_hand_amount INT AFTER off_hand_displayname;
+ALTER TABLE dev_player_item_held ADD off_hand_durability SMALLINT AFTER off_hand_amount;
+ALTER TABLE dev_player_item_held ADD off_hand_enchantments VARCHAR(500) AFTER off_hand_durability;
+ALTER TABLE dev_player_item_held ADD off_hand_lore VARCHAR(500) AFTER off_hand_enchantments;

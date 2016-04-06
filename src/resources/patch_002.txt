@@ -1,0 +1,4 @@
+ALTER TABLE dev_block_break CHANGE block block_type VARCHAR(50);
+ALTER TABLE dev_block_break ADD block_x INT AFTER block_type;
+ALTER TABLE dev_block_break ADD block_y INT AFTER block_x;
+ALTER TABLE dev_block_break ADD block_z INT AFTER block_y;
