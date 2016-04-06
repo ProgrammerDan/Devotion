@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.programmerdan.minecraft.devotion.dao.FlyweightType;
 import com.programmerdan.minecraft.devotion.dao.database.SqlDatabase;
 import com.programmerdan.minecraft.devotion.dao.info.BlockBreakInfo;
+import com.programmerdan.minecraft.devotion.dao.info.BlockInfo;
 import com.programmerdan.minecraft.devotion.dao.info.DropItemInfo;
 import com.programmerdan.minecraft.devotion.dao.info.ItemStackInfo;
 
@@ -27,7 +28,7 @@ public class fBlockBreak extends fPlayer {
 		if(event != null) {
 			this.breakInfo = new BlockBreakInfo();
 			this.breakInfo.trace_id = this.eventInfo.trace_id;
-			this.breakInfo.block = event.getBlock() != null ? event.getBlock().getType().name(): null;
+			this.breakInfo.block = new BlockInfo(event.getBlock() != null ? event.getBlock(): null);
 			this.breakInfo.expToDrop = event.getExpToDrop();
 			this.breakInfo.eventCancelled = event.isCancelled();
 						
@@ -77,7 +78,7 @@ public class fBlockBreak extends fPlayer {
 		
 		// in context of file IO it isn't necessary to write the unique UUID twice b/c the parent
 		// and child records are written together.
-		os.writeUTF(this.breakInfo.block);
+		marshallBlockToStream(this.breakInfo.block, os);
 		os.writeInt(this.breakInfo.expToDrop);
 		os.writeBoolean(this.breakInfo.eventCancelled);
 		os.writeInt(this.dropItems.size());
@@ -93,7 +94,7 @@ public class fBlockBreak extends fPlayer {
 		
 		this.breakInfo = new BlockBreakInfo();
 		this.breakInfo.trace_id = this.eventInfo.trace_id;
-		this.breakInfo.block = is.readUTF();
+		this.breakInfo.block = unmarshallBlockFromStream(is);
 		this.breakInfo.expToDrop = is.readInt();
 		this.breakInfo.eventCancelled = is.readBoolean();
 		

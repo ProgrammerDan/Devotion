@@ -20,6 +20,10 @@ public abstract class Source {
 		this.db = db;
 	}
 	
+	protected SqlDatabase getDb() {
+		return this.db;
+	}
+	
 	public boolean hasUpdates() {
 		return this.sql != null;
 	}

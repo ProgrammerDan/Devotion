@@ -11,6 +11,9 @@ import com.programmerdan.minecraft.devotion.Devotion;
 public class ResourceHelper {
 	public static ArrayList<String> readScriptList(String resourcePath) {
 		InputStream stream = Devotion.class.getResourceAsStream(resourcePath);
+		
+		if(stream == null) return null;
+		
     	StringBuilder script = new StringBuilder("");
     	ArrayList<String> list = new ArrayList<String>(); 
     	

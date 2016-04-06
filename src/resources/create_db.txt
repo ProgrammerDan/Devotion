@@ -400,4 +400,11 @@ CREATE TABLE IF NOT EXISTS dev_drop_item (
    ,item_lore VARCHAR(500)
    
    ,CONSTRAINT pk_dev_drop_item PRIMARY KEY (dev_drop_item_id)
+);
+
+CREATE TABLE IF NOT EXISTS dev_patch (
+    patch_name VARCHAR(200) NOT NULL
+   ,applied_date DATETIME NOT NULL
+   
+   ,CONSTRAINT pk_dev_patches PRIMARY KEY (patch_name)
 )

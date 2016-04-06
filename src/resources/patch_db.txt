@@ -1,7 +1,0 @@
-CREATE PROCEDURE sp_dev_alter()
-BEGIN
-    IF NOT EXISTS (SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = Database() AND TABLE_NAME = 'dev_player_fish' AND COLUMN_NAME = 'caught_entity_id')
-    THEN
-	    ALTER TABLE dev_player_fish ADD caught_entity_id VARCHAR(50) AFTER caught_entity;
-    END IF;
-END

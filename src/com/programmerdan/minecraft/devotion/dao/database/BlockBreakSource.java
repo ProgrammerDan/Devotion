@@ -2,12 +2,11 @@ package com.programmerdan.minecraft.devotion.dao.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import com.programmerdan.minecraft.devotion.dao.info.BlockBreakInfo;
 
 public class BlockBreakSource extends Source {
-	private static final String insertScript = "INSERT dev_block_break (trace_id, block, exp_to_drop, event_cancelled) VALUES (?, ?, ?, ?)";
+	private static final String insertScript = "INSERT dev_block_break (trace_id, block_type, block_x, block_y, block_z, exp_to_drop, event_cancelled) VALUES (?, ?, ?, ?, ?, ?, ?)";
 	
 	public BlockBreakSource(SqlDatabase db) {
 		super(db);
@@ -18,15 +17,10 @@ public class BlockBreakSource extends Source {
 
 		sql.setString(1, info.trace_id);
 		
-		if(info.block != null) {
-			sql.setString(2, info.block);
-		} else {
-			sql.setNull(2, Types.VARCHAR);
-		}
+		int nextIndex = this.setBlockParams(2, info.block);
 		
-		sql.setInt(3, info.expToDrop);
-		
-		sql.setBoolean(4, info.eventCancelled);
+		sql.setInt(nextIndex, info.expToDrop);
+		sql.setBoolean(nextIndex + 1, info.eventCancelled);
 		
 		sql.addBatch();
 	}

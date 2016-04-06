@@ -4,11 +4,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.avaje.ebeaninternal.server.lib.sql.DataSourceException;
+import com.programmerdan.minecraft.devotion.dao.info.PatchInfo;
 import com.programmerdan.minecraft.devotion.util.ResourceHelper;
 
 /**
@@ -27,6 +29,11 @@ public class SqlDatabase {
     
     private ArrayList<Source> sourceList;
     
+    private PatchSource patchSource;
+    public PatchSource getPatchSource() {
+    	return this.patchSource;
+    }
+
     private PlayerSource playerEventSource;
     public PlayerSource getPlayerEventSource() {
     	return this.playerEventSource;
@@ -210,6 +217,7 @@ public class SqlDatabase {
     private void initDataSources() {
     	this.sourceList = new ArrayList<Source>();
     	
+    	this.sourceList.add(this.patchSource = new PatchSource(this));
     	this.sourceList.add(this.playerEventSource = new PlayerSource(this));
     	this.sourceList.add(this.playerLoginSource = new PlayerLoginSource(this));
     	this.sourceList.add(this.playerInteractSource = new PlayerInteractSource(this));
@@ -306,22 +314,50 @@ public class SqlDatabase {
 		
 		this.logger.log(Level.INFO, "Database initialized.");
 		
-		this.logger.log(Level.INFO, "Apply patches to database...");
-		
-		String patch = ResourceHelper.readScript("/patch_db.txt");
+		this.logger.log(Level.INFO, "Applying patches to database...");
 		
 		try {
-			prepareStatement(patch).execute();
-			prepareStatement(patch).execute("call sp_dev_alter()");
-			prepareStatement(patch).execute("DROP PROCEDURE sp_dev_alter");
+			applyPatches();
     	} catch (SQLException e) {
-    		this.logger.log(Level.SEVERE, "Failed to apply patch: \n" + patch);
+    		this.logger.log(Level.SEVERE, "Failed to apply patches.");
 			e.printStackTrace();
 			return false;
 		}
 		
-		this.logger.log(Level.INFO, "Patch applied to database...");
+		this.logger.log(Level.INFO, "Patches applied to database.");
 		
 		return true;
+    }
+    
+    private void applyPatches() throws SQLException {
+    	int patchIndex = 1;
+    	String patchName = String.format("patch_%03d.txt", patchIndex);
+    	ArrayList<String> scripts;
+    	
+    	while((scripts = ResourceHelper.readScriptList("/" + patchName)) != null) {
+    		this.logger.log(Level.INFO, "Found patch " + patchName);
+    		
+    		if(this.patchSource.isExist(patchName)) {
+    			this.logger.log(Level.INFO, "Skipping patch.");
+    		} else {
+	    		this.logger.log(Level.INFO, "Applying patch...");
+	    		
+	    		for(String script : scripts) {
+	    			prepareStatement(script).execute();
+	    		}
+	    		
+	    		PatchInfo patchInfo = new PatchInfo();
+	    		patchInfo.patchName = patchName;
+	    		patchInfo.appliedDate = new Timestamp(System.currentTimeMillis());
+	    		
+	    		begin();
+	    		this.patchSource.insert(patchInfo);
+	    		commit();
+	    		
+	    		this.logger.log(Level.INFO, "Patch applied.");
+    		}
+    		
+    		patchName = String.format("patch_%03d.txt", ++patchIndex);
+    	}
     }
 }
