@@ -30,6 +30,7 @@ import org.bukkit.event.player.PlayerLevelChangeEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -82,6 +83,7 @@ public class FlyweightFactory {
 		Definitions.add(new EventDefinition(FlyweightType.ItemHeld.getId(), PlayerItemHeldEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.LevelChange.getId(), PlayerLevelChangeEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.PickupItem.getId(), PlayerPickupItemEvent.class));
+		Definitions.add(new EventDefinition(FlyweightType.PickupItem.getId(), PlayerPickupArrowEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ResourcePackStatus.getId(), PlayerResourcePackStatusEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.ShearEntity.getId(), PlayerShearEntityEvent.class));
 		Definitions.add(new EventDefinition(FlyweightType.StatisticIncrement.getId(), PlayerStatisticIncrementEvent.class));

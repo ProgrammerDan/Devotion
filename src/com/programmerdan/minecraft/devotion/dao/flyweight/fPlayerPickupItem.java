@@ -15,6 +15,7 @@ import com.programmerdan.minecraft.devotion.dao.info.PlayerPickupItemInfo;
 public class fPlayerPickupItem extends fPlayer {
 	private PlayerPickupItemInfo pickupItemInfo;
 	
+	// TODO add specific understanding of arrow pickup
 	public fPlayerPickupItem(PlayerPickupItemEvent event) {
 		super(event, FlyweightType.PickupItem);
 		

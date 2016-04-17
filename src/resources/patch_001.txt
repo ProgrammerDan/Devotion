@@ -1,1 +1,1 @@
-ALTER TABLE dev_player_fish ADD caught_entity_id VARCHAR(50) AFTER caught_entity
+ALTER TABLE dev_player_fish ADD caught_entity_id VARCHAR(50) AFTER caught_entity;
