@@ -35,15 +35,22 @@ public class Siphon {
 	private Map<String, Object> config;
 	private Integer delay;
 	private Integer slices;
-	private String targetFolder;
+	private String targetFolderString;
+	private File targetFolder;
+	private boolean active;
+	private boolean attached;
+	private SiphonDatabase database;
+
+	public void deactivate() {
+		this.active = false;
+	}
 	
 	public Siphon(String filename) {
 		configFile = new File(filename);
 		
 		if (!configFile.exists()) {
 			configFile = null;
-			System.err.println("The filename provided does not exist.");
-			System.exit(2);
+			throw new SiphonFailure("The filename provided does not exist.");
 		}
 	}
 
@@ -62,12 +69,10 @@ public class Siphon {
 			if (config != null) {
 				this.config = config;
 			} else {
-				System.err.println("Unable to load YAML config.");
-				System.exit(4);
+				throw new SiphonFailure("Unable to load YAML config.");
 			}
 		} catch (FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-			System.exit(3);
+			throw new SiphonFailure(fnfe);
 		}
 		
 		// Slices # of slices to split the day into while extracting
@@ -75,6 +80,66 @@ public class Siphon {
 		// # of minutes to delay between extracts
 		this.delay = (Integer) this.config.get("delay");
 		// Where to put the file.
-		this.targetFolder = (String) this.config.get("targetFolder");
+		this.targetFolderString = (String) this.config.get("targetFolder");
+		this.targetFolder = new File(this.targetFolderString);
+		if (!this.targetFolder.isDirectory()) {
+			throw new SiphonFailure("Target folder provided either isn't a folder or doesn't exist.");
+		}
+
+		if (this.slices == null || this.slices < 0) {
+			throw new SiphonFailure("'slices' must be present and non-negative");
+		}
+
+		if (this.delay == null || this.delay < 0) {
+			throw new SiphonFailure("'delay' must be present and non-negative");
+		}
+
+		active = true;
+
+		// are we listening for user input?
+		this.attached = (Boolean) this.config.get("attached");
+
+		Map<String, Object> database = this.config.get("database");
+
+		String host = (String) database.get("host");
+		int port = (Integer) database.get("port");
+		String db = (String) database.get("database");
+		String user = (String) database.get("user");
+		String password = (String) database.get("password");
+
+		this.database = new SiphonDatabase(host, post, db, user, password);
+
+		doMainLoop();
+	}
+
+
+
+	private void doMainLoop() {
+		Scanner console = null;
+		String command = null;
+		if (attached) {
+			console = new Scanner(System.in);
+		}
+
+		while (active) {
+			if (attached) {
+				try {
+					command = console.nextLine();
+				} catch (NoSuchElementException nsee) {
+					System.err.println("Console detached while attached, assuming shutdown.");
+					attached = false;
+					active = false;
+				}
+			}
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException ie) {
+				System.out.println("Hmm, who woke me?");
+			}
+		}
+
+		if (this.database != null) {
+			this.database.close();
+		}
 	}
 }

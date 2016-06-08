@@ -1,0 +1,10 @@
+slices: 24
+delay: 1
+attached: true
+targetFolder: /backups/
+database:
+  host:
+  port: 3306
+  username:
+  password:
+  database: devotion
