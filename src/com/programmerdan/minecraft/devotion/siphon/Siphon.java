@@ -4,13 +4,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Map;
+import java.util.Scanner;
+import java.util.NoSuchElementException;
 
-import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import org.yaml.snakeyaml.representer.Representer;
 
 /**
  * Utility helper class that can be run separately from the Spigot thread, that slowly
@@ -99,7 +98,8 @@ public class Siphon {
 		// are we listening for user input?
 		this.attached = (Boolean) this.config.get("attached");
 
-		Map<String, Object> database = this.config.get("database");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> database = (Map<String, Object>) this.config.get("database");
 
 		String host = (String) database.get("host");
 		int port = (Integer) database.get("port");
@@ -107,12 +107,14 @@ public class Siphon {
 		String user = (String) database.get("user");
 		String password = (String) database.get("password");
 
-		this.database = new SiphonDatabase(host, post, db, user, password);
+		this.database = new SiphonDatabase(host, port, db, user, password);
 
 		doMainLoop();
 	}
 
-
+	private static final String STOP = "stop";
+	private static final String PAUSE = "pause";
+	private static final String START = "start";
 
 	private void doMainLoop() {
 		Scanner console = null;
@@ -129,6 +131,16 @@ public class Siphon {
 					System.err.println("Console detached while attached, assuming shutdown.");
 					attached = false;
 					active = false;
+				}
+				switch(command) {
+				case STOP:
+					this.active = false;
+					break;
+				case PAUSE:
+					
+					break;
+				case START:
+					break;
 				}
 			}
 			try {

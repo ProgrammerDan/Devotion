@@ -4,10 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Aleksey Terzi
@@ -15,7 +11,7 @@ import java.util.logging.Logger;
  *
  */
 
-public class SqlDatabase {
+public class SiphonDatabase {
 	private String host;
     private int port;
     private String db;
@@ -23,7 +19,7 @@ public class SqlDatabase {
     private String password;
     private Connection connection;
     
-    public SqlDatabase(String host, int port, String db, String user, String password) {
+    public SiphonDatabase(String host, int port, String db, String user, String password) {
         this.host = host;
         this.port = port;
         this.db = db;
@@ -33,7 +29,7 @@ public class SqlDatabase {
         try {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
         } catch (Exception ex) {
-            throw new DataSourceException("Failed to initialize JDBC driver.");
+            throw new SiphonFailure("Failed to initialize JDBC driver.");
         }
     }
     
@@ -48,7 +44,6 @@ public class SqlDatabase {
         } catch (SQLException ex) { //Error handling below:
             throw new SiphonFailure("Could not connnect to the database! Connection string: " + jdbc, ex);
         }
-		return false;
     }
     
     public void close() {
@@ -68,6 +63,10 @@ public class SqlDatabase {
 			ex.printStackTrace();
         }
         return false;
+    }
+    
+    public Connection getConnection() {
+    	return this.connection;
     }
     
     public PreparedStatement prepareStatement(String sqlStatement) throws SQLException {
