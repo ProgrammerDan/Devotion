@@ -131,6 +131,7 @@ public class Siphon {
 					System.err.println("Console detached while attached, assuming shutdown.");
 					attached = false;
 					active = false;
+					break;
 				}
 				switch(command) {
 				case STOP:
