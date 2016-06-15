@@ -7,6 +7,17 @@ public class SiphonWorker implements Runnable {
 	private int slices;
 	private int sliceLength;
 
+	// So some testing reveals that constructing the slice table using precise times will be very expensive on the whole.
+	// The goal of Siphon is to get the data out; not to be precise in its splits.
+	// With that in mind we'll go a new route; leveraging dev_player_id field within dev_player to find in O(ln n) where 
+	// to "stop" our retrieval (within some target "nearness" of real time) and use those dev_player_id values to 
+	// build the slice_table. If follows my testing, this will be _very_ fast.
+	private static final String BOTTOM_BOUND = "SELECT min(dev_player_id) FROM dev_player";
+	private static final String UPPER_BOUND = "SELECT max(dev_player_id) FROM dev_player";
+	private static final String SAMPLE_DATE = "SELECT event_time FROM dev_player WHERE dev_player_id = ?";
+	// using the above three tests, and assuming that _roughly_ event_time is monotonically increasing w.r.t dev_player_id, 
+	// we should be able to get very close to precise with only a few samples.
+
 	private static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slice_table";
 	private static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slice_table (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE event_time >= ? AND event_time < ?"
 	private static final String REMOVE_SLICE_TABLE = "DROP TABLE slice_table";
@@ -14,6 +25,11 @@ public class SiphonWorker implements Runnable {
 	private static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
 	private static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table) INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
 	private static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
+	private static final String ACCUMULATE = "tar --remove-files -czvf /tmp/dev_tracks_{1}.tar.gz /tmp/dev_*.dat";
+	private static final String MOVE = "mv /tmp/dev_tracks_{1}.tar.gz {2}/";
+	private static final String CHOWN = "chown {3} {2}/dev_tracks_{1}.tar.gz";
+
+	// note: {0} is always table name, {1} is always resolved starting datetime, {2} is folder to deposit slices and {3} is name:name permission to chown to.
 
 	private static final String[] TABLES = new String[] {
 		"dev_block_break",
@@ -48,7 +64,9 @@ public class SiphonWorker implements Runnable {
 		"dev_player"
 	};
 	
-	public SiphonWorker(Siphon siphon, SiphonDatabase database, int slices) {
+	// fuzz is number of milliseconds "off" of precise we can tolerate when slicing up the data.
+	// Using 0 is strongly discouraged as its meaningless. Values of 500-1000 make the most sense.
+	public SiphonWorker(Siphon siphon, SiphonDatabase database, int slices, long fuzz) {
 		this.siphon = siphon;
 		this.database = database;
 		this.slices = slices;
