@@ -6,6 +6,8 @@ public class SiphonWorker implements Runnable {
 	private SiphonDatabase database;
 	private int slices;
 	private int sliceLength;
+	private long fuzz;
+	private long minBuffer;
 
 	// So some testing reveals that constructing the slice table using precise times will be very expensive on the whole.
 	// The goal of Siphon is to get the data out; not to be precise in its splits.
@@ -19,7 +21,7 @@ public class SiphonWorker implements Runnable {
 	// we should be able to get very close to precise with only a few samples.
 
 	private static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slice_table";
-	private static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slice_table (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE event_time >= ? AND event_time < ?"
+	private static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slice_table (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE dev_player_id <= ?"
 	private static final String REMOVE_SLICE_TABLE = "DROP TABLE slice_table";
 	private static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slice_table (trace_id)";
 	private static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
@@ -64,13 +66,27 @@ public class SiphonWorker implements Runnable {
 		"dev_player"
 	};
 	
-	// fuzz is number of milliseconds "off" of precise we can tolerate when slicing up the data.
-	// Using 0 is strongly discouraged as its meaningless. Values of 500-1000 make the most sense.
-	public SiphonWorker(Siphon siphon, SiphonDatabase database, int slices, long fuzz) {
+	/**
+	 * SiphonWorker is the root controller for sucking down slices of data in a way that hopefully
+	 * doesn't lock up the database.
+	 *
+	 * @param siphon The Siphon base object / controller.
+	 * @param database The database primitive (used to spawn connections)
+	 * @param slices The number of slices to split each day up into. This is used to determine the size and
+	 *        affinity of slice operations.
+	 * @param fuzz The number of milliseconds "off" of precise we can tolerate when slicing up the data.
+	 *        Using 0 is strongly discouraged as its meaningless. Values of 500-1000 make the most sense.
+	 * @param minBuffer The # of records at a minimum to leave in the database; only capture slices below
+	 *        this buffer value. Useful for keeping a day or two of data in the database but
+	 *        constrained by number so if you have a hugely busy day your database doesn't explode.
+	 */
+	public SiphonWorker(Siphon siphon, SiphonDatabase database, int slices, long fuzz, long minBuffer) {
 		this.siphon = siphon;
 		this.database = database;
 		this.slices = slices;
 		this.sliceLength = 24 / slices;
+		this.fuzz = fuzz;
+		this.minBuffer = minBuffer;
 	}
 	
 	@Override
@@ -81,6 +97,9 @@ public class SiphonWorker implements Runnable {
 		// If it is empty, bound the new transaction. Find oldest data, figure out time of day for it
 		//     and "fit" into slices as informed.
 		// Select into the temptable the data that fits into the next slice.
+		// 
+		// Then use an ExecutorService to farm out all the work of spitting out data to file.
+		// consider using a fixedsize executor .
 		// 
 		// temp table
 		// index

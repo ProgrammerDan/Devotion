@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * @author Aleksey Terzi
+ * Database config wrapper and connection source.
  * @author ProgrammerDan
  *
  */
@@ -17,7 +17,6 @@ public class SiphonDatabase {
     private String db;
     private String user;
     private String password;
-    private Connection connection;
     
     public SiphonDatabase(String host, int port, String db, String user, String password) {
         this.host = host;
@@ -33,44 +32,18 @@ public class SiphonDatabase {
         }
     }
     
-    public boolean connect() {
+    public SiphonConnection connect() {
         String jdbc = "jdbc:mysql://" + host + ":" + port + "/" + db + "?user=" + user + "&password=" + password;
         
         try {
-            this.connection = DriverManager.getConnection(jdbc);
+            Connection connection = DriverManager.getConnection(jdbc);
             
             System.out.println("Connected to database!");
-            return true;
+            return new SiphonConnection(connection);
         } catch (SQLException ex) { //Error handling below:
             throw new SiphonFailure("Could not connnect to the database! Connection string: " + jdbc, ex);
         }
-    }
-    
-    public void close() {
-        try {
-            connection.close();
-        } catch (SQLException ex) {
-            System.err.println("An error occured while closing the connection.");
-			ex.printStackTrace();
-        }
-    }
-    
-    public boolean isConnected() {
-        try {
-            return connection.isValid(5);
-        } catch (SQLException ex) {
-            System.err.println("isConnected error!");
-			ex.printStackTrace();
-        }
-        return false;
-    }
-    
-    public Connection getConnection() {
-    	return this.connection;
-    }
-    
-    public PreparedStatement prepareStatement(String sqlStatement) throws SQLException {
-        return connection.prepareStatement(sqlStatement);
+
+		return SiphonConnection.FAILURE;
     }
 }
-

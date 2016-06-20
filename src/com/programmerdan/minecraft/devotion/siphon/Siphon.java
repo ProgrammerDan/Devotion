@@ -150,9 +150,5 @@ public class Siphon {
 				System.out.println("Hmm, who woke me?");
 			}
 		}
-
-		if (this.database != null) {
-			this.database.close();
-		}
 	}
 }
