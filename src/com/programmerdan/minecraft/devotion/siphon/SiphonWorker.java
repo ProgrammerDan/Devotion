@@ -1,32 +1,28 @@
 package com.programmerdan.minecraft.devotion.siphon;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 public class SiphonWorker implements Runnable {
 
 	private Siphon siphon;
 	private SiphonDatabase database;
 	private int slices;
-	private int sliceLength;
+	private long sliceLength;
 	private long fuzz;
 	private long minBuffer;
 
-	// So some testing reveals that constructing the slice table using precise times will be very expensive on the whole.
-	// The goal of Siphon is to get the data out; not to be precise in its splits.
-	// With that in mind we'll go a new route; leveraging dev_player_id field within dev_player to find in O(ln n) where 
-	// to "stop" our retrieval (within some target "nearness" of real time) and use those dev_player_id values to 
-	// build the slice_table. If follows my testing, this will be _very_ fast.
-	private static final String BOTTOM_BOUND = "SELECT min(dev_player_id) FROM dev_player";
-	private static final String UPPER_BOUND = "SELECT max(dev_player_id) FROM dev_player";
-	private static final String SAMPLE_DATE = "SELECT event_time FROM dev_player WHERE dev_player_id = ?";
-	// using the above three tests, and assuming that _roughly_ event_time is monotonically increasing w.r.t dev_player_id, 
-	// we should be able to get very close to precise with only a few samples.
-
-	private static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slice_table";
-	private static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slice_table (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE dev_player_id <= ?"
-	private static final String REMOVE_SLICE_TABLE = "DROP TABLE slice_table";
-	private static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slice_table (trace_id)";
-	private static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
-	private static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table) INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
-	private static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
 	private static final String ACCUMULATE = "tar --remove-files -czvf /tmp/dev_tracks_{1}.tar.gz /tmp/dev_*.dat";
 	private static final String MOVE = "mv /tmp/dev_tracks_{1}.tar.gz {2}/";
 	private static final String CHOWN = "chown {3} {2}/dev_tracks_{1}.tar.gz";
@@ -84,7 +80,7 @@ public class SiphonWorker implements Runnable {
 		this.siphon = siphon;
 		this.database = database;
 		this.slices = slices;
-		this.sliceLength = 24 / slices;
+		this.sliceLength = 86400000l / slices;
 		this.fuzz = fuzz;
 		this.minBuffer = minBuffer;
 	}
@@ -105,6 +101,138 @@ public class SiphonWorker implements Runnable {
 		// index
 		// export
 		// remove
+		try {
+			SiphonConnection connect = this.database.connect();
+		
+			PreparedStatement bounds = connect.prepareStatement(SiphonConnection.BOUNDS);
+			ResultSet boundsRS = bounds.executeQuery();
+			if (boundsRS.next()) {
+				long bottomID = boundsRS.getLong(1);
+				long upperID = boundsRS.getLong(2);
+				boundsRS.close();
+				bounds.close();
+				
+				long maxID = upperID - this.minBuffer; // this is our actual cap.
+				if (bottomID > maxID) {// nothing to do
+					System.err.println("Nothing to siphon!");
+					return;
+				}
+				long baseID = bottomID;
+				long baseTime = getTime(baseID, connect);
+				long bottomTime = baseTime;
+				
+				// now compute target time as the next-closest subdivision based on slices.
+				Calendar baseDay = Calendar.getInstance();
+				baseDay.setTime(new Date(baseTime));
+				baseDay.set(Calendar.HOUR_OF_DAY, 0);
+				baseDay.set(Calendar.MINUTE, 0);
+				baseDay.set(Calendar.SECOND, 0);
+				baseDay.set(Calendar.MILLISECOND, 0);
+				// target time is the next slice within the day. So day start milliseconds + adjusted target slice within the day based on time already transpired.
+				long targetTime = baseDay.getTimeInMillis() + (((baseTime - baseDay.getTimeInMillis()) / this.sliceLength) + 1) * this.sliceLength; // roundToZero truncation gives low bound + 1 + sliceLength to give target endtime.
+
+				long maxTime = getTime(maxID, connect);
+				if (maxTime > targetTime) {
+					long currentID = (maxID + baseID) / 2;
+					long currentTime = getTime(currentID, connect);
+					int failsafe = 0;
+					while (Math.abs(currentTime - targetTime) > this.fuzz && currentID < maxID && failsafe < 100) {
+						if (currentTime > targetTime) {
+							maxID = currentID - 1;
+						} else { // currentTime < targetTime) {
+							baseID = currentID + 1;
+						} // == handled in loop terminator
+						currentID = (maxID + baseID) / 2;
+						currentTime = getTime(currentID, connect);
+						failsafe ++;
+					}
+					connect.close();
+					
+					if (failsafe < 100) {
+						// found! use bottomTime and currentTime as bounds.
+						System.out.println("Found time and ID span: " + bottomTime + " [" + bottomID + "] to " + currentTime +  " [" + currentID + "]");
+						
+						// now spawn some Callables w/ an Executor to do the work.
+						
+						ExecutorService doWork = Executors.newFixedThreadPool(4);
+						final long sliceID = currentID;
+						// First, create the temporary ID table.
+						Future<Boolean> prep = doWork.submit(new Callable<Boolean>() {
+							@Override
+							public Boolean call() throws SQLException {
+								SiphonConnection connect = database.connect();
+								
+								PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
+								removeIndex.execute();
+								removeIndex.close();
+								
+								PreparedStatement createTable = connect.prepareStatement(SiphonConnection.GET_SLICE_TABLE);
+								createTable.setLong(1, sliceID);
+								int captured = createTable.executeUpdate();
+								System.out.println("Captured " + captured + " rows in slice table.");
+								createTable.close();
+								
+								PreparedStatement addIndex = connect.prepareStatement(SiphonConnection.ADD_SLICE_INDEX);
+								addIndex.execute();
+								addIndex.close();
+								
+								connect.close();
+								return Boolean.TRUE;
+							}	
+						});
+						
+						Boolean outcome = null;
+						long delaySeconds = 0l;
+						while (outcome == null) {
+							try {
+								outcome = prep.get(1000l, TimeUnit.MILLISECONDS);
+							} catch (TimeoutException te) {
+								outcome = null;
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outcome = null;
+							} catch (ExecutionException e) {
+								e.printStackTrace();
+								outcome = null;
+							} finally {
+								delaySeconds ++;
+								System.out.println("Waited " + delaySeconds + "sec so far for table and index creation.");
+							}
+						}
+						// now done, pile on the other executors.
+						
+					} else {
+						System.err.println("Very bad behavior, failed to find either near event or stable ");
+						connect.close();
+					}
+				} else {
+					System.err.println("Nothing to siphon, current max time is too soon.");
+					connect.close();
+				}
+			} else {
+				System.err.println("Nothing to siphon, no records returned from min-max query");
+				connect.close();
+			}
+		} catch(SiphonFailure sf) {
+			System.err.println("Failed to connect to the database");
+			sf.printStackTrace();
+		} catch(SQLException se) {
+			System.err.println("Failed to retrieve information from the database");
+			se.printStackTrace();
+		}
+	}
+	
+	public long getTime(long ID, SiphonConnection connect) throws SQLException {
+		PreparedStatement eventtime = connect.prepareStatement(SiphonConnection.SAMPLE_DATE);
+		eventtime.setLong(1, ID);
+		ResultSet eventtimeRS = eventtime.executeQuery();
+		if (eventtimeRS.next()) {
+			Timestamp time = eventtimeRS.getTimestamp(1);
+			if (time != null) {
+				return time.getTime();
+			}
+		}
+		throw new SiphonFailure("Unable to get event time based on ID");
 	}
 
 }

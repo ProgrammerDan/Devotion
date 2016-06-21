@@ -43,7 +43,5 @@ public class SiphonDatabase {
         } catch (SQLException ex) { //Error handling below:
             throw new SiphonFailure("Could not connnect to the database! Connection string: " + jdbc, ex);
         }
-
-		return SiphonConnection.FAILURE;
     }
 }
