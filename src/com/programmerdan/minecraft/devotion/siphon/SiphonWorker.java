@@ -103,6 +103,30 @@ public class SiphonWorker implements Runnable {
 		// remove
 		try {
 			SiphonConnection connect = this.database.connect();
+
+			// Our first check is to see if a prior transaction was left incomplete.
+			boolean resume = connect.checkTableExists(SiphonConnection.TRANS_TABLE);
+			if (resume) {
+				// we're probably going to resume a presumably aborted process.
+				PreparedStatement retrieveStop = connect.prepareStatement(SiphonConnection.SLICE_TABLE_SIZE);
+				ResultSet checkRS = checkSize.executeQuery();
+				if (checkRS.next()) {
+					long checkCount = checkRS.getLong(1);
+					if (checkCount < 1) {
+						// remove old one!
+						PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
+						removeIndex.execute();
+						removeIndex.close();
+
+						PrepareStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
+						removeSliceTable.execute();
+						removeSliceTable.close();
+						resume = false;
+					}
+				}
+				checkRS.close();
+				checkSize.close();
+			}
 		
 			PreparedStatement bounds = connect.prepareStatement(SiphonConnection.BOUNDS);
 			ResultSet boundsRS = bounds.executeQuery();
@@ -161,16 +185,39 @@ public class SiphonWorker implements Runnable {
 							@Override
 							public Boolean call() throws SQLException {
 								SiphonConnection connect = database.connect();
-								
-								PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
-								removeIndex.execute();
-								removeIndex.close();
-								
-								PreparedStatement createTable = connect.prepareStatement(SiphonConnection.GET_SLICE_TABLE);
-								createTable.setLong(1, sliceID);
-								int captured = createTable.executeUpdate();
-								System.out.println("Captured " + captured + " rows in slice table.");
-								createTable.close();
+
+								boolean resume = connect.checkTableExists(SiphonConnection.SLICE_TABLE_NAME);
+								if (resume) {
+									// we're probably going to resume a presumably aborted process.
+									PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.SLICE_TABLE_SIZE);
+									ResultSet checkRS = checkSize.executeQuery();
+									if (checkRS.next()) {
+										long checkCount = checkRS.getLong(1);
+										if (checkCount < 1) {
+											// remove old one!
+											PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
+											removeIndex.execute();
+											removeIndex.close();
+
+											PrepareStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
+											removeSliceTable.execute();
+											removeSliceTable.close();
+											resume = false;
+										}
+									}
+									checkRS.close();
+									checkSize.close();
+								}
+
+								if (!resume) {
+									PreparedStatement createTable = connect.prepareStatement(SiphonConnection.GET_SLICE_TABLE);
+									createTable.setLong(1, sliceID);
+									int captured = createTable.executeUpdate();
+									System.out.println("Captured " + captured + " rows in slice table.");
+									createTable.close();
+								} else {
+									System.out.println("Resuming a prior capture.");
+								}
 								
 								PreparedStatement addIndex = connect.prepareStatement(SiphonConnection.ADD_SLICE_INDEX);
 								addIndex.execute();

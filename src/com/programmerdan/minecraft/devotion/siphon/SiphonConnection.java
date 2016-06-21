@@ -5,12 +5,20 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Soft wrapper for Connection, might wind up discarding this.
+ * Soft wrapper for Connection
+ * 
  */
 public class SiphonConnection {
 	private Connection connection;
 
 	public static final SiphonConnection FAILURE = new SiphonConnection(null);
+
+	// Each slice is nominally a transaction that cannot overlap with an attempt to store another slice. 
+	// So we create and destroy a table specifically to earmark the beginning and end of the transaction.
+	public static final String TRANS_TABLE = "slicetrans";
+	public static final String TRANS_CREATE = "CREATE TABLE IF NOT EXISTS slicetrans (dev_player_id BIGINT(20) NOT NULL, event_time DATETIME NOT NULL) SELECT dev_player_id, event_time FROM dev_player WHERE dev_player_id = ?";
+	public static final String TRANS_SELECT = "SELECT * FROM slicetrans";
+	public static final String TRANS_REMOVE = "DROP TABLE slicetrans";
 
 	// So some testing reveals that constructing the slice table using precise times will be very expensive on the whole.
 	// The goal of Siphon is to get the data out; not to be precise in its splits.
@@ -19,15 +27,18 @@ public class SiphonConnection {
 	// build the slice_table. If follows my testing, this will be _very_ fast.
 	public static final String BOUNDS = "SELECT min(dev_player_id), max(dev_player_id) FROM dev_player";
 	public static final String SAMPLE_DATE = "SELECT event_time FROM dev_player WHERE dev_player_id = ?";
+
 	// using the above three tests, and assuming that _roughly_ event_time is monotonically increasing w.r.t dev_player_id, 
 	// we should be able to get very close to precise with only a few samples.
-	public static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slice_table";
-	public static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slice_table (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE dev_player_id <= ?";
-	public static final String REMOVE_SLICE_TABLE = "DROP TABLE slice_table";
-	public static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slice_table (trace_id)";
-	public static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
-	public static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slice_table) INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
-	public static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT * FROM slice_table)";
+	public static final String SLICE_TABLE_NAME = "slicetable";
+	public static final String SLICE_TABLE_SIZE = "SELECT count(*) FROM slicetable";
+	public static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slicetable";
+	public static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slicetable (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE dev_player_id <= ?";
+	public static final String REMOVE_SLICE_TABLE = "DROP TABLE slicetable";
+	public static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slicetable (trace_id)";
+	public static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slicetable)";
+	public static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slicetable) INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
+	public static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT * FROM slicetable)";
 
 
 	public SiphonConnection(Connection connection) {
@@ -65,5 +76,16 @@ public class SiphonConnection {
 		}
         return connection.prepareStatement(sqlStatement);
     }
+
+	public boolean checkTableExists(String tablename) throws SQLException {
+		if (connection == null) {
+			throw new SQLException("Connection not available.");
+		}
+		DatabaseMetaData metadata = connection.getMetaData();
+		ResultSet tabledata = metadata.getTables(null, null, tablename, null);
+		boolean ret = tabledata.next();
+		tabledata.close();
+		return ret;
+	}
 }
 
