@@ -113,7 +113,7 @@ public class SiphonWorker implements Runnable {
 				PreparedStatement retrieveStop = connect.prepareStatement(SiphonConnection.TRANS_SELECT);
 				ResultSet retrieveRS = retrieveStop.executeQuery();
 				if (retrieveRS.next()) {
-					long sliceID = retrieveRS.getLong(1);
+					sliceID = retrieveRS.getLong(1);
 					Timestamp sliceTimestamp = retrieveRS.getTimestamp(2);
 					if (sliceTimestamp != null) {
 						sliceTime = sliceTimestamp.getTime();
@@ -121,138 +121,163 @@ public class SiphonWorker implements Runnable {
 				}
 				retrieveRS.close();
 				retrieveStop.close();
-			} else {
-			PreparedStatement bounds = connect.prepareStatement(SiphonConnection.BOUNDS);
-			ResultSet boundsRS = bounds.executeQuery();
-			if (boundsRS.next()) {
-				long bottomID = boundsRS.getLong(1);
-				long upperID = boundsRS.getLong(2);
+			}
+
+			if (sliceID < 0) { // resume failed or doesn't exist.
+				PrepareStatement transRemove = connect.prepareStatement(SiphonConnection.TRANS_REMOVE);
+				transRemove.execute();
+				transRemove.close();
+
+				long bottomID = -1L;
+				long upperID = -1L;
+				
+				PreparedStatement bounds = connect.prepareStatement(SiphonConnection.BOUNDS);
+				ResultSet boundsRS = bounds.executeQuery();
+				if (boundsRS.next()) {
+					bottomID = boundsRS.getLong(1);
+					upperID = boundsRS.getLong(2);
+				}
 				boundsRS.close();
 				bounds.close();
-				
-				long maxID = upperID - this.minBuffer; // this is our actual cap.
-				if (bottomID > maxID) {// nothing to do
-					System.err.println("Nothing to siphon!");
-					return;
-				}
-				long baseID = bottomID;
-				long baseTime = getTime(baseID, connect);
-				long bottomTime = baseTime;
-				
-				// now compute target time as the next-closest subdivision based on slices.
-				Calendar baseDay = Calendar.getInstance();
-				baseDay.setTime(new Date(baseTime));
-				baseDay.set(Calendar.HOUR_OF_DAY, 0);
-				baseDay.set(Calendar.MINUTE, 0);
-				baseDay.set(Calendar.SECOND, 0);
-				baseDay.set(Calendar.MILLISECOND, 0);
-				// target time is the next slice within the day. So day start milliseconds + adjusted target slice within the day based on time already transpired.
-				long targetTime = baseDay.getTimeInMillis() + (((baseTime - baseDay.getTimeInMillis()) / this.sliceLength) + 1) * this.sliceLength; // roundToZero truncation gives low bound + 1 + sliceLength to give target endtime.
 
-				long maxTime = getTime(maxID, connect);
-				if (maxTime > targetTime) {
-					long currentID = (maxID + baseID) / 2;
-					long currentTime = getTime(currentID, connect);
-					int failsafe = 0;
-					while (Math.abs(currentTime - targetTime) > this.fuzz && currentID < maxID && failsafe < 100) {
-						if (currentTime > targetTime) {
-							maxID = currentID - 1;
-						} else { // currentTime < targetTime) {
-							baseID = currentID + 1;
-						} // == handled in loop terminator
-						currentID = (maxID + baseID) / 2;
-						currentTime = getTime(currentID, connect);
-						failsafe ++;
+				if (bottomID > -1 && upperID > -1) {					
+					long maxID = upperID - this.minBuffer; // this is our actual cap.
+					if (bottomID > maxID) {// nothing to do
+						System.err.println("Nothing to siphon!");
+						return;
 					}
-					connect.close();
+					long baseID = bottomID;
+					long baseTime = getTime(baseID, connect);
+					long bottomTime = baseTime;
 					
-					if (failsafe < 100) {
-						// found! use bottomTime and currentTime as bounds.
-						System.out.println("Found time and ID span: " + bottomTime + " [" + bottomID + "] to " + currentTime +  " [" + currentID + "]");
-						
-						// now spawn some Callables w/ an Executor to do the work.
-						
-						ExecutorService doWork = Executors.newFixedThreadPool(4);
-						final long sliceID = currentID;
-						// First, create the temporary ID table.
-						Future<Boolean> prep = doWork.submit(new Callable<Boolean>() {
-							@Override
-							public Boolean call() throws SQLException {
-								SiphonConnection connect = database.connect();
+					// now compute target time as the next-closest subdivision based on slices.
+					Calendar baseDay = Calendar.getInstance();
+					baseDay.setTime(new Date(baseTime));
+					baseDay.set(Calendar.HOUR_OF_DAY, 0);
+					baseDay.set(Calendar.MINUTE, 0);
+					baseDay.set(Calendar.SECOND, 0);
+					baseDay.set(Calendar.MILLISECOND, 0);
+					// target time is the next slice within the day. So day start milliseconds + adjusted target slice within the day based on time already transpired.
+					long targetTime = baseDay.getTimeInMillis() + (((baseTime - baseDay.getTimeInMillis()) / this.sliceLength) + 1) * this.sliceLength; // roundToZero truncation gives low bound + 1 + sliceLength to give target endtime.
 
-								boolean resume = connect.checkTableExists(SiphonConnection.SLICE_TABLE_NAME);
-								if (resume) {
-									// we're probably going to resume a presumably aborted process.
-									PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.SLICE_TABLE_SIZE);
-									ResultSet checkRS = checkSize.executeQuery();
-									if (checkRS.next()) {
-										long checkCount = checkRS.getLong(1);
-										if (checkCount < 1) {
-											// remove old one!
-											PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
-											removeIndex.execute();
-											removeIndex.close();
-
-											PrepareStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
-											removeSliceTable.execute();
-											removeSliceTable.close();
-											resume = false;
-										}
-									}
-									checkRS.close();
-									checkSize.close();
-								}
-
-								if (!resume) {
-									PreparedStatement createTable = connect.prepareStatement(SiphonConnection.GET_SLICE_TABLE);
-									createTable.setLong(1, sliceID);
-									int captured = createTable.executeUpdate();
-									System.out.println("Captured " + captured + " rows in slice table.");
-									createTable.close();
-								} else {
-									System.out.println("Resuming a prior capture.");
-								}
-								
-								PreparedStatement addIndex = connect.prepareStatement(SiphonConnection.ADD_SLICE_INDEX);
-								addIndex.execute();
-								addIndex.close();
-								
-								connect.close();
-								return Boolean.TRUE;
-							}	
-						});
-						
-						Boolean outcome = null;
-						long delaySeconds = 0l;
-						while (outcome == null) {
-							try {
-								outcome = prep.get(1000l, TimeUnit.MILLISECONDS);
-							} catch (TimeoutException te) {
-								outcome = null;
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-								outcome = null;
-							} catch (ExecutionException e) {
-								e.printStackTrace();
-								outcome = null;
-							} finally {
-								delaySeconds ++;
-								System.out.println("Waited " + delaySeconds + "sec so far for table and index creation.");
-							}
+					long maxTime = getTime(maxID, connect);
+					if (maxTime > targetTime) {
+						long currentID = (maxID + baseID) / 2;
+						long currentTime = getTime(currentID, connect);
+						int failsafe = 0;
+						while (Math.abs(currentTime - targetTime) > this.fuzz && currentID < maxID && failsafe < 100) {
+							if (currentTime > targetTime) {
+								maxID = currentID - 1;
+							} else { // currentTime < targetTime) {
+								baseID = currentID + 1;
+							} // == handled in loop terminator
+							currentID = (maxID + baseID) / 2;
+							currentTime = getTime(currentID, connect);
+							failsafe ++;
 						}
-						// now done, pile on the other executors.
 						
+						if (failsafe < 100) {
+							// found! use bottomTime and currentTime as bounds.
+							System.out.println("Found time and ID span: " + bottomTime + " [" + bottomID + "] to " + currentTime +  " [" + currentID + "]");
+							sliceID = currentID;
+							sliceTime = currentTime;
+						} else {
+							System.err.println("Very bad behavior, failed to find either near event or stable. Are you sure data is properly ordered?");
+						}
 					} else {
-						System.err.println("Very bad behavior, failed to find either near event or stable ");
-						connect.close();
+						System.err.println("Nothing to siphon, current max time is too soon.");
 					}
 				} else {
-					System.err.println("Nothing to siphon, current max time is too soon.");
-					connect.close();
+					System.err.println("Nothing to siphon, no records returned from min-max query");
 				}
-			} else {
-				System.err.println("Nothing to siphon, no records returned from min-max query");
+			} 
+
+			// Ok, we've either got a slice ID or we call it quits.
+			if (sliceID > -1) {
+				// Try to set up resume data point
+				PreparedStatement transBegin = connect.prepareStatement(SiphonConnection.TRANS_CREATE);
+				transBegin.setLong(1, sliceID);
+				int captured = transBegin.executeUpdate();
+				if (captured < 1) {
+					System.err.println("WARNING: Resume point not created.");
+				}
+				transBegin.close();
 				connect.close();
+
+				// now spawn some Callables w/ an Executor to do the work.
+				ExecutorService doWork = Executors.newFixedThreadPool(4);
+				final long targetSliceID = sliceID;
+				// First, create the temporary ID table.
+				Future<Boolean> prep = doWork.submit(new Callable<Boolean>() {
+					@Override
+					public Boolean call() throws SQLException {
+						SiphonConnection connect = database.connect();
+
+						boolean resume = connect.checkTableExists(SiphonConnection.SLICE_TABLE_NAME);
+						if (resume) {
+							// we're probably going to resume a presumably aborted process.
+							PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.SLICE_TABLE_SIZE);
+							ResultSet checkRS = checkSize.executeQuery();
+							if (checkRS.next()) {
+								long checkCount = checkRS.getLong(1);
+								if (checkCount < 1) {
+									// remove old one!
+									PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
+									removeIndex.execute();
+									removeIndex.close();
+
+									PrepareStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
+									removeSliceTable.execute();
+									removeSliceTable.close();
+									resume = false;
+								}
+							}
+							checkRS.close();
+							checkSize.close();
+						}
+
+						if (!resume) {
+							PreparedStatement createTable = connect.prepareStatement(SiphonConnection.GET_SLICE_TABLE);
+							createTable.setLong(1, finalSliceID);
+							int captured = createTable.executeUpdate();
+							System.out.println("Captured " + captured + " rows in slice table.");
+							createTable.close();
+						} else {
+							System.out.println("Resuming a prior capture.");
+						}
+						
+						PreparedStatement addIndex = connect.prepareStatement(SiphonConnection.ADD_SLICE_INDEX);
+						addIndex.execute();
+						addIndex.close();
+						
+						connect.close();
+						return Boolean.TRUE;
+					}	
+				});
+				
+				Boolean outcome = null;
+				long delaySeconds = 0l;
+				long delayStart = System.currentTimeMillis();
+				while (outcome == null) {
+					try {
+						outcome = prep.get(1000l, TimeUnit.MILLISECONDS);
+					} catch (TimeoutException te) {
+						outcome = null;
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+						outcome = null;
+					} catch (ExecutionException e) {
+						e.printStackTrace();
+						outcome = null;
+					} finally {
+						delaySeconds ++;
+						System.out.println("Waited " + delaySeconds + "sec (" + (System.currentTimeMills() - delayStart) + "ms system clock) so far for table and index creation.");
+					}
+				}
+				// now done, pile on the other executors...
+			} else {
+				connect.close();
+				System.err.println("Unable to find any data to siphon.");
 			}
 		} catch(SiphonFailure sf) {
 			System.err.println("Failed to connect to the database");
