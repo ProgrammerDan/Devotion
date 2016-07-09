@@ -7,6 +7,10 @@ import java.io.FileReader;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
@@ -34,11 +38,15 @@ public class Siphon {
 	private Map<String, Object> config;
 	private Integer delay;
 	private Integer slices;
+	private Integer fuzz;
+	private Integer buffer;
 	private String targetFolderString;
 	private File targetFolder;
+	private String targetOwner;
 	private boolean active;
 	private boolean attached;
 	private SiphonDatabase database;
+	private int concurrency;
 
 	public void deactivate() {
 		this.active = false;
@@ -78,12 +86,17 @@ public class Siphon {
 		this.slices = (Integer) this.config.get("slices");
 		// # of minutes to delay between extracts
 		this.delay = (Integer) this.config.get("delay");
+		// Max amount of concurrency
+		this.concurrency = (Integer) this.config.get("concurrency");
 		// Where to put the file.
 		this.targetFolderString = (String) this.config.get("targetFolder");
 		this.targetFolder = new File(this.targetFolderString);
 		if (!this.targetFolder.isDirectory()) {
 			throw new SiphonFailure("Target folder provided either isn't a folder or doesn't exist.");
 		}
+		
+		this.targetOwner = (String) this.config.get("targetOwner");
+		System.out.println("Owner of backups set to targetOwner");
 
 		if (this.slices == null || this.slices < 0) {
 			throw new SiphonFailure("'slices' must be present and non-negative");
@@ -92,7 +105,19 @@ public class Siphon {
 		if (this.delay == null || this.delay < 0) {
 			throw new SiphonFailure("'delay' must be present and non-negative");
 		}
+		
+		this.fuzz = (Integer) this.config.get("fuzz");
+		
+		this.buffer = (Integer) this.config.get("buffer");
 
+		if (this.fuzz == null || this.fuzz < 0) {
+			throw new SiphonFailure("'fuzz' must be present and non-negative");
+		}
+
+		if (this.buffer == null || this.buffer < 0) {
+			throw new SiphonFailure("'buffer' must be present and non-negative");
+		}
+		
 		active = true;
 
 		// are we listening for user input?
@@ -122,8 +147,19 @@ public class Siphon {
 		if (attached) {
 			console = new Scanner(System.in);
 		}
+		
+		boolean runWorker = true;
+		long currentDelay = -1l;
+		SiphonWorker currentWorker = null;
+		Future<Boolean> workerFuture = null;
+		ExecutorService doSiphon = Executors.newSingleThreadExecutor();
 
 		while (active) {
+			if (runWorker && currentWorker == null) {
+				System.out.println("Kicking off a new Siphon!");
+				currentWorker = new SiphonWorker(this, this.database, this.slices, this.fuzz, this.buffer);
+				workerFuture = doSiphon.submit(currentWorker);
+			}
 			if (attached) {
 				try {
 					command = console.nextLine();
@@ -135,20 +171,57 @@ public class Siphon {
 				}
 				switch(command) {
 				case STOP:
+					runWorker = false;
 					this.active = false;
+					System.out.println("Current siphon will complete and application will exit.");
 					break;
 				case PAUSE:
-					
+					runWorker = false;
+					System.out.println("Current siphon will complete but no new workers will run until you issue " + START);
 					break;
 				case START:
+					runWorker = true;
+					System.out.println("New siphons will continue as planned.");
 					break;
 				}
 			}
 			try {
-				Thread.sleep(50);
+				Thread.sleep(50l);
 			} catch (InterruptedException ie) {
 				System.out.println("Hmm, who woke me?");
+			} finally {
+				if (currentDelay > -1) {
+					currentDelay += 50l;
+				}
+			}
+			if (currentWorker != null && currentDelay < 0l) {
+				if (workerFuture.isDone()){
+					try {
+						System.out.println("Current Siphon process complete with flag " + workerFuture.get() + ". Beginning delay time.");
+					} catch (InterruptedException | ExecutionException e) {
+						e.printStackTrace();
+					}
+					currentDelay = 0l;
+				}
+			}
+			if ((currentDelay / 60000) > this.delay) {
+				System.out.println("Delay complete. A new Siphon will begin unless paused.");
+				currentDelay = -1l;
+				currentWorker = null;
+				workerFuture = null;
 			}
 		}
+	}
+
+	public int getConcurrency() {
+		return this.concurrency;
+	}
+	
+	public String getTargetFolder() {
+		return this.targetFolderString;
+	}
+	
+	public String getTargetOwner() {
+		return this.targetOwner;
 	}
 }

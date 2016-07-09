@@ -1,7 +1,9 @@
 package com.programmerdan.minecraft.devotion.siphon;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -33,12 +35,15 @@ public class SiphonConnection {
 	public static final String SLICE_TABLE_NAME = "slicetable";
 	public static final String SLICE_TABLE_SIZE = "SELECT count(*) FROM slicetable";
 	public static final String REMOVE_SLICE_INDEX = "DROP INDEX IF EXISTS slice_table_idx ON slicetable";
-	public static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slicetable (trace_id VARCHAR(36) NOT NULL) SELECT trace_id FROM dev_player WHERE dev_player_id <= ?";
+	public static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slicetable (trace_id VARCHAR(36) NOT NULL, dev_player_id BIGINT NOT NULL) SELECT trace_id, dev_player_id FROM dev_player WHERE dev_player_id <= ?";
 	public static final String REMOVE_SLICE_TABLE = "DROP TABLE slicetable";
-	public static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slicetable (trace_id)";
-	public static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slicetable)";
-	public static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT * FROM slicetable) INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
-	public static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT * FROM slicetable)";
+	public static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slicetable (trace_id, dev_player_id)";
+	//public static final String GENERAL_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT trace_id FROM slicetable) LIMIT ?";
+	public static final String FILE_SELECT = "SELECT * FROM {0} WHERE trace_id IN (SELECT trace_id FROM slicetable) LIMIT ? INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n";
+	public static final String GENERAL_DELETE = "DELETE FROM {0} WHERE trace_id IN (SELECT trace_id FROM slicetable) LIMIT ?";
+	/*public static final String GENERAL_MAIN_SELECT = "SELECT * FROM {0} WHERE dev_player_id IN (SELECT dev_player_id FROM slicetable) LIMIT ? ";
+	public static final String FILE_MAIN_SELECT = "SELECT * FROM {0} WHERE dev_player_id IN (SELECT dev_player_id FROM slicetable) LIMIT ? INTO OUTFILE '/tmp/{0}_{1}.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\n'";
+	public static final String GENERAL_MAIN_DELETE = "DELETE FROM {0} WHERE dev_player_id IN (SELECT dev_player_id FROM slicetable) LIMIT ?";*/
 
 
 	public SiphonConnection(Connection connection) {

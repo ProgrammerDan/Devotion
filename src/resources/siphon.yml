@@ -1,10 +1,25 @@
+# Number of slices to cut each day up into. Each slice will be a separate backup file.
 slices: 24
+# Number of minutes to delay between each slice siphon.
 delay: 1
+# If siphon will be accepting input.
 attached: true
+# Where to deposit the backup files.
 targetFolder: /backups/
+# The user who should wind up owning the backups. It should be the same user as Siphon is run under.
+# Make sure this user has permission to chown files created by the database.
+targetOwner: devotion
+# Max number of tables to concurrently export or cleanup while producing a slice.
+concurrency: 1
+# How close to target size for the Slice should we get (controls how many queries we will spend to
+# "find" the target)
+fuzz: 100
+# How many datapoints to _always_ keep in the database
+buffer: 1000000
+# Configure the DB
 database:
-  host:
+  host: localhost
   port: 3306
-  username:
+  username: bukkit
   password:
   database: devotion
