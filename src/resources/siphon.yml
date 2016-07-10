@@ -4,8 +4,10 @@ slices: 24
 delay: 1
 # If siphon will be accepting input.
 attached: true
-# Where to deposit the backup files.
+# Where to deposit the backup files. Include trailing path separators as required by your system.
 targetFolder: /backups/
+# Where for SQL to create backup files. Include trailing path separators.
+tmpFolder: /tmp/
 # The user who should wind up owning the backups. It should be the same user as Siphon is run under.
 # Make sure this user has permission to chown files created by the database.
 targetOwner: devotion
@@ -20,6 +22,8 @@ buffer: 1000000
 database:
   host: localhost
   port: 3306
-  username: bukkit
+  user: bukkit
   password:
   database: devotion
+  # Database specific tmp folder due to console differences in some windows editions.
+  tmpFolder: /tmp/

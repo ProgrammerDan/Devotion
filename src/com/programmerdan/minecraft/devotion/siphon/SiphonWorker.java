@@ -1,15 +1,22 @@
 package com.programmerdan.minecraft.devotion.siphon;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLWarning;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -27,11 +34,12 @@ public class SiphonWorker implements Callable<Boolean> {
 	private long fuzz;
 	private long minBuffer;
 
-	private static final String ACCUMULATE = "tar --remove-files -czvf /tmp/dev_tracks_{1}.tar.gz /tmp/dev_*.dat";
-	private static final String MOVE = "mv /tmp/dev_tracks_{1}.tar.gz {2}/";
-	private static final String CHOWN = "chown {3} {2}/dev_tracks_{1}.tar.gz";
-
-	// note: {0} is always table name, {1} is always resolved starting datetime, {2} is folder to deposit slices and {3} is name:name permission to chown to.
+	private static final String ACCUMULATE = "tar --remove-files -czvf %1$sdev_tracks_%2$s.tar.gz %1$sdev_*.dat";
+	// 1 - temp folder, 2 - datetime
+	private static final String MOVE = "mv %1$sdev_tracks_%2$s.tar.gz %3$s";
+	// 1 - temp folder, 2 - datetime, 3 - deposit folder
+	private static final String CHOWN = "chown %1$s %3$sdev_tracks_%2$s.tar.gz";
+	// 1 - name:name permission , 2 - datetime, 3 - deposit folder
 
 	private static final String[] TABLES = new String[] {
 		"dev_block_break",
@@ -113,6 +121,7 @@ public class SiphonWorker implements Callable<Boolean> {
 			// Our first check is to see if a prior transaction was left incomplete.
 			boolean resume = connect.checkTableExists(SiphonConnection.TRANS_TABLE);
 			if (resume) {
+				System.out.println("Resuming a prior slice export");
 				// we're going to resume a presumably aborted process.
 				PreparedStatement retrieveStop = connect.prepareStatement(SiphonConnection.TRANS_SELECT);
 				ResultSet retrieveRS = retrieveStop.executeQuery();
@@ -130,6 +139,7 @@ public class SiphonWorker implements Callable<Boolean> {
 			// BEGIN TRANSACTION
 			
 			if (sliceID < 0) { // resume failed or doesn't exist.
+				System.out.println("Starting a new slice export transaction");
 				PreparedStatement transRemove = connect.prepareStatement(SiphonConnection.TRANS_REMOVE);
 				transRemove.execute();
 				transRemove.close();
@@ -185,7 +195,7 @@ public class SiphonWorker implements Callable<Boolean> {
 						
 						if (failsafe < 100) {
 							// found! use bottomTime and currentTime as bounds.
-							System.out.println("Found time and ID span: " + bottomTime + " [" + bottomID + "] to " + currentTime +  " [" + currentID + "]");
+							System.out.println("Found time and ID span: " + bottomTime + " [" + bottomID + "] to " + currentTime +  " [" + currentID + "] in " + failsafe + " steps.");
 							sliceID = currentID;
 							sliceTime = currentTime;
 						} else {
@@ -229,6 +239,7 @@ public class SiphonWorker implements Callable<Boolean> {
 						int captured = 0;
 						boolean resume = connect.checkTableExists(SiphonConnection.SLICE_TABLE_NAME);
 						if (resume) {
+							System.out.println("Trying to resume an old slice export");
 							// we're probably going to resume a presumably aborted process.
 							PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.SLICE_TABLE_SIZE);
 							ResultSet checkRS = checkSize.executeQuery();
@@ -298,50 +309,68 @@ public class SiphonWorker implements Callable<Boolean> {
 				if (outcome == null) {
 					System.err.println("We failed at the last -- could not create slice table.");
 				} else {
-					
+					System.out.println("Launching tasks to export data");
 					// EXPORT SLICE DATA TO FILE
 					
-					List<Future<Integer>> futures = new LinkedList<Future<Integer>>();
+					Map<Future<Integer>, Boolean> futures = new LinkedHashMap<Future<Integer>, Boolean>();
 					final int maxGrab = outcome;
 					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss-SSSS");
 					final String targetSliceTimeString = sdf.format(new Date(targetSliceTime));
 					for (final String table : TABLES) {
 						Future<Integer> tableOutcome = doWork.submit(new Callable<Integer>() {
 							@Override
-							public Integer call() throws SQLException {
-								SiphonConnection connect = database.connect();
-								int size = 0;
-								
-								PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.FILE_SELECT.replaceAll("{0}", table).replaceAll("{1}", targetSliceTimeString));
-								checkSize.setInt(1, maxGrab);
-								ResultSet checkRS = checkSize.executeQuery();
-								if (checkRS.next()) {
-									size = checkRS.getInt(1);
+							public Integer call() throws Exception {
+								try {
+									SiphonConnection connect = database.connect();
+									
+									PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.FILE_SELECT,
+											table, targetSliceTimeString, siphon.getDatabaseTmpFolder()));
+									checkSize.setInt(1, maxGrab);
+									System.out.println(checkSize);
+									checkSize.execute();
+									int size = checkSize.getUpdateCount();
 									if (size > 0) {
 										System.out.println("Found " + size + " records for " + table + " and saved them to tmp");
 									} else {
 										System.out.println("No records found within the range for " + table + " while saving to tmp");
 									}
-								} else {
-									System.out.println("No response to query for " + table + " while saving to tmp");
+									SQLWarning warn = checkSize.getWarnings();
+									while (warn != null) {
+										System.out.println("[WARNING] " + warn.getLocalizedMessage());
+										warn = checkSize.getWarnings();
+									}
+									
+									return size;
+								} catch (SQLException sqe) {
+									throw new Exception("Error in query for " + table + " while saving to tmp", sqe);
 								}
-								
-								return size;
 							}
 						});
-						futures.add(tableOutcome);
+						futures.put(tableOutcome, false);
 					}
 					
 					// now we wait for completion.
 					boolean allDone = false;
+					boolean noErrors = false;
 					delaySeconds = 0l;
 					delayStart = System.currentTimeMillis();
 					while (!allDone) {
 						allDone = true;
-						for (Future<Integer> future : futures) {
+						noErrors = true;
+						for (Future<Integer> future : futures.keySet()) {
 							if (!future.isDone()) {
 								allDone = false;
 								break;
+							} else {
+								if (!futures.get(future)) { // only print out error once.
+									futures.put(future, true);
+									try {
+										future.get();
+									} catch(ExecutionException | InterruptedException ee) {
+										noErrors = false;
+										ee.printStackTrace();
+									}
+								}
 							}
 						}
 						if (!allDone) {
@@ -358,46 +387,93 @@ public class SiphonWorker implements Callable<Boolean> {
 					}
 					System.out.println("Took ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) to export slice.");
 					
+					boolean abort = false;
+					if (!noErrors) {
+						System.err.println(" Export completed with errors. Aborting.");
+						abort = true;
+					}
+					
 					// SYSTEM COMMANDS TO TARBALL AND MOVE TO BACKUP
 					
-					boolean abort = false;
-					// Now run system commands to tarball it all
-					try {
-						Process accumulate = Runtime.getRuntime().exec(SiphonWorker.ACCUMULATE.replaceAll("{1}", targetSliceTimeString));
-						delaySeconds = 0l;
-						delayStart = System.currentTimeMillis();
-						while (!accumulate.waitFor(1l, TimeUnit.SECONDS)) {
-							System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for accumulation.");
+					if (!abort) {
+						// Now run system commands to tarball it all
+						try {
+							String accumProc = String.format(SiphonWorker.ACCUMULATE,
+									siphon.getTmpFolder(), targetSliceTimeString);
+							System.out.println("Running command: " + accumProc);
+							Process accumulate = Runtime.getRuntime().exec(accumProc);
+							BufferedReader accumulateBIS = new BufferedReader(new InputStreamReader(accumulate.getErrorStream()));
+							delaySeconds = 0l;
+							delayStart = System.currentTimeMillis();
+							while (!accumulate.waitFor(1l, TimeUnit.SECONDS)) {
+								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for accumulation.");
+							}
+							System.out.println("Done accumulation after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: " 
+										+ accumulate.exitValue());
+							if (accumulate.exitValue() > 0) { // by convention, failure.
+								StringBuffer error = new StringBuffer();
+								String line = accumulateBIS.readLine();
+								while (line != null) {
+									error.append(line).append("\n");
+									line = accumulateBIS.readLine();
+								}
+								throw new ExecutionException("Accumulation failed", new Exception(error.toString()));
+							}
+	
+							String moveProc = String.format(SiphonWorker.MOVE,
+									siphon.getTmpFolder(), targetSliceTimeString, siphon.getTargetFolder());
+							System.out.println("Move command: " + moveProc);
+							Process move = Runtime.getRuntime().exec(moveProc);
+							BufferedReader moveBIS = new BufferedReader(new InputStreamReader(move.getErrorStream()));
+							delaySeconds = 0l;
+							delayStart = System.currentTimeMillis();
+							while (!move.waitFor(1l, TimeUnit.SECONDS)) {
+								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for move.");
+							}
+							System.out.println("Done move after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
+									+ move.exitValue());
+							if (move.exitValue() > 0) { // by convention, failure.
+								StringBuffer error = new StringBuffer();
+								String line = moveBIS.readLine();
+								while (line != null) {
+									error.append(line).append("\n");
+									line = moveBIS.readLine();
+								}
+								throw new ExecutionException("Move failed", new Exception(error.toString()));
+							}
+						} catch (IOException | SecurityException | InterruptedException | ExecutionException e) {
+							e.printStackTrace();
+							abort = true;
 						}
-						System.out.println("Done accumulation after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock)");
-
-						Process move = Runtime.getRuntime().exec(SiphonWorker.MOVE.replaceAll("{1}", targetSliceTimeString)
-								.replaceAll("{2}", siphon.getTargetFolder()));
-						delaySeconds = 0l;
-						delayStart = System.currentTimeMillis();
-						while (!move.waitFor(1l, TimeUnit.SECONDS)) {
-							System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for move.");
+						
+						if (!abort) {
+							try {
+								Process chown = Runtime.getRuntime().exec(String.format(SiphonWorker.CHOWN,
+										siphon.getTargetOwner(), targetSliceTimeString, siphon.getTargetFolder()));
+								BufferedReader chownBIS = new BufferedReader(new InputStreamReader(chown.getErrorStream()));
+								delaySeconds = 0l;
+								delayStart = System.currentTimeMillis();
+								while (!chown.waitFor(1l, TimeUnit.SECONDS)) {
+									System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for chown.");
+								}
+								System.out.println("Done chown after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
+										+ chown.exitValue());
+								if (chown.exitValue() > 0) { // by convention, failure.
+									StringBuffer error = new StringBuffer();
+									String line = chownBIS.readLine();
+									while (line != null) {
+										error.append(line).append("\n");
+										line = chownBIS.readLine();
+									}
+									throw new ExecutionException("Accumulation failed", new Exception(error.toString()));
+								}
+							} catch (IOException | SecurityException | InterruptedException | ExecutionException e) {
+								System.err.println("[WARNING] Chown Failed.");
+								e.printStackTrace();
+							}
 						}
-						System.out.println("Done move after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock)");
-
-						Process chown = Runtime.getRuntime().exec(SiphonWorker.CHOWN.replaceAll("{1}", targetSliceTimeString)
-								.replaceAll("{2}", siphon.getTargetFolder())
-								.replaceAll("{3}", siphon.getTargetOwner()));
-						delaySeconds = 0l;
-						delayStart = System.currentTimeMillis();
-						while (!chown.waitFor(1l, TimeUnit.SECONDS)) {
-							System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for chown.");
-						}
-						System.out.println("Done chown after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock)");
-					} catch (IOException e) {
-						e.printStackTrace();
-						abort = true;
-					} catch (SecurityException se) {
-						se.printStackTrace();
-						abort = true;
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						abort = true;
+					} else {
+						System.err.println("Aborting backup file create, move and chown.");
 					}
 					
 					// REMOVE BACKED UP RECORDS FROM SOURCE TABLES
@@ -405,32 +481,33 @@ public class SiphonWorker implements Callable<Boolean> {
 					if (!abort) {
 						// We haven't aborted, so clean up.
 						// now done, pile on the other executors...
-						futures = new LinkedList<Future<Integer>>();
+						futures = new LinkedHashMap<Future<Integer>, Boolean>();
 						for (final String table : TABLES) {
 							Future<Integer> tableOutcome = doWork.submit(new Callable<Integer>() {
 								@Override
 								public Integer call() throws SQLException {
-									SiphonConnection connect = database.connect();
-									int size = 0;
+									try {
+										SiphonConnection connect = database.connect();
 									
-									PreparedStatement checkSize = connect.prepareStatement(SiphonConnection.GENERAL_DELETE.replaceAll("{0}", table));
-									checkSize.setInt(1, maxGrab);
-									ResultSet checkRS = checkSize.executeQuery();
-									if (checkRS.next()) {
-										size = checkRS.getInt(1);
+										PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.GENERAL_DELETE,
+												table));
+										checkSize.setInt(1, maxGrab);
+										System.out.println(checkSize);
+										int size = checkSize.executeUpdate();
 										if (size > 0) {
 											System.out.println("Deleted " + size + " records from " + table);
 										} else {
 											System.out.println("No records deleted within the range for " + table);
 										}
-									} else {
-										System.out.println("No response to deletion request for " + table + " while cleaning up");
+										
+										return size;
+									} catch (SQLException sqe) {
+										System.out.println("Query failure in deletion request for " + table + " while cleaning up");
+										throw sqe;
 									}
-									
-									return size;
 								}
 							});
-							futures.add(tableOutcome);
+							futures.put(tableOutcome, false);
 						}
 						// now we wait for completion.
 						allDone = false;
@@ -438,8 +515,16 @@ public class SiphonWorker implements Callable<Boolean> {
 						delayStart = System.currentTimeMillis();
 						while (!allDone) {
 							allDone = true;
-							for (Future<Integer> future : futures) {
+							for (Future<Integer> future : futures.keySet()) {
 								if (!future.isDone()) {
+									if (!futures.get(future)) { // only print out error once.
+										futures.put(future, true);
+										try {
+											future.get();
+										} catch(ExecutionException | InterruptedException ee) {
+											ee.printStackTrace();
+										}
+									}
 									allDone = false;
 									break;
 								}
@@ -460,60 +545,63 @@ public class SiphonWorker implements Callable<Boolean> {
 					} else {
 						System.err.println("Aborting, slice cleanup skipped.");
 					}
-				}
-				// REMOVE SLICE ID TABLE
 				
-				prep = doWork.submit(new Callable<Integer>() {
-					@Override
-					public Integer call() throws SQLException {
-						SiphonConnection connect = database.connect();
-						PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
-						removeIndex.execute();
-						removeIndex.close();
-
-						PreparedStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
-						removeSliceTable.execute();
-						removeSliceTable.close();
-
-						connect.close();
-
-						return 1;
-					}	
-				});
-				
-				outcome = null;
-				delaySeconds = 0l;
-				delayStart = System.currentTimeMillis();
-				while (outcome == null) {
-					try {
-						outcome = prep.get(1l, TimeUnit.SECONDS);
-					} catch (TimeoutException te) {
+					// REMOVE SLICE ID TABLE
+					if (!abort) {
+						prep = doWork.submit(new Callable<Integer>() {
+							@Override
+							public Integer call() throws SQLException {
+								SiphonConnection connect = database.connect();
+								PreparedStatement removeIndex = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_INDEX);
+								removeIndex.execute();
+								removeIndex.close();
+		
+								PreparedStatement removeSliceTable = connect.prepareStatement(SiphonConnection.REMOVE_SLICE_TABLE);
+								removeSliceTable.execute();
+								removeSliceTable.close();
+		
+								connect.close();
+		
+								return 1;
+							}	
+						});
+						
 						outcome = null;
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						outcome = null;
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-						outcome = null;
-						break;
-					} finally {
-						delaySeconds ++;
-						System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for removal of slice ID table and index.");
+						delaySeconds = 0l;
+						delayStart = System.currentTimeMillis();
+						while (outcome == null) {
+							try {
+								outcome = prep.get(1l, TimeUnit.SECONDS);
+							} catch (TimeoutException te) {
+								outcome = null;
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+								outcome = null;
+							} catch (ExecutionException e) {
+								e.printStackTrace();
+								outcome = null;
+								break;
+							} finally {
+								delaySeconds ++;
+								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for removal of slice ID table and index.");
+							}
+						}
 					}
 				}
 				
 				// CLEAN TRANSACTION
-				connect = database.connect();
-				
-				PreparedStatement transEnd = connect.prepareStatement(SiphonConnection.TRANS_REMOVE);
-				int cleared = transEnd.executeUpdate();
-				if (cleared < 1) {
-					System.err.println("WARNING: Resume point not cleared.");
-				} else {
+				try {
+					connect = database.connect();
+					
+					PreparedStatement transEnd = connect.prepareStatement(SiphonConnection.TRANS_REMOVE);
+					transEnd.execute();
 					System.out.println("Resume point removed." );
+					transEnd.close();
+					connect.close();
+				} catch (SQLException sqe) {
+					System.err.println("WARNING: Resume point not cleared.");
+					sqe.printStackTrace();
 				}
-				transEnd.close();
-				connect.close();
 				
 				System.out.println("Siphon Worker Process Complete." );
 			} else {

@@ -41,7 +41,11 @@ public class Siphon {
 	private Integer fuzz;
 	private Integer buffer;
 	private String targetFolderString;
-	private File targetFolder;
+	//private File targetFolder;
+	private String tmpFolderString;
+	//private File tmpFolder;
+	private String databaseTmpFolderString;
+	//private File databaseTmpFolder;
 	private String targetOwner;
 	private boolean active;
 	private boolean attached;
@@ -90,13 +94,19 @@ public class Siphon {
 		this.concurrency = (Integer) this.config.get("concurrency");
 		// Where to put the file.
 		this.targetFolderString = (String) this.config.get("targetFolder");
-		this.targetFolder = new File(this.targetFolderString);
+		/*this.targetFolder = new File(this.targetFolderString);
 		if (!this.targetFolder.isDirectory()) {
 			throw new SiphonFailure("Target folder provided either isn't a folder or doesn't exist.");
-		}
+		}*/
+		// Where to stage the file.
+		this.tmpFolderString = (String) this.config.get("tmpFolder");
+		/*this.tmpFolder = new File(this.tmpFolderString);
+		if (!this.tmpFolder.isDirectory()) {
+			throw new SiphonFailure("Temporary folder provided either isn't a folder or doesn't exist.");
+		}*/
 		
 		this.targetOwner = (String) this.config.get("targetOwner");
-		System.out.println("Owner of backups set to targetOwner");
+		System.out.println("Owner of backups set to " + targetOwner);
 
 		if (this.slices == null || this.slices < 0) {
 			throw new SiphonFailure("'slices' must be present and non-negative");
@@ -131,7 +141,12 @@ public class Siphon {
 		String db = (String) database.get("database");
 		String user = (String) database.get("user");
 		String password = (String) database.get("password");
-
+		this.databaseTmpFolderString = (String) database.get("tmpFolder");
+		/*this.databaseTmpFolder = new File(this.databaseTmpFolderString);
+		if (!this.databaseTmpFolder.isDirectory()) {
+			throw new SiphonFailure("Temporary folder for databse provided either isn't a folder or doesn't exist.");
+		}*/
+		
 		this.database = new SiphonDatabase(host, port, db, user, password);
 
 		doMainLoop();
@@ -154,19 +169,19 @@ public class Siphon {
 		Future<Boolean> workerFuture = null;
 		ExecutorService doSiphon = Executors.newSingleThreadExecutor();
 
-		while (active) {
+		while (this.active) {
 			if (runWorker && currentWorker == null) {
 				System.out.println("Kicking off a new Siphon!");
 				currentWorker = new SiphonWorker(this, this.database, this.slices, this.fuzz, this.buffer);
 				workerFuture = doSiphon.submit(currentWorker);
 			}
-			if (attached) {
+			if (this.attached) {
 				try {
 					command = console.nextLine();
 				} catch (NoSuchElementException nsee) {
 					System.err.println("Console detached while attached, assuming shutdown.");
-					attached = false;
-					active = false;
+					this.attached = false;
+					this.active = false;
 					break;
 				}
 				switch(command) {
@@ -220,6 +235,15 @@ public class Siphon {
 	public String getTargetFolder() {
 		return this.targetFolderString;
 	}
+	
+	public String getTmpFolder() {
+		return this.tmpFolderString;
+	}
+
+	public String getDatabaseTmpFolder() {
+		return this.databaseTmpFolderString;
+	}
+
 	
 	public String getTargetOwner() {
 		return this.targetOwner;
