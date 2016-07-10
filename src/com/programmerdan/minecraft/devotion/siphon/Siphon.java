@@ -34,9 +34,12 @@ public class Siphon {
 		(new Siphon(args[0])).begin();
 	}
 	
+	private Boolean debug;
+	
 	private File configFile;
 	private Map<String, Object> config;
 	private Integer delay;
+	private Integer checkDelay;
 	private Integer slices;
 	private Integer fuzz;
 	private Integer buffer;
@@ -49,6 +52,7 @@ public class Siphon {
 	private String targetOwner;
 	private boolean active;
 	private boolean attached;
+	private boolean runWorker = false;
 	private SiphonDatabase database;
 	private int concurrency;
 
@@ -86,10 +90,15 @@ public class Siphon {
 			throw new SiphonFailure(fnfe);
 		}
 		
+		// Extra debug output?
+		this.debug = (Boolean) this.config.get("debug");
+		
 		// Slices # of slices to split the day into while extracting
 		this.slices = (Integer) this.config.get("slices");
 		// # of minutes to delay between extracts
 		this.delay = (Integer) this.config.get("delay");
+		// # of seconds inbetween checks on completion of tasks
+		this.checkDelay = (Integer) this.config.get("checkDelay");
 		// Max amount of concurrency
 		this.concurrency = (Integer) this.config.get("concurrency");
 		// Where to put the file.
@@ -116,6 +125,10 @@ public class Siphon {
 			throw new SiphonFailure("'delay' must be present and non-negative");
 		}
 		
+		if (this.checkDelay == null || this.checkDelay < 1) {
+			throw new SiphonFailure("'checkDelay' must be present and non-zero positive");
+		}
+
 		this.fuzz = (Integer) this.config.get("fuzz");
 		
 		this.buffer = (Integer) this.config.get("buffer");
@@ -156,14 +169,62 @@ public class Siphon {
 	private static final String PAUSE = "pause";
 	private static final String START = "start";
 
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+	
+	public boolean getActive() {
+		return this.active;
+	}
+	
+	public void setRunWorker(boolean run) {
+		this.runWorker = run;
+	}
+	
 	private void doMainLoop() {
-		Scanner console = null;
-		String command = null;
 		if (attached) {
-			console = new Scanner(System.in);
+			final Siphon siphon = this;
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					Scanner console = null;
+					String command = null;
+					console = new Scanner(System.in);
+					
+					while(siphon.getActive()) {
+						try {
+							command = console.nextLine();
+						} catch (NoSuchElementException nsee) {
+							System.err.println("Console detached while attached, assuming shutdown.");
+							siphon.setActive(false);
+							siphon.setRunWorker(false);
+							break;
+						}
+						switch(command) {
+						case STOP:
+							siphon.setActive(false);
+							siphon.setRunWorker(false);
+							System.out.println("Current siphon will complete and application will exit.");
+							break;
+						case PAUSE:
+							siphon.setRunWorker(false);
+							System.out.println("Current siphon will complete but no new workers will run until you issue " + START);
+							break;
+						case START:
+							siphon.setRunWorker(true);
+							System.out.println("New siphons will continue as planned.");
+							break;
+						}
+					}
+					System.out.println("Console input shut down");
+					
+					console.close();
+				}
+			}).start();
 		}
 		
-		boolean runWorker = true;
+		runWorker = true;
 		long currentDelay = -1l;
 		SiphonWorker currentWorker = null;
 		Future<Boolean> workerFuture = null;
@@ -174,31 +235,6 @@ public class Siphon {
 				System.out.println("Kicking off a new Siphon!");
 				currentWorker = new SiphonWorker(this, this.database, this.slices, this.fuzz, this.buffer);
 				workerFuture = doSiphon.submit(currentWorker);
-			}
-			if (this.attached) {
-				try {
-					command = console.nextLine();
-				} catch (NoSuchElementException nsee) {
-					System.err.println("Console detached while attached, assuming shutdown.");
-					this.attached = false;
-					this.active = false;
-					break;
-				}
-				switch(command) {
-				case STOP:
-					runWorker = false;
-					this.active = false;
-					System.out.println("Current siphon will complete and application will exit.");
-					break;
-				case PAUSE:
-					runWorker = false;
-					System.out.println("Current siphon will complete but no new workers will run until you issue " + START);
-					break;
-				case START:
-					runWorker = true;
-					System.out.println("New siphons will continue as planned.");
-					break;
-				}
 			}
 			try {
 				Thread.sleep(50l);
@@ -226,6 +262,8 @@ public class Siphon {
 				workerFuture = null;
 			}
 		}
+		System.out.println("Main loop ended, waiting for executor shutdown.");
+		doSiphon.shutdown();
 	}
 
 	public int getConcurrency() {
@@ -243,9 +281,16 @@ public class Siphon {
 	public String getDatabaseTmpFolder() {
 		return this.databaseTmpFolderString;
 	}
-
 	
 	public String getTargetOwner() {
 		return this.targetOwner;
+	}
+	
+	public int getCheckDelay() {
+		return this.checkDelay;
+	}
+	
+	public boolean isDebug() {
+		return (this.debug == null ? false : this.debug);
 	}
 }

@@ -1,7 +1,11 @@
 # Number of slices to cut each day up into. Each slice will be a separate backup file.
 slices: 24
+# (OPTIONAL, default false) Debug mode output (outputs query construction and command line construction, helpful when first configuring.
+debug: false
 # Number of minutes to delay between each slice siphon.
 delay: 1
+# Number of seconds inbetween a check for asynch task completion
+checkDelay: 5
 # If siphon will be accepting input.
 attached: true
 # Where to deposit the backup files. Include trailing path separators as required by your system.

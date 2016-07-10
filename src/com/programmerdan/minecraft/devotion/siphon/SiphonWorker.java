@@ -1,8 +1,6 @@
 package com.programmerdan.minecraft.devotion.siphon;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
@@ -14,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -289,19 +285,22 @@ public class SiphonWorker implements Callable<Boolean> {
 				long delayStart = System.currentTimeMillis();
 				while (outcome == null) {
 					try {
-						outcome = prep.get(1000l, TimeUnit.MILLISECONDS);
+						outcome = prep.get(siphon.getCheckDelay(), TimeUnit.SECONDS);
 					} catch (TimeoutException te) {
 						outcome = null;
 					} catch (InterruptedException e) {
-						e.printStackTrace();
+						if (siphon.isDebug()) e.printStackTrace();
 						outcome = null;
 					} catch (ExecutionException e) {
 						e.printStackTrace();
 						outcome = null;
 						break;
 					} finally {
-						delaySeconds ++;
+						delaySeconds += siphon.getCheckDelay();
 						System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for table and index creation.");
+						if (prep.isDone()) {
+							break;
+						}
 					}
 				}
 				
@@ -326,7 +325,7 @@ public class SiphonWorker implements Callable<Boolean> {
 									PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.FILE_SELECT,
 											table, targetSliceTimeString, siphon.getDatabaseTmpFolder()));
 									checkSize.setInt(1, maxGrab);
-									System.out.println(checkSize);
+									if (siphon.isDebug()) System.out.println(checkSize);
 									checkSize.execute();
 									int size = checkSize.getUpdateCount();
 									if (size > 0) {
@@ -375,12 +374,12 @@ public class SiphonWorker implements Callable<Boolean> {
 						}
 						if (!allDone) {
 							try {
-								Thread.sleep(1000l);
+								Thread.sleep(siphon.getCheckDelay() * 1000l);
 							} catch (InterruptedException e) {
-								e.printStackTrace();
+								if (siphon.isDebug()) e.printStackTrace();
 								outcome = null;
 							} finally {
-								delaySeconds ++;
+								delaySeconds += siphon.getCheckDelay();
 								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for table exports.");
 							}
 						}
@@ -400,12 +399,13 @@ public class SiphonWorker implements Callable<Boolean> {
 						try {
 							String accumProc = String.format(SiphonWorker.ACCUMULATE,
 									siphon.getTmpFolder(), targetSliceTimeString);
-							System.out.println("Running command: " + accumProc);
+							if (siphon.isDebug()) System.out.println("Running command: " + accumProc);
 							Process accumulate = Runtime.getRuntime().exec(accumProc);
 							BufferedReader accumulateBIS = new BufferedReader(new InputStreamReader(accumulate.getErrorStream()));
 							delaySeconds = 0l;
 							delayStart = System.currentTimeMillis();
-							while (!accumulate.waitFor(1l, TimeUnit.SECONDS)) {
+							while (!accumulate.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
+								delaySeconds += siphon.getCheckDelay();
 								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for accumulation.");
 							}
 							System.out.println("Done accumulation after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: " 
@@ -422,12 +422,13 @@ public class SiphonWorker implements Callable<Boolean> {
 	
 							String moveProc = String.format(SiphonWorker.MOVE,
 									siphon.getTmpFolder(), targetSliceTimeString, siphon.getTargetFolder());
-							System.out.println("Move command: " + moveProc);
+							if (siphon.isDebug()) System.out.println("Move command: " + moveProc);
 							Process move = Runtime.getRuntime().exec(moveProc);
 							BufferedReader moveBIS = new BufferedReader(new InputStreamReader(move.getErrorStream()));
 							delaySeconds = 0l;
 							delayStart = System.currentTimeMillis();
-							while (!move.waitFor(1l, TimeUnit.SECONDS)) {
+							while (!move.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
+								delaySeconds += siphon.getCheckDelay();
 								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for move.");
 							}
 							System.out.println("Done move after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
@@ -453,7 +454,8 @@ public class SiphonWorker implements Callable<Boolean> {
 								BufferedReader chownBIS = new BufferedReader(new InputStreamReader(chown.getErrorStream()));
 								delaySeconds = 0l;
 								delayStart = System.currentTimeMillis();
-								while (!chown.waitFor(1l, TimeUnit.SECONDS)) {
+								while (!chown.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
+									delaySeconds += siphon.getCheckDelay();
 									System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for chown.");
 								}
 								System.out.println("Done chown after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
@@ -492,7 +494,7 @@ public class SiphonWorker implements Callable<Boolean> {
 										PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.GENERAL_DELETE,
 												table));
 										checkSize.setInt(1, maxGrab);
-										System.out.println(checkSize);
+										if (siphon.isDebug()) System.out.println(checkSize);
 										int size = checkSize.executeUpdate();
 										if (size > 0) {
 											System.out.println("Deleted " + size + " records from " + table);
@@ -531,12 +533,12 @@ public class SiphonWorker implements Callable<Boolean> {
 							}
 							if (!allDone) {
 								try {
-									Thread.sleep(1000l);
+									Thread.sleep(siphon.getCheckDelay()*1000l);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 									outcome = null;
 								} finally {
-									delaySeconds ++;
+									delaySeconds += siphon.getCheckDelay();
 									System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for table cleanup.");
 								}
 							}
@@ -571,24 +573,27 @@ public class SiphonWorker implements Callable<Boolean> {
 						delayStart = System.currentTimeMillis();
 						while (outcome == null) {
 							try {
-								outcome = prep.get(1l, TimeUnit.SECONDS);
+								outcome = prep.get(siphon.getCheckDelay(), TimeUnit.SECONDS);
 							} catch (TimeoutException te) {
 								outcome = null;
 							} catch (InterruptedException e) {
-								e.printStackTrace();
+								if (siphon.isDebug()) e.printStackTrace();
 								outcome = null;
 							} catch (ExecutionException e) {
 								e.printStackTrace();
 								outcome = null;
 								break;
 							} finally {
-								delaySeconds ++;
+								delaySeconds += siphon.getCheckDelay();
 								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for removal of slice ID table and index.");
+								if (prep.isDone()) {
+									break;
+								}
 							}
 						}
 					}
 				}
-				
+			
 				// CLEAN TRANSACTION
 				try {
 					connect = database.connect();
@@ -602,6 +607,8 @@ public class SiphonWorker implements Callable<Boolean> {
 					System.err.println("WARNING: Resume point not cleared.");
 					sqe.printStackTrace();
 				}
+				
+				doWork.shutdown();
 				
 				System.out.println("Siphon Worker Process Complete." );
 			} else {
