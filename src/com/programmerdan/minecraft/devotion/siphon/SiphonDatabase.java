@@ -37,7 +37,6 @@ public class SiphonDatabase {
         try {
             Connection connection = DriverManager.getConnection(jdbc);
             
-            //System.out.println("Connected to database!");
             return new SiphonConnection(connection);
         } catch (SQLException ex) { //Error handling below:
             throw new SiphonFailure("Could not connnect to the database! Connection string: " + jdbc, ex);

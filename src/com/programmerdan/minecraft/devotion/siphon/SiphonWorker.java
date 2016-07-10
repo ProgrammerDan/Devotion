@@ -408,10 +408,18 @@ public class SiphonWorker implements Callable<Boolean> {
 					if (!abort) {
 						// Now run system commands to tarball it all
 						try {
-							ProcessBuilder accumBuilder = new ProcessBuilder("su", "-c", 
+							ProcessBuilder accumBuilder = null;
+							if (siphon.getWrapAccumulate()) {
+								accumBuilder = new ProcessBuilder("su", "-c", 
 									String.format("tar --remove-files -czvf %1$sdev_tracks_%2$s.tar.gz %1$sdev_*.dat", siphon.getTmpFolder(), targetSliceTimeString))
 									.redirectError(Redirect.INHERIT).redirectOutput(Redirect.INHERIT);
-							if (siphon.isDebug()) System.out.println("Running command: " + accumBuilder.toString());
+							} else {
+								accumBuilder = new ProcessBuilder("tar", "--remove-files", "-czvf", 
+										String.format("%1$sdev_tracks_%2$s.tar.gz", siphon.getTmpFolder(), targetSliceTimeString),
+										String.format("%1$sdev_*.dat", siphon.getTmpFolder()))
+										.redirectError(Redirect.INHERIT).redirectOutput(Redirect.INHERIT);								
+							}
+							if (siphon.isDebug()) System.out.println("Running command: " + accumBuilder.command());
 							
 							Process accumulate = accumBuilder.start();
 
@@ -447,7 +455,7 @@ public class SiphonWorker implements Callable<Boolean> {
 									String.format("%1$s", siphon.getTargetFolder()))
 									.redirectError(Redirect.INHERIT).redirectOutput(Redirect.INHERIT);
 							
-							if (siphon.isDebug()) System.out.println("Move command: " + moveBuilder.toString());
+							if (siphon.isDebug()) System.out.println("Move command: " + moveBuilder.command());
 							Process move = moveBuilder.start();
 							delaySeconds = 0l;
 							delayStart = System.currentTimeMillis();
@@ -487,7 +495,8 @@ public class SiphonWorker implements Callable<Boolean> {
 										String.format("%1$s", siphon.getTargetOwner()),
 										String.format("%1$sdev_tracks_%2$s.tar.gz", siphon.getTargetFolder(), targetSliceTimeString))
 										.redirectError(Redirect.INHERIT).redirectOutput(Redirect.INHERIT);
-								if (siphon.isDebug()) System.out.println("Chown command: " + chownBuilder.toString());
+								
+								if (siphon.isDebug()) System.out.println("Chown command: " + chownBuilder.command());
 								Process chown = chownBuilder.start();
 								delaySeconds = 0l;
 								delayStart = System.currentTimeMillis();
@@ -523,138 +532,6 @@ public class SiphonWorker implements Callable<Boolean> {
 					} else {
 						System.err.println("Aborting backup file create, move and chown.");
 					}					
-					/*if (!abort) {
-						// Now run system commands to tarball it all
-						try {
-							String accumProc = String.format(siphon.getCommandAccumulate(),
-									siphon.getTmpFolder(), targetSliceTimeString);
-							if (siphon.isDebug()) System.out.println("Running command: " + accumProc);
-							
-							Process accumulate = Runtime.getRuntime().exec(accumProc);
-							BufferedReader accumulateBIS = new BufferedReader(new InputStreamReader(accumulate.getErrorStream()));
-							delaySeconds = 0l;
-							delayStart = System.currentTimeMillis();
-							boolean notDone = true;
-							while (notDone) { // 1.8 !accumulate.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
-								try {
-									accumulate.exitValue();
-									break;
-								} catch (IllegalThreadStateException ise) {
-									notDone = true;
-								} catch (Exception e) {
-									e.printStackTrace();
-									notDone = false;
-								}
-								try {
-									Thread.sleep(siphon.getCheckDelay() * 1000l);
-								} catch (InterruptedException ie) {
-									if (siphon.isDebug()) ie.printStackTrace();
-								}
-								delaySeconds += siphon.getCheckDelay();
-								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for accumulation.");
-							}
-							System.out.println("Done accumulation after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: " 
-										+ accumulate.exitValue());
-							if (accumulate.exitValue() > 0) { // by convention, failure.
-								StringBuffer error = new StringBuffer();
-								String line = accumulateBIS.readLine();
-								while (line != null) {
-									error.append(line).append("\n");
-									line = accumulateBIS.readLine();
-								}
-								throw new ExecutionException("Accumulation failed", new Exception(error.toString()));
-							}
-	
-							String moveProc = String.format(siphon.getCommandMove(),
-									siphon.getTmpFolder(), targetSliceTimeString, siphon.getTargetFolder());
-							if (siphon.isDebug()) System.out.println("Move command: " + moveProc);
-							Process move = Runtime.getRuntime().exec(moveProc);
-							BufferedReader moveBIS = new BufferedReader(new InputStreamReader(move.getErrorStream()));
-							delaySeconds = 0l;
-							delayStart = System.currentTimeMillis();
-							notDone = true;
-							while (notDone) {//!move.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
-								try {
-									move.exitValue();
-									break;
-								} catch (IllegalThreadStateException ise) {
-									notDone = true;
-								} catch (Exception e) {
-									e.printStackTrace();
-									notDone = false;
-								}
-								try {
-									Thread.sleep(siphon.getCheckDelay() * 1000l);
-								} catch (InterruptedException ie) {
-									if (siphon.isDebug()) ie.printStackTrace();
-								}
-								
-								delaySeconds += siphon.getCheckDelay();
-								System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for move.");
-							}
-							System.out.println("Done move after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
-									+ move.exitValue());
-							if (move.exitValue() > 0) { // by convention, failure.
-								StringBuffer error = new StringBuffer();
-								String line = moveBIS.readLine();
-								while (line != null) {
-									error.append(line).append("\n");
-									line = moveBIS.readLine();
-								}
-								throw new ExecutionException("Move failed", new Exception(error.toString()));
-							}
-						} catch (IOException | SecurityException | ExecutionException e) {
-							e.printStackTrace();
-							abort = true;
-						}
-						
-						if (!abort) {
-							try {
-								String chownProc = String.format(siphon.getCommandChown(),
-										siphon.getTargetOwner(), targetSliceTimeString, siphon.getTargetFolder());
-								if (siphon.isDebug()) System.out.println("Chown command: " + chownProc);
-								Process chown = Runtime.getRuntime().exec(chownProc);
-								BufferedReader chownBIS = new BufferedReader(new InputStreamReader(chown.getErrorStream()));
-								delaySeconds = 0l;
-								delayStart = System.currentTimeMillis();
-								boolean notDone = true;
-								while (notDone) {//!chown.waitFor(siphon.getCheckDelay(), TimeUnit.SECONDS)) {
-									try {
-										chown.exitValue();
-										break;
-									} catch (IllegalThreadStateException ise) {
-										notDone = true;
-									} catch (Exception e) {
-										e.printStackTrace();
-										notDone = false;
-									}
-									try {
-										Thread.sleep(siphon.getCheckDelay() * 1000l);
-									} catch (InterruptedException ie) {
-										if (siphon.isDebug()) ie.printStackTrace();
-									}
-									delaySeconds += siphon.getCheckDelay();
-									System.out.println("Waited ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) so far for chown.");
-								}
-								System.out.println("Done chown after ~" + delaySeconds + "sec (" + (System.currentTimeMillis() - delayStart) + "ms system clock) with exit value: "
-										+ chown.exitValue());
-								if (chown.exitValue() > 0) { // by convention, failure.
-									StringBuffer error = new StringBuffer();
-									String line = chownBIS.readLine();
-									while (line != null) {
-										error.append(line).append("\n");
-										line = chownBIS.readLine();
-									}
-									throw new ExecutionException("Accumulation failed", new Exception(error.toString()));
-								}
-							} catch (IOException | SecurityException | ExecutionException e) {
-								System.err.println("[WARNING] Chown Failed.");
-								e.printStackTrace();
-							}
-						}
-					} else {
-						System.err.println("Aborting backup file create, move and chown.");
-					}*/
 					
 					// REMOVE BACKED UP RECORDS FROM SOURCE TABLES
 					
@@ -670,8 +547,8 @@ public class SiphonWorker implements Callable<Boolean> {
 									try {
 										connect = database.connect();
 									
-										PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.GENERAL_DELETE,
-												table));
+										PreparedStatement checkSize = connect.prepareStatement(
+												String.format(SiphonConnection.GENERAL_DELETE, table));
 										checkSize.setInt(1, maxGrab);
 										if (siphon.isDebug()) System.out.println(checkSize);
 										int size = checkSize.executeUpdate();
@@ -818,6 +695,9 @@ public class SiphonWorker implements Callable<Boolean> {
 		return Boolean.TRUE;
 	}
 	
+	/**
+	 * Gets a timestamp associated with a specific sequence within dev_player
+	 **/
 	public long getTime(long ID, SiphonConnection connect) throws SQLException {
 		PreparedStatement eventtime = connect.prepareStatement(SiphonConnection.SAMPLE_DATE);
 		eventtime.setLong(1, ID);

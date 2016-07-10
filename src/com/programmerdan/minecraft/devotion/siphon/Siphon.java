@@ -44,15 +44,10 @@ public class Siphon {
 	private Integer fuzz;
 	private Integer buffer;
 	private String targetFolderString;
-	//private File targetFolder;
 	private String tmpFolderString;
-	//private File tmpFolder;
 	private String databaseTmpFolderString;
-	//private File databaseTmpFolder;
 	private String targetOwner;
-	private String commandAccumulate;
-	private String commandMove;
-	private String commandChown;
+	private Boolean wrapAccumulate;
 	private boolean active;
 	private boolean attached;
 	private boolean runWorker = false;
@@ -106,29 +101,14 @@ public class Siphon {
 		this.concurrency = (Integer) this.config.get("concurrency");
 		// Where to put the file.
 		this.targetFolderString = (String) this.config.get("targetFolder");
-		/*this.targetFolder = new File(this.targetFolderString);
-		if (!this.targetFolder.isDirectory()) {
-			throw new SiphonFailure("Target folder provided either isn't a folder or doesn't exist.");
-		}*/
 		// Where to stage the file.
 		this.tmpFolderString = (String) this.config.get("tmpFolder");
-		/*this.tmpFolder = new File(this.tmpFolderString);
-		if (!this.tmpFolder.isDirectory()) {
-			throw new SiphonFailure("Temporary folder provided either isn't a folder or doesn't exist.");
-		}*/
+		// Wrap tar with su -c?
+		this.wrapAccumulate = (Boolean) this.config.get("wrapAccumulate");
+		System.out.println("Wrapping accumulate with su -c to handle Java's weird shell invocation stuff");
 		
 		this.targetOwner = (String) this.config.get("targetOwner");
 		System.out.println("Owner of backups set to " + targetOwner);
-		
-		this.commandAccumulate = this.config.containsKey("commandAccumulate") ? (String) this.config.get("commandAccumulate") : SiphonWorker.ACCUMULATE;
-		System.out.println("Accumulate set to " + commandAccumulate);
-
-		this.commandMove = this.config.containsKey("commandMove") ? (String) this.config.get("commandMove") : SiphonWorker.MOVE;
-		System.out.println("Move set to " + commandMove);
-
-		this.commandChown = this.config.containsKey("commandChown") ? (String) this.config.get("commandChown") : SiphonWorker.CHOWN;
-		System.out.println("Chown set to " + commandChown);
-
 		
 		if (this.slices == null || this.slices < 0) {
 			throw new SiphonFailure("'slices' must be present and non-negative");
@@ -299,16 +279,8 @@ public class Siphon {
 		return this.targetOwner;
 	}
 	
-	public String getCommandAccumulate() {
-		return this.commandAccumulate;
-	}
-	
-	public String getCommandMove() {
-		return this.commandMove;
-	}
-	
-	public String getCommandChown() {
-		return this.commandChown;
+	public boolean getWrapAccumulate() {
+		return this.wrapAccumulate == null ? false : this.wrapAccumulate;
 	}
 	
 	public int getCheckDelay() {

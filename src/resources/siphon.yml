@@ -12,13 +12,8 @@ attached: true
 targetFolder: /backups/
 # Where for SQL to create backup files. Include trailing path separators.
 tmpFolder: /tmp/
-# Optional: Include comparable directives for tarballing, moving, and chowning.
-commandAccumulate: "tar --remove-files -czvf %1$sdev_tracks_%2$s.tar.gz %1$sdev_*.dat"
-# %1$s - temp folder, %2$s - datetime
-commandMove: "mv %1$sdev_tracks_%2$s.tar.gz %3$s"
-# %1$s - temp folder, %2$s - datetime, %3$s - deposit folder
-commandChown: "chown %1$s %3$sdev_tracks_%2$s.tar.gz"
-# %1$s - name:name permission , %2$s - datetime, %3$s - deposit folder
+# Optional: wrap the accumulate command (tar) with 'su -c'. Set to false for Windows systems, true for *nix systems as appropriate.
+wrapAccumulate: true
 # The user who should wind up owning the backups. It should be the same user as Siphon is run under.
 # Make sure this user has permission to chown files created by the database.
 targetOwner: devotion
