@@ -50,6 +50,9 @@ public class Siphon {
 	private String databaseTmpFolderString;
 	//private File databaseTmpFolder;
 	private String targetOwner;
+	private String commandAccumulate;
+	private String commandMove;
+	private String commandChown;
 	private boolean active;
 	private boolean attached;
 	private boolean runWorker = false;
@@ -116,7 +119,17 @@ public class Siphon {
 		
 		this.targetOwner = (String) this.config.get("targetOwner");
 		System.out.println("Owner of backups set to " + targetOwner);
+		
+		this.commandAccumulate = this.config.containsKey("commandAccumulate") ? (String) this.config.get("commandAccumulate") : SiphonWorker.ACCUMULATE;
+		System.out.println("Accumulate set to " + commandAccumulate);
 
+		this.commandMove = this.config.containsKey("commandMove") ? (String) this.config.get("commandMove") : SiphonWorker.MOVE;
+		System.out.println("Move set to " + commandMove);
+
+		this.commandChown = this.config.containsKey("commandChown") ? (String) this.config.get("commandChown") : SiphonWorker.CHOWN;
+		System.out.println("Chown set to " + commandChown);
+
+		
 		if (this.slices == null || this.slices < 0) {
 			throw new SiphonFailure("'slices' must be present and non-negative");
 		}
@@ -284,6 +297,18 @@ public class Siphon {
 	
 	public String getTargetOwner() {
 		return this.targetOwner;
+	}
+	
+	public String getCommandAccumulate() {
+		return this.commandAccumulate;
+	}
+	
+	public String getCommandMove() {
+		return this.commandMove;
+	}
+	
+	public String getCommandChown() {
+		return this.commandChown;
 	}
 	
 	public int getCheckDelay() {
