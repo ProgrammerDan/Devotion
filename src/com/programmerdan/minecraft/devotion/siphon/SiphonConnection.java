@@ -38,11 +38,16 @@ public class SiphonConnection {
 	public static final String GET_SLICE_TABLE = "CREATE TABLE IF NOT EXISTS slicetable (trace_id VARCHAR(36) NOT NULL, dev_player_id BIGINT NOT NULL) SELECT trace_id, dev_player_id FROM dev_player WHERE dev_player_id <= ?";
 	public static final String REMOVE_SLICE_TABLE = "DROP TABLE IF EXISTS slicetable";
 	public static final String ADD_SLICE_INDEX = "CREATE INDEX IF NOT EXISTS slice_table_idx ON slicetable (trace_id, dev_player_id)";
-	public static final String FILE_SELECT = "CREATE TABLE slicedump SELECT * FROM %1$s WHERE trace_id IN (SELECT trace_id FROM slicetable) LIMIT ? ";
-	public static final String FILE_DUMP = "SELECT * FROM slicedump WHERE INTO OUTFILE '%3$s%1$s_%2$s.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n'";
-	public static final String FILE_CLEANUP = "DROP TABLE IF EXISTS slicedump";
-	public static final String GENERAL_DELETE = "DELETE FROM %1$s WHERE trace_id IN (SELECT trace_id FROM slicetable) LIMIT ?";
 
+	public static final String SLICE_DUMP_NAME = "slicedump_%1$s";
+	public static final String FILE_SELECT = "CREATE TABLE slicedump_%1$s SELECT * FROM %1$s WHERE %1$s_id < (SELECT MIN(%1$s_id) + ? FROM %1$s)";
+	public static final String FILE_INDEX = "CREATE INDEX slicedump_%1$s_idx ON slicedump_%1$s (trace_id, %1$s_id)";
+	public static final String FILE_SHRINK = "DELETE FROM slicedump_%1$s WHERE trace_id NOT IN (SELECT trace_id FROM slicetable)";
+	public static final String FILE_DUMP = "SELECT * FROM slicedump_%1$s INTO OUTFILE '%3$s%1$s_%2$s.dat' FIELDS TERMINATED BY \";\" OPTIONALLY ENCLOSED BY '\"' LINES TERMINATED BY '\\n'";
+
+	public static final String GENERAL_DELETE = "DELETE FROM %1$s WHERE %1$s_id IN (SELECT %1$s_id FROM slicedump_%1$s) LIMIT ? ";
+	public static final String FILE_CLEANUP = "DROP TABLE IF EXISTS slicedump_%1$s";
+	public static final String FILE_REMOVE_INDEX = "DROP INDEX IF EXISTS slicedump_%1$s_idx ON slicedump_%1$s";
 
 	public SiphonConnection(Connection connection) {
 		this.connection = connection;

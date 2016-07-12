@@ -1,8 +1,6 @@
 package com.programmerdan.minecraft.devotion.siphon;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,13 +28,6 @@ public class SiphonWorker implements Callable<Boolean> {
 	private long sliceLength;
 	private long fuzz;
 	private long minBuffer;
-
-	public static final String ACCUMULATE = "tar --remove-files -czvf %1$sdev_tracks_%2$s.tar.gz %1$sdev_*.dat";
-	// 1 - temp folder, 2 - datetime
-	public static final String MOVE = "mv %1$sdev_tracks_%2$s.tar.gz %3$s";
-	// 1 - temp folder, 2 - datetime, 3 - deposit folder
-	public static final String CHOWN = "chown %1$s %3$sdev_tracks_%2$s.tar.gz";
-	// 1 - name:name permission , 2 - datetime, 3 - deposit folder
 
 	private static final String[] TABLES = new String[] {
 		"dev_block_break",
@@ -331,27 +322,81 @@ public class SiphonWorker implements Callable<Boolean> {
 								try {
 									connect = database.connect();
 									
-									PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.FILE_SELECT,
-											table, targetSliceTimeString, siphon.getDatabaseTmpFolder()));
-									checkSize.setInt(1, maxGrab);
+									if (connect.checkTableExists(String.format(SiphonConnection.SLICE_DUMP_NAME, table))){
+										PreparedStatement cleanSize = connect.prepareStatement(String.format(SiphonConnection.FILE_CLEANUP, table));
+										if (siphon.isDebug()) {
+											System.out.println(cleanSize);
+										} else {
+											System.out.println("Temp table previously existed, cleaning up " + table);
+										}
+										cleanSize.execute();
+									}
+									
+									PreparedStatement selectSize = connect.prepareStatement(String.format(SiphonConnection.FILE_SELECT, table));
+									selectSize.setInt(1, maxGrab);
 									if (siphon.isDebug()) {
-										System.out.println(checkSize);
+										System.out.println(selectSize);
 									} else {
 										System.out.println("Getting records for " + table);
 									}
-									checkSize.execute();
-									int size = checkSize.getUpdateCount();
+									selectSize.execute();
+									int size = selectSize.getUpdateCount();
 									if (size > 0) {
-										System.out.println("Found " + size + " records for " + table + " and saved them to tmp");
+										System.out.println("Staging " + size + " records for " + table);
+									} else {
+										System.out.println("No records found within the range for " + table);
+									}
+									SQLWarning warn = selectSize.getWarnings();
+									while (warn != null) {
+										System.out.println("[WARNING] " + warn.getLocalizedMessage());
+										warn = warn.getNextWarning();
+									}
+									selectSize.close();
+									
+									if (size <= 0) {
+										return size;
+									}
+									
+									PreparedStatement addIndex = connect.prepareStatement(String.format(SiphonConnection.FILE_INDEX, table));
+									addIndex.execute();
+									addIndex.close();
+									
+									PreparedStatement shrink = connect.prepareStatement(String.format(SiphonConnection.FILE_SHRINK, table));
+									shrink.execute();
+									int nsize = shrink.getUpdateCount();
+									if (nsize > 0) {
+										System.out.println("Shrinking stage by " + nsize + " records for " + table);
+									} else {
+										System.out.println("Keeping prior size for " + table);
+									}
+									warn = shrink.getWarnings();
+									while (warn != null) {
+										System.out.println("[WARNING] " + warn.getLocalizedMessage());
+										warn = warn.getNextWarning();
+									}
+									shrink.close();
+
+									PreparedStatement dumpSize = connect.prepareStatement(String.format(SiphonConnection.FILE_DUMP,
+											table, targetSliceTimeString, siphon.getDatabaseTmpFolder()));
+									if (siphon.isDebug()) {
+										System.out.println(dumpSize);
+									} else {
+										System.out.println("Exporting records for " + table);
+									}
+									dumpSize.execute();
+									size = dumpSize.getUpdateCount();
+									if (size > 0) {
+										System.out.println("Saved " + size + " records from " + table + " to tmp");
 									} else {
 										System.out.println("No records found within the range for " + table + " while saving to tmp");
 									}
-									SQLWarning warn = checkSize.getWarnings();
+									warn = dumpSize.getWarnings();
 									while (warn != null) {
 										System.out.println("[WARNING] " + warn.getLocalizedMessage());
-										warn = checkSize.getWarnings();
+										warn = warn.getNextWarning();
 									}
-									
+									dumpSize.close();
+
 									return size;
 								} catch (SQLException sqe) {
 									throw new Exception("Error in query for " + table + " while saving to tmp", sqe);
@@ -561,6 +606,35 @@ public class SiphonWorker implements Callable<Boolean> {
 										} else {
 											System.out.println("No records deleted within the range for " + table);
 										}
+										SQLWarning warn = checkSize.getWarnings();
+										while (warn != null) {
+											System.out.println("[WARNING] " + warn.getLocalizedMessage());
+											warn = warn.getNextWarning();
+										}
+										checkSize.close();
+
+										PreparedStatement removSize = connect.prepareStatement(String.format(SiphonConnection.FILE_REMOVE_INDEX, table));
+										if (siphon.isDebug()) {
+											System.out.println(removSize);
+										} else {
+											System.out.println("Cleaning up index for " + table);
+										}
+										removSize.execute();
+										removSize.close();
+										
+										PreparedStatement cleanSize = connect.prepareStatement(String.format(SiphonConnection.FILE_CLEANUP, table));
+										if (siphon.isDebug()) {
+											System.out.println(cleanSize);
+										} else {
+											System.out.println("Cleaning up temp records for " + table);
+										}
+										cleanSize.execute();
+										warn = cleanSize.getWarnings();
+										while (warn != null) {
+											System.out.println("[WARNING] " + warn.getLocalizedMessage());
+											warn = warn.getNextWarning();
+										}
+										cleanSize.close();
 										
 										return size;
 									} catch (SQLException sqe) {
@@ -580,6 +654,9 @@ public class SiphonWorker implements Callable<Boolean> {
 							allDone = true;
 							for (Future<Integer> future : futures.keySet()) {
 								if (!future.isDone()) {
+									allDone = false;
+									break;
+								} else {
 									if (!futures.get(future)) { // only print out error once.
 										futures.put(future, true);
 										try {
