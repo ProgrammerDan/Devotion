@@ -334,7 +334,11 @@ public class SiphonWorker implements Callable<Boolean> {
 									PreparedStatement checkSize = connect.prepareStatement(String.format(SiphonConnection.FILE_SELECT,
 											table, targetSliceTimeString, siphon.getDatabaseTmpFolder()));
 									checkSize.setInt(1, maxGrab);
-									if (siphon.isDebug()) System.out.println(checkSize);
+									if (siphon.isDebug()) {
+										System.out.println(checkSize);
+									} else {
+										System.out.println("Getting records for " + table);
+									}
 									checkSize.execute();
 									int size = checkSize.getUpdateCount();
 									if (size > 0) {
